@@ -333,12 +333,13 @@
     }
 
     function resetFullProgress() {
-        if(confirm("Tem certeza que deseja limpar todo o seu progresso?")) {
-            localStorage.removeItem(STORAGE_KEY);
-            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
-            quizState.currentIndex = 0;
-            changeApplicationView('practice');
-        }
+        // Removido o confirm() letal. O reset é imediato.
+        localStorage.removeItem(STORAGE_KEY);
+        quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+        quizState.currentIndex = 0;
+        const btnResume = document.getElementById('btnResumeQuiz');
+        if(btnResume) btnResume.style.display = 'none';
+        changeApplicationView('practice');
     }
 
     function initializeSearch() {
@@ -468,8 +469,7 @@
     }
 
     function finishQuiz() {
-        const unans = quizState.userAnswers.filter(a => a === null).length;
-        if (unans > 0 && !confirm(`Existem ${unans} questões sem resposta. Deseja terminar mesmo assim?`)) return;
+        // Removida a verificação com confirm() que paralisava o motor no iframe.
         stopSuccessAnimation();
         const correct = quizState.userAnswers.filter((a, i) => a === questionsDatabase[i].correctIndex).length;
         const total = questionsDatabase.length;
