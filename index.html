@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Índice Geral - Química Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            --white: #FFFFFF;
+
+            /* Cores das Categorias - Tema Química */
+            --color-materia: #008080; /* Teal/Azul Petróleo */
+            --bg-materia: #B2DFDB;
+            
+            --color-atomo: #673AB7; /* Roxo */
+            --bg-atomo: #D1C4E9;
+            
+            --color-tabela: #E65100; /* Laranja Escuro */
+            --bg-tabela: #FFE0B2;
+
+            --color-ligacoes: #2E7D32; /* Verde Escuro */
+            --bg-ligacoes: #C8E6C9;
+
+            --color-funcoes: #C2185B; /* Rosa Escuro/Magenta */
+            --bg-funcoes: #F8BBD0;
+
+            --color-reacoes: #FBC02D; /* Amarelo/Mostarda */
+            --bg-reacoes: #FFF9C4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* --- HEADER (LOGO AUMENTADA) --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 30px 0 20px 0; 
+        }
+        .logo-img {
+            max-height: 130px; 
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            text-align: center;
+            font-weight: 900;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .subtitle {
+            text-align: center;
+            color: #555;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        /* --- BARRA DE PESQUISA --- */
+        .search-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            background-color: var(--white);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .search-input:focus {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+
+        /* --- BADGES DE CATEGORIA --- */
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .badge {
+            padding: 8px 16px;
+            color: white;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+        }
+        .badge-materia { background-color: var(--color-materia); }
+        .badge-atomo { background-color: var(--color-atomo); }
+        .badge-tabela { background-color: var(--color-tabela); }
+        .badge-ligacoes { background-color: var(--color-ligacoes); }
+        .badge-funcoes { background-color: var(--color-funcoes); }
+        .badge-reacoes { background-color: var(--color-reacoes); color: #000; } /* Letra preta para contraste no amarelo */
+
+        /* --- BOTÕES DOS TÓPICOS (CARACTERIZADOS) --- */
+        .topic-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 16px 20px;
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 4px 4px 0px var(--border-color);
+            transition: all 0.1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--border-color);
+            background-color: #FAFAFA;
+        }
+
+        .topic-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+
+        /* A Borda Lateral Colorida (Característica) */
+        .topic-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            border-right: 2px solid var(--border-color);
+        }
+
+        /* Cores das laterais por categoria */
+        .btn-materia::before { background-color: var(--bg-materia); }
+        .btn-atomo::before { background-color: var(--bg-atomo); }
+        .btn-tabela::before { background-color: var(--bg-tabela); }
+        .btn-ligacoes::before { background-color: var(--bg-ligacoes); }
+        .btn-funcoes::before { background-color: var(--bg-funcoes); }
+        .btn-reacoes::before { background-color: var(--bg-reacoes); }
+
+        .arrow { font-weight: 900; color: #CBD5E0; }
+        .topic-btn:hover .arrow { color: var(--text-color); }
+
+        /* Mensagem de Não Encontrado */
+        #no-results {
+            text-align: center;
+            color: #888;
+            margin-top: 30px;
+            font-weight: 600;
+            display: none;
+        }
+
+        footer {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <!-- Substitua pelo caminho real da logo de química se houver uma específica -->
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        <h1>Índice Geral Química</h1>
+        <p class="subtitle">Foco Estratégico IFCE</p>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar qualquer conteúdo...">
+        </div>
+
+        <!-- MÓDULO 1: INTRODUÇÃO E MATÉRIA -->
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-materia">🧪 Introdução e Matéria</span></div>
+            <a href="propriedades-materia.html" class="topic-btn btn-materia">Propriedades Gerais e Específicas <span class="arrow">➜</span></a>
+            <a href="estados-fisicos.html" class="topic-btn btn-materia">Estados Físicos e Mudanças de Fase <span class="arrow">➜</span></a>
+            <a href="substancias-misturas.html" class="topic-btn btn-materia">Substâncias Puras e Misturas <span class="arrow">➜</span></a>
+            <a href="separacao-misturas.html" class="topic-btn btn-materia">Métodos de Separação de Misturas <span class="arrow">➜</span></a>
+        </div>
+
+        <!-- MÓDULO 2: O ÁTOMO -->
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-atomo">⚛️ Estrutura Atômica</span></div>
+            <a href="modelos-atomicos.html" class="topic-btn btn-atomo">Modelos Atômicos: Dalton a Bohr <span class="arrow">➜</span></a>
+            <a href="particulas-fundamentais.html" class="topic-btn btn-atomo">Prótons, Nêutrons, Elétrons e Massa <span class="arrow">➜</span></a>
+            <a href="formacao-ions.html" class="topic-btn btn-atomo">Íons: Cátions e Ânions <span class="arrow">➜</span></a>
+            <a href="semelhancas-atomicas.html" class="topic-btn btn-atomo">Isótopos, Isóbaros e Isótonos <span class="arrow">➜</span></a>
+        </div>
+
+        <!-- MÓDULO 3: TABELA PERIÓDICA -->
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-tabela">📊 Tabela Periódica</span></div>
+            <a href="organizacao-tabela.html" class="topic-btn btn-tabela">Organização: Famílias e Períodos <span class="arrow">➜</span></a>
+            <a href="classificacao-elementos.html" class="topic-btn btn-tabela">Metais, Ametais e Gases Nobres <span class="arrow">➜</span></a>
+            <a href="propriedades-periodicas.html" class="topic-btn btn-tabela">Propriedades e Tendências Básicas <span class="arrow">➜</span></a>
+        </div>
+
+        <!-- MÓDULO 4: LIGAÇÕES QUÍMICAS -->
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-ligacoes">🔗 Ligações Químicas</span></div>
+            <a href="regra-octeto.html" class="topic-btn btn-ligacoes">A Regra do Octeto e Estabilidade <span class="arrow">➜</span></a>
+            <a href="ligacao-ionica.html" class="topic-btn btn-ligacoes">Ligação Iônica (Transferência) <span class="arrow">➜</span></a>
+            <a href="ligacao-covalente.html" class="topic-btn btn-ligacoes">Ligação Covalente (Compartilhamento) <span class="arrow">➜</span></a>
+            <a href="ligacao-metalica.html" class="topic-btn btn-ligacoes">Ligação Metálica (Mar de Elétrons) <span class="arrow">➜</span></a>
+        </div>
+
+        <!-- MÓDULO 5: FUNÇÕES INORGÂNICAS -->
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-funcoes">⚗️ Funções Inorgânicas</span></div>
+            <a href="teoria-arrhenius.html" class="topic-btn btn-funcoes">Conceito de Arrhenius (Ionização e Dissociação) <span class="arrow">➜</span></a>
+            <a href="acidos-bases.html" class="topic-btn btn-funcoes">Ácidos e Bases (Características e Nomenclatura) <span class="arrow">➜</span></a>
+            <a href="sais-oxidos.html" class="topic-btn btn-funcoes">Sais e Óxidos (Aplicações no Cotidiano) <span class="arrow">➜</span></a>
+            <a href="escala-ph.html" class="topic-btn btn-funcoes">Escala de pH e Indicadores Ácido-Base <span class="arrow">➜</span></a>
+        </div>
+
+        <!-- MÓDULO 6: REAÇÕES QUÍMICAS -->
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-reacoes">💥 Reações e Leis Ponderais</span></div>
+            <a href="tipos-reacoes.html" class="topic-btn btn-reacoes">Tipos: Síntese, Análise, Simples e Dupla Troca <span class="arrow">➜</span></a>
+            <a href="leis-ponderais.html" class="topic-btn btn-reacoes">Leis de Lavoisier (Massa) e Proust (Proporção) <span class="arrow">➜</span></a>
+            <a href="balanceamento.html" class="topic-btn btn-reacoes">Balanceamento de Equações (Método das Tentativas) <span class="arrow">➜</span></a>
+        </div>
+
+        <div id="no-results">
+            <p>😕 Nenhum tópico encontrado com esse nome.</p>
+        </div>
+
+    </div>
+
+    <footer>
+        © 2026 Promover Educação
+    </footer>
+
+    <script>
+        // Lógica de Pesquisa com normalização de acentos (mantida idêntica)
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        searchInput.addEventListener('keyup', function(e) {
+            const term = e.target.value.toLowerCase();
+            // Normaliza o termo de busca (remove acentos)
+            const termNormalized = term.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleGroups = 0;
+
+            contentGroups.forEach(group => {
+                const links = group.querySelectorAll('.topic-btn');
+                let hasVisibleLink = false;
+
+                links.forEach(link => {
+                    const text = link.textContent.toLowerCase();
+                    // Normaliza o texto do link (remove acentos)
+                    const textNormalized = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    
+                    if (textNormalized.includes(termNormalized)) {
+                        link.style.display = 'flex';
+                        hasVisibleLink = true;
+                    } else {
+                        link.style.display = 'none';
+                    }
+                });
+
+                if (hasVisibleLink) {
+                    group.style.display = 'block';
+                    totalVisibleGroups++;
+                } else {
+                    group.style.display = 'none';
+                }
+            });
+
+            if (totalVisibleGroups === 0) {
+                noResultsMsg.style.display = 'block';
+            } else {
+                noResultsMsg.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
