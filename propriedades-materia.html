@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Propriedades da Matéria - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: QUÍMICA (Azul Petróleo / Teal) --- */
+        :root {
+            --bg-color: #F0FDFA; /* Fundo Teal muito claro */
+            --text-color: #134E4A; /* Teal quase preto */
+            --border-color: #042F2E; /* Contorno escuro asfalto */
+            --white: #FFFFFF;
+            
+            --theme-light: #CCFBF1; /* Teal pastel */
+            --theme-medium: #14B8A6; /* Teal vivo */
+            --theme-dark: #0F766E; /* Teal profundo */
+            --theme-contrast: #F59E0B; /* Âmbar (Atenção/Destaque) */
+            --theme-accent: #E11D48; /* Rosa/Vermelho para alertas */
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            /* Padrão pontilhado sutil (estilo laboratório) */
+            background-image: radial-gradient(var(--theme-medium) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: var(--bg-color);
+        }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        /* --- NAVEGAÇÃO --- */
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        /* --- PESQUISA --- */
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        /* --- TEORIA --- */
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .theory-box h4 { font-size: 1.1rem; font-weight: 800; color: var(--text-color); margin-top: 10px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; }
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: var(--theme-dark); font-weight: 700; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.teal { background-color: #F0FDFA; border-left-color: #0D9488; color: #115E59; }
+
+        /* --- BOTÕES GERAIS --- */
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        /* --- QUIZ UI --- */
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        /* --- FEEDBACK DA QUESTÃO --- */
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        /* --- RESULTADOS --- */
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        /* --- RODAPÉ DE NAVEGAÇÃO --- */
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">💧</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Propriedades da Matéria</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <!-- VISTA: TEORIA -->
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito... (ex: Massa, Densidade, Inércia)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🧱 1. Matéria, Corpo e Objeto</div>
+                <article class="theory-box search-target">
+                    <h3>O que compõe o Universo?</h3>
+                    <p>O universo é formado por Matéria e Energia. A <strong>Matéria</strong> é tudo aquilo que tem massa e ocupa lugar no espaço (volume). Até o ar invisível que respiras é matéria!</p>
+                    
+                    <div class="visual-area">
+                        <svg width="280" height="100" viewBox="0 0 280 100">
+                            <!-- Árvore (Matéria) -->
+                            <rect x="25" y="50" width="10" height="30" fill="#78350F" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="30" cy="40" r="20" fill="#10B981" stroke="#042F2E" stroke-width="2"/>
+                            <text x="30" y="95" text-anchor="middle" font-size="10" font-weight="bold" fill="#042F2E">Matéria</text>
+                            
+                            <path d="M 65 50 L 85 50 L 80 45 M 85 50 L 80 55" fill="none" stroke="#042F2E" stroke-width="2"/>
+
+                            <!-- Tronco (Corpo) -->
+                            <rect x="100" y="45" width="40" height="15" rx="2" fill="#D97706" stroke="#042F2E" stroke-width="2"/>
+                            <ellipse cx="100" cy="52.5" rx="5" ry="7.5" fill="#FCD34D" stroke="#042F2E" stroke-width="2"/>
+                            <text x="120" y="95" text-anchor="middle" font-size="10" font-weight="bold" fill="#042F2E">Corpo</text>
+                            
+                            <path d="M 160 50 L 180 50 L 175 45 M 180 50 L 175 55" fill="none" stroke="#042F2E" stroke-width="2"/>
+
+                            <!-- Cadeira (Objeto) -->
+                            <line x1="210" y1="30" x2="210" y2="70" stroke="#B45309" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="210" y1="50" x2="230" y2="50" stroke="#B45309" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="230" y1="50" x2="230" y2="70" stroke="#B45309" stroke-width="3" stroke-linecap="round"/>
+                            <text x="220" y="95" text-anchor="middle" font-size="10" font-weight="bold" fill="#042F2E">Objeto</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Matéria:</strong> É o material bruto da natureza (Ex: Ouro, Madeira, Vidro).</li>
+                        <li><strong>Corpo:</strong> É uma porção limitada de matéria, sem uso específico (Ex: Um tronco de árvore caído, uma barra de ouro).</li>
+                        <li><strong>Objeto:</strong> É um corpo fabricado para ter utilidade para o Homem (Ex: Uma cadeira de madeira, um anel de ouro).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🌐 2. Propriedades Gerais</div>
+                <article class="theory-box search-target">
+                    <h3>Aquilo que TODOS têm</h3>
+                    <p>São as características que <strong>toda</strong> e qualquer matéria tem, independentemente de ser água, ferro ou plástico. Estas propriedades <strong>não</strong> servem para identificar de que material uma coisa é feita.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="450" height="150" viewBox="0 0 400 150">
+                            <!-- ================= SERINGA 1: NORMAL ================= -->
+                            <!-- Dedo/Rolha -->
+                            <rect x="170" y="40" width="8" height="20" rx="3" fill="#FCA5A5" stroke="#042F2E" stroke-width="2"/>
+                            <!-- Corpo Seringa -->
+                            <rect x="60" y="30" width="100" height="40" fill="#CCFBF1" stroke="#042F2E" stroke-width="2" fill-opacity="0.5"/>
+                            <!-- Bico -->
+                            <polygon points="160,40 170,45 170,55 160,60" fill="#CCFBF1" stroke="#042F2E" stroke-width="2"/>
+                            <!-- Êmbolo (Puxado para trás) -->
+                            <rect x="20" y="45" width="40" height="10" fill="#9CA3AF" stroke="#042F2E" stroke-width="2"/>
+                            <rect x="60" y="30" width="8" height="40" fill="#4B5563" stroke="#042F2E" stroke-width="2"/>
+                            
+                            <!-- 12 Partículas de Ar bem espalhadas -->
+                            <circle cx="75" cy="50" r="2.5" fill="#0F766E"/>
+                            <circle cx="85" cy="38" r="2.5" fill="#0F766E"/>
+                            <circle cx="95" cy="62" r="2.5" fill="#0F766E"/>
+                            <circle cx="110" cy="45" r="2.5" fill="#0F766E"/>
+                            <circle cx="120" cy="55" r="2.5" fill="#0F766E"/>
+                            <circle cx="130" cy="35" r="2.5" fill="#0F766E"/>
+                            <circle cx="140" cy="60" r="2.5" fill="#0F766E"/>
+                            <circle cx="150" cy="48" r="2.5" fill="#0F766E"/>
+                            <circle cx="80" cy="60" r="2.5" fill="#0F766E"/>
+                            <circle cx="105" cy="35" r="2.5" fill="#0F766E"/>
+                            <circle cx="135" cy="45" r="2.5" fill="#0F766E"/>
+                            <circle cx="155" cy="38" r="2.5" fill="#0F766E"/>
+
+                            <!-- Legenda 1 -->
+                            <text x="100" y="105" font-size="12" font-weight="900" fill="#0F766E" text-anchor="middle">Ar Normal</text>
+                            <text x="100" y="125" font-size="10" font-weight="600" fill="#134E4A" text-anchor="middle">Partículas com muito</text>
+                            <text x="100" y="140" font-size="10" font-weight="600" fill="#134E4A" text-anchor="middle">espaço vazio entre elas.</text>
+
+                            <!-- ================= SETA DE TRANSIÇÃO ================= -->
+                            <path d="M 190 50 L 210 50 M 205 45 L 210 50 L 205 55" fill="none" stroke="#F59E0B" stroke-width="3"/>
+                            
+                            <!-- ================= SERINGA 2: COMPRIMIDA ================= -->
+                            <!-- Dedo/Rolha -->
+                            <rect x="370" y="40" width="8" height="20" rx="3" fill="#FCA5A5" stroke="#042F2E" stroke-width="2"/>
+                            <!-- Corpo Seringa -->
+                            <rect x="260" y="30" width="100" height="40" fill="#CCFBF1" stroke="#042F2E" stroke-width="2" fill-opacity="0.5"/>
+                            <!-- Bico -->
+                            <polygon points="360,40 370,45 370,55 360,60" fill="#CCFBF1" stroke="#042F2E" stroke-width="2"/>
+                            <!-- Êmbolo (Empurrado) -->
+                            <rect x="220" y="45" width="100" height="10" fill="#9CA3AF" stroke="#042F2E" stroke-width="2"/>
+                            <rect x="320" y="30" width="8" height="40" fill="#4B5563" stroke="#042F2E" stroke-width="2"/>
+                            
+                            <!-- Seta de Força -->
+                            <path d="M 230 35 L 255 35 M 245 30 L 255 35 L 245 40" fill="none" stroke="#E11D48" stroke-width="3"/>
+                            <text x="242" y="25" font-size="10" font-weight="900" fill="#E11D48" text-anchor="middle">PRESSÃO</text>
+
+                            <!-- AS MESMAS 12 Partículas apertadas (Volume menor) -->
+                            <circle cx="330" cy="50" r="2.5" fill="#0F766E"/>
+                            <circle cx="335" cy="38" r="2.5" fill="#0F766E"/>
+                            <circle cx="340" cy="62" r="2.5" fill="#0F766E"/>
+                            <circle cx="345" cy="45" r="2.5" fill="#0F766E"/>
+                            <circle cx="350" cy="55" r="2.5" fill="#0F766E"/>
+                            <circle cx="355" cy="35" r="2.5" fill="#0F766E"/>
+                            <circle cx="328" cy="60" r="2.5" fill="#0F766E"/>
+                            <circle cx="338" cy="48" r="2.5" fill="#0F766E"/>
+                            <circle cx="342" cy="60" r="2.5" fill="#0F766E"/>
+                            <circle cx="348" cy="35" r="2.5" fill="#0F766E"/>
+                            <circle cx="332" cy="45" r="2.5" fill="#0F766E"/>
+                            <circle cx="352" cy="48" r="2.5" fill="#0F766E"/>
+
+                            <!-- Legenda 2 -->
+                            <text x="310" y="105" font-size="12" font-weight="900" fill="#E11D48" text-anchor="middle">Ar Comprimido</text>
+                            <text x="310" y="125" font-size="10" font-weight="600" fill="#134E4A" text-anchor="middle">A mesma matéria num</text>
+                            <text x="310" y="140" font-size="10" font-weight="600" fill="#134E4A" text-anchor="middle">volume muito menor.</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Massa e Volume:</strong> Toda a matéria pesa (massa) e ocupa espaço (volume).</li>
+                        <li><strong>Impenetrabilidade:</strong> Dois corpos não podem ocupar o mesmo lugar no espaço ao mesmo tempo. Se puseres gelo num copo cheio, a água transborda.</li>
+                        <li><strong>Compressibilidade:</strong> É a capacidade de diminuir o volume quando submetido a pressão. <em>Olha para a imagem acima:</em> Ao empurrares a seringa, tu não matas as partículas de ar; tu apenas as espremes no espaço vazio que existia entre elas. Os gases são altamente compressíveis.</li>
+                        <li><strong>Elasticidade:</strong> A capacidade da matéria voltar ao seu volume inicial quando a força de compressão acaba (se largares o êmbolo da seringa, o ar empurra-o de volta).</li>
+                        <li><strong>Inércia:</strong> A tendência da matéria de manter o seu estado (repouso ou movimento). É por isso que és projetado para a frente quando um carro trava bruscamente.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🎯 3. Propriedades Específicas</div>
+                <article class="theory-box search-target">
+                    <h3>A Impressão Digital da Matéria</h3>
+                    <p>Estas são as características que diferenciam uma substância da outra. Se te derem um pó branco sem rótulo, é com estas propriedades que vais descobrir se é sal ou açúcar.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="200" height="100" viewBox="0 0 200 100">
+                            <!-- Fogo (Combustão - Prop Química) -->
+                            <path d="M 90 90 Q 100 70 110 90 Q 100 100 90 90" fill="#F59E0B" stroke="#E11D48" stroke-width="2"/>
+                            <!-- Balão Fervendo (Ebulição - Prop Física) -->
+                            <path d="M 85 30 L 115 30 L 115 50 L 130 80 A 10 10 0 0 1 120 90 L 80 90 A 10 10 0 0 1 70 80 L 85 50 Z" fill="#CCFBF1" stroke="#042F2E" stroke-width="2"/>
+                            <!-- Bolhas -->
+                            <circle cx="95" cy="75" r="3" fill="#FFFFFF" stroke="#042F2E"/>
+                            <circle cx="105" cy="80" r="2" fill="#FFFFFF" stroke="#042F2E"/>
+                            <circle cx="100" cy="65" r="4" fill="#FFFFFF" stroke="#042F2E"/>
+                            <!-- Termómetro -->
+                            <rect x="97" y="10" width="6" height="60" rx="3" fill="#FFFFFF" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="100" cy="70" r="5" fill="#E11D48"/>
+                            <line x1="100" y1="70" x2="100" y2="40" stroke="#E11D48" stroke-width="2"/>
+                            <!-- Vapor -->
+                            <path d="M 90 20 Q 80 10 95 0" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-dasharray="2 2"/>
+                            <path d="M 110 20 Q 120 10 105 0" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-dasharray="2 2"/>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Propriedades Físicas:</strong>
+                            <ul>
+                                <li><strong>Ponto de Fusão (PF):</strong> Temperatura em que o sólido derrete e vira líquido (A água pura é a 0ºC).</li>
+                                <li><strong>Ponto de Ebulição (PE):</strong> Temperatura em que o líquido ferve e vira gás (A água pura é a 100ºC ao nível do mar).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Propriedades Organoléticas:</strong> São aquelas que impressionam os nossos 5 sentidos (Cor para a visão; Odor para o olfato; Sabor para o paladar; Textura para o tato).</li>
+                        <li><strong>Propriedades Químicas:</strong> Como o material reage com outros (Ex: o ferro sofre oxidação/ferrugem, a madeira sofre combustão/queima).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚖️ 4. A Densidade (O Segredo da Flutuação)</div>
+                <article class="theory-box search-target">
+                    <h3>O que pesa mais: 1kg de Chumbo ou 1kg de Algodão?</h3>
+                    <p>Pesam o mesmo (ambos têm 1kg de massa)! Mas o algodão ocupa uma sala inteira (volume gigantesco) e o chumbo cabe na tua mão (volume minúsculo). O chumbo é muito mais <strong>Denso</strong>.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="200" height="120" viewBox="0 0 200 120">
+                            <!-- Proveta -->
+                            <path d="M 70 20 L 70 100 A 10 10 0 0 0 80 110 L 120 110 A 10 10 0 0 0 130 100 L 130 20" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <ellipse cx="100" cy="20" rx="30" ry="5" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <!-- Óleo (Topo) -->
+                            <rect x="71.5" y="40" width="57" height="20" fill="#FCD34D"/>
+                            <text x="140" y="53" font-size="10" font-weight="bold" fill="#B45309">Óleo</text>
+                            <!-- Água (Meio) -->
+                            <rect x="71.5" y="60" width="57" height="20" fill="#3B82F6"/>
+                            <text x="140" y="73" font-size="10" font-weight="bold" fill="#1D4ED8">Água</text>
+                            <!-- Chumbo (Fundo) -->
+                            <path d="M 71.5 80 L 128.5 80 L 128.5 100 A 8.5 8.5 0 0 1 120 108.5 L 80 108.5 A 8.5 8.5 0 0 1 71.5 100 Z" fill="#9CA3AF"/>
+                            <circle cx="100" cy="95" r="6" fill="#4B5563" stroke="#042F2E" stroke-width="1"/>
+                            <text x="140" y="98" font-size="10" font-weight="bold" fill="#374151">Metal</text>
+                            <!-- Linhas separadoras -->
+                            <line x1="71.5" y1="40" x2="128.5" y2="40" stroke="#042F2E" stroke-width="2"/>
+                            <line x1="71.5" y1="60" x2="128.5" y2="60" stroke="#042F2E" stroke-width="2"/>
+                            <line x1="71.5" y1="80" x2="128.5" y2="80" stroke="#042F2E" stroke-width="2"/>
+                        </svg>
+                    </div>
+
+                    <div class="inline-example">
+                        Fórmula: <strong>d = m / V</strong><br>
+                        <span style="font-size:0.85rem; font-weight:500;">(Densidade = Massa a dividir pelo Volume)</span>
+                    </div>
+
+                    <div class="highlight-box teal">
+                        <strong>A Regra de Ouro da Flutuação:</strong><br>
+                        O que for MENOS denso <strong>flutua</strong> (vai para cima). O que for MAIS denso <strong>afunda</strong> (vai para baixo).<br>
+                        <em>Exemplo:</em> O óleo (d = 0,8 g/cm³) flutua em cima da água (d = 1,0 g/cm³) porque o óleo é menos denso.
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Progresso 🔄
+            </button>
+        </main>
+
+        <!-- VISTA: PRÁTICA (QUIZ) -->
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - IFCE</h2>
+                <p style="color: var(--theme-contrast); font-size: 0.95rem; font-weight:600;">
+                    30 questões de Química Básica. Acerta <strong>80% (24/30)</strong> para garantir a aprovação. O teu progresso fica salvo automaticamente!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <!-- VISTA: RESULTADOS -->
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Acertaste 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <!-- RODAPÉ DE NAVEGAÇÃO -->
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - QUÍMICA IFCE) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Tudo o que existe no universo e que os químicos estudam é essencialmente constituído por matéria ou energia. Na Física Clássica e Química, qual a definição de Matéria?", options: ["Tudo o que produz luz e calor no universo.", "Qualquer substância invisível aos olhos.", "Tudo aquilo que tem massa e ocupa lugar no espaço (tem volume).", "Tudo aquilo que pode ser destruído por reações químicas."], correctIndex: 2, explanation: { correctText: "A definição universal de matéria abrange desde um grão de areia até um planeta. Se tem massa (pesa) e tem volume (ocupa espaço), é matéria. O ar, por exemplo, é matéria.", otherOptions: ["A luz e o calor são formas de Energia, não de Matéria.", "Matéria não pode ser criada nem destruída (Lavoisier)."] } },
+        { level: "Médio", text: "Analise a seguinte sequência: I. Árvore na floresta; II. Prancha grossa de madeira cortada; III. Mesa de jantar. Na Química, como classificamos rigorosamente estes três elementos, respetivamente?", options: ["Matéria, Objeto e Corpo.", "Matéria, Corpo e Objeto.", "Objeto, Matéria e Corpo.", "Corpo, Corpo e Matéria."], correctIndex: 1, explanation: { correctText: "A árvore (madeira) é a MATÉRIA-prima. Quando tu cortas um pedaço delimitado sem fim específico (a prancha), tens um CORPO. Quando trabalhas esse corpo para lhe dar utilidade (uma mesa para comer), ele vira um OBJETO.", otherOptions: ["Não confunda a ordem lógica de fabrico."] } },
+        { level: "Fácil", text: "As propriedades que nos permitem dizer se um material é algodão, ferro ou água salgada são chamadas de Propriedades Específicas. E as propriedades que TODOS os materiais têm em comum chamam-se Propriedades Gerais. Qual das seguintes é uma Propriedade GERAL?", options: ["Ponto de Fusão", "Densidade", "Massa", "Cor"], correctIndex: 2, explanation: { correctText: "A Massa é uma propriedade Geral. Tanto a água como o ferro e o plástico têm massa. Por isso, a massa não te ajuda a adivinhar de que material é feita uma amostra misteriosa.", otherOptions: ["PF, Densidade e Cor são propriedades específicas (cada material tem a sua)."] } },
+        { level: "Médio", text: "Um aluno do IFCE tenta colocar mais roupas dentro de uma mala que já está completamente cheia. Para conseguir fechar o fecho, ele senta-se em cima da mala. Que propriedade geral da matéria ele utilizou no ar e nas roupas?", options: ["Elasticidade", "Divisibilidade", "Impenetrabilidade", "Compressibilidade"], correctIndex: 3, explanation: { correctText: "A compressibilidade é a capacidade que a matéria tem de diminuir o seu volume quando sujeita a uma pressão ou força externa. Os gases (o ar dentro da mala) são extremamente compressíveis.", otherOptions: ["A impenetrabilidade diz que dois corpos não ocupam o mesmo espaço (o ar teve de sair ou ser espremido)."] } },
+        { level: "Fácil", text: "Se estiveres a andar num autocarro a 80 km/h e o motorista travar bruscamente, o teu corpo é projetado para a frente. Que Propriedade Geral da Matéria explica a tua teimosia em continuar o movimento?", options: ["Inércia", "Gravidade", "Densidade", "Expansibilidade"], correctIndex: 0, explanation: { correctText: "A Inércia (1ª Lei de Newton) é a tendência que a matéria tem de manter o seu estado. Se estavas em movimento, o teu corpo 'quer' continuar em movimento, mesmo que o autocarro trave.", otherOptions: ["Gravidade empurra para o centro da Terra, não para a frente."] } },
+        { level: "Difícil", text: "A famosa experiência da seringa: Um aluno puxa o êmbolo de uma seringa vazia (enchendo-a de ar), tapa a ponta com o dedo e empurra o êmbolo. Ele consegue empurrá-lo até metade, mas não até ao fim. Depois repete o processo, mas enche a seringa com água. Ele não consegue empurrar o êmbolo quase nada. O que isto prova?", options: ["A água tem mais massa que o ar e anula a inércia.", "Os líquidos (água) têm compressibilidade quase nula em comparação com os gases (ar), e ambos respeitam a impenetrabilidade (a água não deixa o êmbolo ocupar o seu lugar).", "O ar não é matéria, mas a água é.", "A água evapora devido à pressão do dedo."], correctIndex: 1, explanation: { correctText: "O ar é um gás, logo as suas moléculas estão muito afastadas e podem ser apertadas (alta compressibilidade). A água é líquida, as moléculas já estão encostadas, logo o seu volume não diminui sob pressão manual (baixa compressibilidade). E como a água lá dentro é matéria, ela impede o êmbolo de descer (impenetrabilidade).", otherOptions: ["O ar É matéria, tem massa e ocupa espaço."] } },
+        { level: "Médio", text: "Ao observar um anel metálico abandonado num laboratório, um aluno nota que ele é amarelo e brilhante, deduzindo ser Ouro. Ele está a utilizar que tipo de Propriedade da Matéria para o seu palpite inicial?", options: ["Propriedades Químicas", "Propriedades Físicas Extensivas", "Propriedades Organoléticas", "Propriedades Gerais"], correctIndex: 2, explanation: { correctText: "As Propriedades Organoléticas (ou organolépticas) são as propriedades específicas que nós percebemos com os nossos sentidos (Olfato, Visão, Paladar, Tato). A cor 'amarelo brilhante' é percebida pela visão.", otherOptions: ["A reação a um ácido seria uma propriedade Química."] } },
+        { level: "Fácil", text: "Uma fábrica precisa separar barras de ferro (Ponto de Fusão = 1538ºC) misturadas com barras de estanho (Ponto de Fusão = 232ºC). O engenheiro decide aquecer o forno a 300ºC. O Ponto de Fusão é uma propriedade específica de que tipo?", options: ["Propriedade Química", "Propriedade Organolética", "Propriedade Física", "Propriedade Biolóxica"], correctIndex: 2, explanation: { correctText: "O Ponto de Fusão (temperatura em que passa de sólido para líquido) é uma Propriedade Física. A fusão não altera a estrutura química do estanho, ele continua a ser estanho, apenas mudou de estado físico.", otherOptions: ["Propriedades químicas envolvem reações que destroem a substância original (ex: queima, ferrugem)."] } },
+        { level: "Difícil", text: "Distingue o que é físico do que é químico! Assinala a única opção que descreve, pela ordem correta, uma propriedade Organolética, uma Física e uma Química da matéria.", options: ["Cor; Odor; Ponto de Ebulição.", "Combustibilidade; Densidade; Sabor.", "Brilho; Ponto de Fusão; Oxidação (Ferrugem).", "Inércia; Massa; Solubilidade."], correctIndex: 2, explanation: { correctText: "Brilho = Vês com os olhos (Organolética). Ponto de Fusão = Mudança de estado físico medida no termómetro (Física). Oxidação = O ferro reage com o oxigénio e vira outra substância (Química).", otherOptions: ["A opção 1 tem duas organoléticas.", "A opção 4 tem propriedades gerais."] } },
+        { level: "Médio", text: "A combustibilidade é uma propriedade específica muito importante. A gasolina queima facilmente no motor do carro, enquanto a água não. Isto significa que queimar (sofrer combustão) é uma:", options: ["Propriedade Física, porque altera a forma da gasolina.", "Propriedade Química, porque a gasolina reage com o oxigénio e transforma-se em gases diferentes (CO2 e H2O).", "Propriedade Geral, porque todos os líquidos evaporam.", "Propriedade Organolética térmica."], correctIndex: 1, explanation: { correctText: "Se ao final do processo a substância original já não existe e transformou-se numa substância nova, é um fenómeno Químico. A gasolina queimada desaparece para dar origem ao fumo (gases).", otherOptions: ["A evaporação pura seria física, mas a queima é sempre química."] } },
+        { level: "Fácil", text: "A Densidade Absoluta é a grandeza que relaciona a massa de um corpo com o seu volume. Qual é a fórmula matemática correta para calcular a densidade de um objeto?", options: ["Densidade = Massa + Volume", "Densidade = Volume / Massa", "Densidade = Massa × Volume", "Densidade = Massa / Volume (d = m/v)"], correctIndex: 3, explanation: { correctText: "A densidade (d) é a razão entre a Massa (m) que o corpo tem e o espaço/Volume (V) que ele ocupa. Memoriza: d = m / V.", otherOptions: ["Se o volume fosse o divisor invertido, corpos leves afundariam sempre."] } },
+        { level: "Médio", text: "Cálculo Rápido: Num laboratório do IFCE, os alunos pesaram um cubo de metal misterioso numa balança e viram que a sua Massa era de 200 gramas. A seguir, com uma régua, calcularam o Volume do cubo como sendo 25 cm³. Qual é a Densidade do metal?", options: ["8 g/cm³", "5.000 g/cm³", "0,125 g/cm³", "175 g/cm³"], correctIndex: 0, explanation: { correctText: "Aplicando a fórmula: Densidade = Massa / Volume. d = 200g / 25cm³. A densidade é de 8 gramas por centímetro cúbico (8 g/cm³).", otherOptions: ["Se multiplicares, obténs 5000, o que é um erro de aplicação da fórmula."] } },
+        { level: "Difícil", text: "Um copo contém 50 cm³ de água pura, que tem uma densidade exata de 1,0 g/cm³. Quantas GRAMAS de água existem dentro daquele copo?", options: ["1 grama", "25 gramas", "50 gramas", "100 gramas"], correctIndex: 2, explanation: { correctText: "Se a densidade é 1,0 g/cm³, significa que cada 1 centímetro cúbico (1 mililitro) de água pesa exatamente 1 grama. Portanto, 50 cm³ de água pesam 50 gramas. A água é a única substância perfeita neste aspeto no dia a dia.", otherOptions: ["Apenas inverter ou ignorar a proporção leva a erros grosseiros em laboratório."] } },
+        { level: "Fácil", text: "A velha charada de infância: O que pesa mais, 1 quilograma de chumbo ou 1 quilograma de penas de algodão?", options: ["O chumbo pesa mais.", "O algodão pesa mais.", "Ambos pesam exatamente o mesmo (1 kg).", "Depende do tamanho do chumbo."], correctIndex: 2, explanation: { correctText: "Ambos têm a mesma MASSA (1 kg). A charada engana o cérebro porque o volume deles é diferente. Para ter 1kg de penas precisas de um saco gigante, para ter 1kg de chumbo basta um cubinho pequeno. O chumbo é muito mais denso, mas o peso na balança é igual.", otherOptions: ["Densidade ≠ Massa absoluta."] } },
+        { level: "Médio", text: "Completando o raciocínio da charada do chumbo e do algodão. Porque é que 1 kg de chumbo cabe numa caixa de sapatos, mas 1 kg de algodão encheria o porta-bagagens de um carro?", options: ["Porque o algodão tem menos massa que o chumbo.", "Porque o chumbo tem uma DENSIDADE muito superior, concentrando muita massa em pouco volume.", "Porque o algodão não obedece à propriedade geral da impenetrabilidade.", "Porque o chumbo é um metal magnético especial."], correctIndex: 1, explanation: { correctText: "O chumbo é super denso. As partículas (átomos) dele estão compactadas. O algodão é muito pouco denso, cheio de espaços vazios de ar, exigindo muito mais volume para somar a mesma quantidade de quilogramas na balança.", otherOptions: ["A massa deles é igual na charada (1 kg)."] } },
+        { level: "Fácil", text: "Ao deitares um pingo de Óleo num copo de Água, vês que eles não se misturam e o Óleo fica sempre a flutuar na parte superior. O que podes afirmar, sem sombra de dúvida, sobre as propriedades deles?", options: ["A água tem mais volume do que o óleo no copo.", "A água é menos densa que o óleo.", "O óleo é menos denso do que a água.", "O óleo tem moléculas mais pesadas que as da água."], correctIndex: 2, explanation: { correctText: "A Regra de Ouro da flutuação: O material menos denso (mais 'leve' por unidade de volume) sobe e flutua. O material mais denso afunda. Se o óleo flutua, a densidade do óleo é menor que a da água.", otherOptions: ["A água afunda porque é mais densa (d=1,0) que o óleo (d≈0,8)."] } },
+        { level: "Médio", text: "Um pedaço de gelo é colocado num copo com água em estado líquido. O gelo flutua, deixando apenas uma pequena parte fora da água. Fisicamente, o que isto nos revela?", options: ["Que o gelo tem uma densidade menor do que a da água líquida.", "Que o gelo, por ser sólido, é infinitamente mais denso que a água.", "Que o gelo tem propriedades antinaturais, pois não tem massa.", "Que o copo tem propriedades organoléticas repulsivas."], correctIndex: 0, explanation: { correctText: "A água é uma das poucas substâncias da natureza que, ao congelar (ficar sólida), expande o seu volume e a sua densidade diminui. Como o gelo é um pouco menos denso que a água líquida (d ≈ 0,92), ele flutua. É por isso que os icebergs não vão ao fundo do mar.", otherOptions: ["Quase todos os outros materiais ficam mais densos no estado sólido, a água é a anomalia maravilhosa da natureza."] } },
+        { level: "Difícil", text: "Cálculo de Laboratório: Um aluno coloca um anel dentro de um tubo de ensaio (proveta) contendo 50 mL de água. O nível da água sobe imediatamente para os 60 mL. Ele tira o anel e pesa-o na balança: 193 gramas. Sabendo que o volume que subiu (10 mL) é o volume do anel, qual a densidade do metal?", options: ["5,0 g/mL", "19,3 g/mL", "3,2 g/mL", "193 g/mL"], correctIndex: 1, explanation: { correctText: "Este é o método de Arquimedes. Volume do anel = 60 mL - 50 mL = 10 mL. Massa do anel = 193 g. Densidade = 193 / 10 = 19,3 g/mL. (Este é o valor exato da densidade do Ouro puro).", otherOptions: ["Dividir 193 por 60 (volume final total com água) daria 3,2, um erro tremendo de raciocínio lógico."] } },
+        { level: "Médio", text: "Três líquidos que não se misturam (A, B e C) são colocados numa garrafa de vidro. O Líquido A (Mercúrio) tem d=13,6 g/cm³. O Líquido B (Água) tem d=1,0 g/cm³. O Líquido C (Álcool) tem d=0,79 g/cm³. Como ficará a ordem dos líquidos na garrafa de BAIXO para CIMA?", options: ["Álcool, Água, Mercúrio.", "Água, Álcool, Mercúrio.", "Mercúrio, Água, Álcool.", "Eles vão explodir."], correctIndex: 2, explanation: { correctText: "O mais denso vai para o fundo. O menos denso flutua no topo. Fundo = Mercúrio (13,6). Meio = Água (1,0). Topo = Álcool (0,79). Fica na ordem: A, B, C.", otherOptions: ["O álcool no fundo faria a física chorar."] } },
+        { level: "Fácil", text: "A maleabilidade e a ductilidade são Propriedades Específicas Físicas muito encontradas em metais. O que é que estas duas propriedades significam na prática industrial?", options: ["A capacidade do metal de enferrujar rápido na água.", "Maleabilidade: capacidade de transformar em Lâminas finas (ex: papel de alumínio). Ductilidade: capacidade de transformar em Fios (ex: fios de cobre elétricos).", "A capacidade do metal de entrar em ebulição a baixa temperatura.", "A capacidade do metal de flutuar no mercúrio."], correctIndex: 1, explanation: { correctText: "Maleabilidade vem de 'malhar' (bater até fazer chapas finas, como zinco dos telhados). Ductilidade vem de 'dúctil' (esticar até fazer fios muito finos sem quebrar).", otherOptions: ["Ferrugem é química."] } },
+        { level: "Difícil", text: "Um ovo afunda quando colocado num copo com água pura da torneira. Mas se o aluno adicionar 4 colheres bem cheias de SAL (NaCl) na água e mexer, o ovo sobe e passa a flutuar na superfície. Qual a explicação rigorosa para isto?", options: ["O sal diminui a massa do ovo por corrosão química imediata.", "O ovo ganhou massa por absorver a água salgada.", "O sal dissolvido na água aumentou fortemente a DENSIDADE do líquido. A mistura (água+sal) tornou-se mais densa que o ovo, obrigando o ovo a flutuar.", "A água com sal tem menor impenetrabilidade."], correctIndex: 2, explanation: { correctText: "Inicialmente: Densidade Ovo > Densidade Água (Ovo afunda). Com sal: Densidade Água Salgada > Densidade Ovo (Ovo flutua). O volume da água não mudou quase nada, mas a massa dela aumentou muito com o sal, aumentando o 'd=m/v'. É por isso que é super fácil flutuar no Mar Morto (altíssima salinidade).", otherOptions: ["A casca do ovo não é comida em 2 segundos por sal."] } },
+        { level: "Médio", text: "Um pedaço de ferro enferrujou com a chuva e um pedaço de vidro partiu-se ao cair ao chão. Respectivamente, que tipos de fenómenos ocorreram na matéria?", options: ["Ambos são fenómenos físicos.", "Fenómeno Químico e Fenómeno Físico.", "Fenómeno Físico e Fenómeno Químico.", "Ambos são fenómenos organoléticos."], correctIndex: 1, explanation: { correctText: "Enferrujar cria uma nova substância (óxido de ferro), logo é Químico. Partir o vidro apenas destrói a forma do corpo em pedaços menores (divisibilidade), o pó do vidro continua a ser vidro, logo é Físico.", otherOptions: ["Misturar a ordem é o erro mais comum em provas."] } },
+        { level: "Fácil", text: "Qual das seguintes afirmações sobre a Elasticidade (uma Propriedade Geral) está correta?", options: ["É a capacidade da matéria de se transformar num líquido rapidamente.", "É a capacidade da matéria de voltar à sua forma e volume originais depois de cessar a força que a estava a deformar.", "Apenas as borrachas elásticas possuem elasticidade no universo.", "É a tendência da matéria de explodir sob pressão."], correctIndex: 1, explanation: { correctText: "Elasticidade é voltar ao normal (ex: puxas a mola, soltas, ela volta). Surpreendentemente, é uma propriedade GERAL. Até o aço tem um grau microscópico de elasticidade nas pontes e estruturas de edifícios.", otherOptions: ["Todas as matérias têm um limite elástico, por menor que seja."] } },
+        { level: "Difícil", text: "O IFCE apresenta-te 4 recipientes com água em ebulição, mas em cidades diferentes: Fortaleza (ao nível do mar, pressão de 1 atm) e La Paz (nas montanhas dos Andes, muito acima do nível do mar, menor pressão do ar). Sobre a propriedade Ponto de Ebulição (PE), é correto afirmar:", options: ["O PE da água será exatamente 100ºC em ambas as cidades, a água não liga para a geografia.", "A água em Fortaleza ferve a uma temperatura MAIOR (100ºC) do que em La Paz (onde ferverá aos 87ºC), pois no alto da montanha há menos pressão esmagando o líquido.", "A água em La Paz ferve aos 120ºC por estar mais perto do sol.", "O PE é uma propriedade geral e nunca varia."], correctIndex: 1, explanation: { correctText: "Para o líquido ferver e as bolhas subirem, ele tem de vencer a pressão atmosférica em cima dele. Ao nível do mar (Fortaleza) a pressão é máxima, exige 100ºC. Lá no alto do monte (La Paz), o ar é rarefeito, a pressão é fraca, então com apenas 87ºC a água já tem força para virar gás.", otherOptions: ["Isto explica porque cozer feijão no topo do Everest demora muitas horas: a água ferve morna."] } },
+        { level: "Médio", text: "Num sistema contendo 100g de gelo e 200g de água líquida no mesmo copo, quantas 'Fases' e quantos 'Componentes' químicos temos na mistura, respetivamente?", options: ["2 Fases (sólida e líquida) e 2 Componentes químicos.", "1 Fase e 1 Componente.", "2 Fases (visualização do gelo e da água) e 1 ÚNICO Componente (H2O).", "3 Fases (copo, água e gelo) e 2 Componentes."], correctIndex: 2, explanation: { correctText: "Fase é o que tu VÊS (vês o cubinho sólido e vês a poça de líquido = 2 fases, mistura heterogénea). Componente é o nome químico da substância (ambos são apenas Água - H2O = 1 componente).", otherOptions: ["Gelo e água não são substâncias químicas diferentes, a fórmula não muda."] } },
+        { level: "Fácil", text: "A dureza é a propriedade que os materiais têm de riscar outros ou de resistir a serem riscados. Qual é o material natural mais duro conhecido no planeta Terra, capaz de riscar o vidro facilmente?", options: ["O Ferro.", "O Diamante.", "O Vidro temperado.", "O Chumbo."], correctIndex: 1, explanation: { correctText: "Na escala de Mohs de dureza mineral, o Diamante está no topo (nota 10). Apenas um diamante pode riscar outro diamante. O chumbo é muito macio, podes riscá-lo com a unha.", otherOptions: ["Dureza não é o mesmo que Resistência a impactos (um diamante quebra se lhe deres uma martelada, mas o martelo de ferro não quebra, apenas amassa)."] } },
+        { level: "Médio", text: "Durante a pandemia, usou-se muito Álcool a 70% ou Álcool a 96% (Etanol). O Etanol tem uma enorme Volatilidade. O que significa uma substância ser muito volátil?", options: ["Ela incendeia-se sozinha e explode com o choque mecânico.", "Ela tem muita facilidade em passar do estado líquido para o estado gasoso à temperatura ambiente, secando rápido das mãos.", "Ela tem uma alta densidade escorregadia.", "Ela reage com plásticos derretendo-os."], correctIndex: 1, explanation: { correctText: "Substâncias voláteis (álcool, acetona, gasolina, perfume) evaporam muito rápido mesmo sem estarem no fogão. As suas moléculas soltam-se facilmente para o ar (baixo ponto de ebulição).", otherOptions: ["Combustibilidade é a facilidade de pegar fogo (que o álcool também tem, mas não é a definição de volátil)."] } },
+        { level: "Difícil", text: "Qualidade do Leite! A densidade do leite puro de vaca é de cerca de 1,030 g/mL. Um inspetor sanitário mediu a densidade de um lote de uma fazenda e o aparelho marcou 1,010 g/mL (quase 1,000 g/mL). O que o agricultor batoteiro provavelmente fez?", options: ["Deixou o leite congelar.", "Adicionou sal ao leite.", "Adicionou ÁGUA (adulterou) ao leite, puxando a densidade da mistura para mais perto de 1,0 g/mL.", "Ferveu o leite, perdendo a lactose no vapor."], correctIndex: 2, explanation: { correctText: "A densidade da água é 1,000 g/mL (menor que a do leite puro). Se tu misturares muita água barata no leite, a densidade final da panela vai baixar de 1,030 para algo próximo de 1,0. É assim que a ASAE / fiscais descobrem o crime da água no leite sem precisar provar o sabor.", otherOptions: ["Adicionar sal aumentaria a densidade para valores maiores que 1,030."] } },
+        { level: "Médio", text: "Tensão Superficial da água. Repara que insetos como mosquitos (melgas) e aranhas de água conseguem andar a pé por cima da água de um lago sem se afundarem. Qual a explicação para esta propriedade dos líquidos?", options: ["A água tem buracos microscópicos por onde o oxigénio entra e levita o mosquito.", "As moléculas de água na superfície 'dão as mãos' puxando-se fortemente umas às outras (coesão), formando uma película invisível super resistente ao peso leve do mosquito.", "Os insetos anulam a gravidade emitindo sons nas patas.", "A água de lagoa é uma mistura heterogénea muito densa igual ao mercúrio duro."], correctIndex: 1, explanation: { correctText: "As pontes de hidrogénio na água puxam as moléculas com força para dentro e para os lados, criando um 'trampolim' elástico na superfície. É a tensão superficial que também forma as gotas esféricas.", otherOptions: ["Se puseres uma gota de detergente na água, tu quebras esta tensão e o inseto afunda imediatamente!"] } },
+        { level: "Fácil", text: "Para terminar a prova sobre matéria: Toda a substância Pura (como a Água Destilada H2O pura) tem uma característica matemática nos seus gráficos de aquecimento que as misturas da torneira não têm. Qual é?", options: ["A água destilada nunca atinge a fervura.", "Numa substância Pura, o Ponto de Fusão (PF) e o Ponto de Ebulição (PE) ocorrem a temperaturas FIXAS (constantes, a linha do gráfico fica reta).", "A água pura aquece a velocidades irregulares em forma de círculos.", "Apenas ferve de noite sem radiação UV."], correctIndex: 1, explanation: { correctText: "Na água pura ao nível do mar, a água começa a ferver aos 100ºC e FICA nos 100ºC (a temperatura não sobe 1 grau) até a última gota virar gás. Se for água da torneira (mistura com sais), a temperatura começa a subir do 100ºC para 102º, 105º enquanto ferve (não tem linha reta).", otherOptions: ["Isto é a base para o próximo capítulo do IFCE sobre Estados Físicos e Gráficos de Aquecimento!"] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_materia_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                // Verifica se o array salvo tem o mesmo tamanho do banco atual (previne quebras em atualizações)
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    // Descobre a última questão respondida para abrir nela
+                    let lastAnswered = parsed.lastIndexOf(parsed.findLast(a => a !== null));
+                    if (lastAnswered === -1) lastAnswered = 0;
+                    if (lastAnswered < questionsDatabase.length - 1) lastAnswered++; // avança pra próxima vazia
+                    
+                    quizState.currentIndex = lastAnswered;
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${lastAnswered + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tens a certeza que queres APAGAR todo o teu histórico de respostas e começar a prova de novo?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            renderCurrentQuestion();
+            renderNavigationMap();
+            document.getElementById('btnResumeQuiz').style.display = 'none';
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = normalizeText(event.target.value);
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = normalizeText(group.textContent);
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    function normalizeText(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    /* --- CONTROLO DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Químico Aprovado!' : '❌ Diagnóstico de Falha Atómica!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>O Facto Científico:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Desvios:</strong></small>
+                    ${distortionsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <span class="difficulty-badge ${badgeClass}">${question.level}</span>
+                <div style="margin-bottom:25px;">
+                    <div class="quiz-question-counter">
+                        <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                    </div>
+                    <h2 class="quiz-question-text">${question.text}</h2>
+                </div>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress(); // Salva na memória persistente
+        
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    /* --- ANIMAÇÕES (CONFETTI) --- */
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#0F766E', '#14B8A6', '#F59E0B', '#E11D48'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    /* --- NAVEGAÇÃO MAPA --- */
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        
+        if (btnPrev) btnPrev.disabled = (quizState.currentIndex === 0);
+        
+        if (btnNext) {
+            const isLastQuestion = quizState.currentIndex === questionsDatabase.length - 1;
+            if (isLastQuestion) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; // zero stars
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões por responder. Quer terminar a prova mesmo assim (as em branco serão dadas como erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Acertaste ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 DOMÍNIO MACROSCÓPICO ABSOLUTO!</strong> O teu laboratório mental está impecável. Não erraste nas pegadinhas da densidade nem na diferença entre propriedades gerais e específicas.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONTAMINAÇÃO LÓGICA NO LABORATÓRIO!</strong> Foste avaliado abaixo da meta (80%). Revisa urgente a fórmula da Densidade (d=m/V) e o conceito de Impenetrabilidade da Matéria.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Deixaste em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+                    
+                    let plainQuestionText = question.text.replace(/<div class="q-svg-container">[\s\S]*?<\/div>/gi, ' [Gráfico Omitido] ');
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${plainQuestionText}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">O teu desvio: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">O Fato Científico: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>
