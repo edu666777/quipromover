@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Propriedades Periódicas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: PROPRIEDADES (Rubi e Azul Escuro) --- */
+        :root {
+            --bg-color: #FFF1F2; 
+            --text-color: #4C0519; 
+            --border-color: #881337; 
+            --white: #FFFFFF;
+            
+            --theme-light: #FECDD3; 
+            --theme-medium: #E11D48; 
+            --theme-dark: #BE123C; 
+            --theme-contrast: #2563EB; 
+            --theme-accent: #F59E0B; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #DBEAFE;
+            --correct-border: #1D4ED8;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #2563EB; color: #1E3A8A; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #1D4ED8; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">📏</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Propriedades Periódicas</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Raio, Eletronegatividade)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">📏 1. Raio Atômico (O Tamanho)</div>
+                <article class="theory-box search-target">
+                    <h3>Quem é o mais "gordinho"?</h3>
+                    <p>O Raio Atômico mede a distância do núcleo até o elétron mais externo. Na tabela, o tamanho do átomo <strong>Cresce para BAIXO e para a ESQUERDA</strong>.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Na Família (↓):</strong> Ao descer num grupo, o átomo ganha mais camadas (níveis de energia K, L, M...). Mais camadas = Átomo maior.</li>
+                        <li><strong>No Período (←):</strong> Ao ir para a direita num mesmo período, os átomos têm a mesma quantidade de camadas, mas o núcleo ganha mais prótons. Mais prótons puxam os elétrons com mais força, <strong>encolhendo</strong> o átomo. Logo, o maior fica na esquerda!</li>
+                    </ul>
+                    
+                    <div class="highlight-box blue">
+                        <strong>O Gigante:</strong> O maior átomo natural da tabela é o <strong>Frâncio (Fr)</strong>, localizado no extremo inferior esquerdo.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🧲 2. Eletronegatividade</div>
+                <article class="theory-box search-target">
+                    <h3>A "Ganância" por Elétrons</h3>
+                    <p>Eletronegatividade é a força com que um átomo "puxa" os elétrons de uma ligação química para si. Na tabela, ela <strong>Cresce para CIMA e para a DIREITA</strong>.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>A Lógica:</strong> Átomos pequenos (lá em cima e à direita) têm o núcleo muito perto da superfície. Eles puxam elétrons alheios com uma força brutal.</li>
+                        <li><strong>O Ladrão:</strong> O elemento mais eletronegativo da tabela é o <strong>Flúor (F)</strong> (canto superior direito).</li>
+                    </ul>
+
+                    <div class="highlight-box" style="background-color: #FEF2F2; border-left-color: #EF4444; color: #9F1239;">
+                        <strong>Cuidado com os Gases Nobres!</strong> Como eles já são estáveis (Regra do Octeto), eles não querem puxar elétrons de ninguém. Portanto, <strong>NÃO possuem eletronegatividade</strong> considerada no Ensino Médio.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚡ 3. Energia de Ionização</div>
+                <article class="theory-box search-target">
+                    <h3>O "Preço" de um Elétron</h3>
+                    <p>A Energia (ou Potencial) de Ionização é a energia que você precisa <strong>gastar</strong> para "arrancar" um elétron de um átomo. Ela <strong>Cresce para CIMA e para a DIREITA</strong>.</p>
+                    
+                    <p style="margin-top: 10px;"><strong>Por que cresce igual à Eletronegatividade?</strong> Átomos pequenos seguram seus elétrons com muita força (núcleo perto da valência). Arrancar um elétron do Flúor (pequeno) custa uma fortuna de energia. Arrancar um elétron do Frâncio (gigante) é quase de graça, porque o elétron está muito longe do núcleo.</p>
+                    
+                    <div class="highlight-box blue">
+                        <strong>Nota:</strong> Os Gases Nobres <strong>PARTICIPAM</strong> da Energia de Ionização. Aliás, eles são os que cobram o "preço" mais alto (possuem a maior energia de ionização), pois detestam perder a sua estabilidade! O Hélio (He) tem a maior de todas.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">❤️ 4. Eletroafinidade (Afinidade Eletrônica)</div>
+                <article class="theory-box search-target">
+                    <h3>A Energia da "Alegria"</h3>
+                    <p>É a energia <strong>liberada</strong> quando um átomo neutro no estado gasoso "ganha" um elétron. Segue a mesma seta da eletronegatividade: <strong>Cresce para CIMA e para a DIREITA</strong> (excluindo os Gases Nobres).</p>
+                    <p>Átomos que adoram ganhar elétrons (como os Halogênios) liberam muita energia de "alegria" quando finalmente conseguem um elétron para o seu octeto.</p>
+                </article>
+            </section>
+
+            <!-- BLOCO: RESUMO VISUAL -->
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-contrast);">📌 O Mapa das Setas (Resumo)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast); border-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Como crescem na Tabela?</h3>
+                    
+                    <div class="visual-area" style="background-color: #F8FAFC;">
+                        <svg width="280" height="200" viewBox="0 0 280 200">
+                            <!-- Esboço da tabela -->
+                            <rect x="40" y="30" width="200" height="120" rx="4" fill="#E2E8F0" stroke="#64748B" stroke-width="2"/>
+                            
+                            <!-- Raio Atômico (Cresce Esquerda e Baixo) -->
+                            <path d="M 120 180 L 30 180 L 30 50" fill="none" stroke="#BE123C" stroke-width="4" marker-end="url(#arrow-red)"/>
+                            <text x="50" y="170" font-size="12" font-weight="900" fill="#BE123C">Raio Atômico (Tamanho)</text>
+
+                            <!-- Outras Propriedades (Cresce Direita e Cima) -->
+                            <path d="M 150 10 L 250 10 L 250 130" fill="none" stroke="#2563EB" stroke-width="4" marker-end="url(#arrow-blue)"/>
+                            <text x="80" y="25" font-size="11" font-weight="900" fill="#2563EB">Eletronegatividade & Ionização</text>
+
+                            <defs>
+                                <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#BE123C"/></marker>
+                                <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB"/></marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <p style="text-align: center; font-weight: 700; font-size: 0.95rem;">O Raio Atômico é "do contra". Tudo o que é o resto (Eletronegatividade, Ionização, Afinidade) cresce exatamente no sentido inverso ao do Raio!</p>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões essenciais sobre Raio Atômico, Eletronegatividade e Ionização. Acerte <strong>80% (24/30)</strong> para dominar as propriedades da tabela!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Propriedades Periódicas PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Como se define, de forma simplificada, o Raio Atômico de um elemento químico?", options: ["A distância entre dois núcleos de átomos diferentes.", "A distância do núcleo atômico até o seu elétron mais externo (na camada de valência).", "A massa total do núcleo atômico.", "O espaço vazio entre os prótons e os nêutrons."], correctIndex: 1, explanation: { correctText: "O raio atômico é a medida que dita o 'tamanho' do átomo, medindo do centro (núcleo) até a borda da sua eletrosfera.", otherOptions: [] } },
+        { level: "Fácil", text: "Ao descer em uma mesma Família (coluna vertical) da Tabela Periódica, o que acontece com o tamanho (raio atômico) dos elementos?", options: ["Permanece constante.", "Diminui, pois a força nuclear fica mais pesada.", "Aumenta, pois o átomo ganha um número maior de camadas eletrônicas (níveis de energia).", "Aumenta apenas para os gases nobres."], correctIndex: 2, explanation: { correctText: "Ao descer num grupo (ex: do Lítio para o Sódio e depois Potássio), estamos a descer de período (de 2 para 3 para 4). Mais camadas = átomo fisicamente mais gordo/maior.", otherOptions: [] } },
+        { level: "Médio", text: "Ao caminhar da ESQUERDA para a DIREITA no mesmo Período (linha horizontal) da Tabela Periódica, o Raio Atômico diminui. Qual a justificativa científica rigorosa para isso?", options: ["Porque os átomos da direita têm menos elétrons no total.", "Porque, mantendo o mesmo número de camadas, o número de prótons no núcleo (carga nuclear) aumenta, 'puxando' a eletrosfera com mais força e encolhendo o átomo.", "Porque a temperatura atômica diminui.", "Porque os metais sempre se expandem em relação aos ametais."], correctIndex: 1, explanation: { correctText: "No mesmo período, o número de camadas não muda. Contudo, ao ir para a direita, o Z aumenta (mais prótons). Um núcleo mais 'potente' atrai a mesma nuvem com mais ferocidade, contraindo o raio.", otherOptions: [] } },
+        { level: "Fácil", text: "Com base nas setas de crescimento do Raio Atômico (Cresce para BAIXO e para a ESQUERDA), qual é considerado o MAIOR átomo natural da Tabela Periódica?", options: ["Flúor (F).", "Césio (Cs) / Frâncio (Fr).", "Oxigênio (O).", "Hélio (He)."], correctIndex: 1, explanation: { correctText: "O Frâncio (e o Césio, que é o maior estável não radioativo) ficam no extremo inferior esquerdo da tabela, logo, são os 'gigantes' em tamanho atômico.", otherOptions: ["Hélio e Flúor estão na ponta oposta (pequenos)."] } },
+        { level: "Fácil", text: "Qual das definições abaixo corresponde perfeitamente ao conceito de 'Eletronegatividade' na Química?", options: ["A capacidade do átomo de repelir elétrons para longe do seu núcleo.", "A energia necessária para arrancar um elétron do núcleo.", "A tendência (força) que um átomo tem de ATRAIR elétrons para si numa ligação química covalente.", "O número exato de elétrons da última camada."], correctIndex: 2, explanation: { correctText: "Eletronegatividade é a famosa 'ganância' atômica. É o poder do átomo de puxar os elétrons da ligação partilhada para perto de si.", otherOptions: [] } },
+        { level: "Médio", text: "Sabendo que a Eletronegatividade cresce para CIMA e para a DIREITA na Tabela Periódica (excluindo os Gases Nobres), qual elemento é o 'rei' da eletronegatividade (o maior ladrão de elétrons)?", options: ["Oxigênio (O).", "Frâncio (Fr).", "Flúor (F).", "Carbono (C)."], correctIndex: 2, explanation: { correctText: "O Flúor é o elemento mais eletronegativo da tabela (fica no canto superior direito dos Halogênios). Ele ganha o 'cabo de guerra' dos elétrons contra qualquer outro elemento.", otherOptions: [] } },
+        { level: "Médio", text: "Existe um motivo óbvio pelo qual excluímos os Gases Nobres da análise de Eletronegatividade nas provas do Ensino Médio. Qual é esse motivo?", options: ["Porque eles são gasosos e não possuem massa mensurável.", "Porque eles já possuem 8 elétrons na valência (estabilidade do octeto), não tendo 'vontade' natural nem força para atrair novos elétrons em ligações químicas comuns.", "Porque as suas camadas eletrônicas não permitem a passagem da luz.", "Porque eles são os únicos com eletronegatividade negativa matemática."], correctIndex: 1, explanation: { correctText: "A eletronegatividade é a sede por elétrons em ligações. Como os gases nobres já estão completos (inertes), eles não fazem ligações em condições normais, logo não exibem 'ganância' mensurável.", otherOptions: [] } },
+        { level: "Fácil", text: "Como se chama a propriedade periódica que define a ENERGIA MÍNIMA NECESSÁRIA para 'arrancar' um elétron de um átomo neutro no estado gasoso?", options: ["Afinidade Eletrônica.", "Eletropositividade.", "Potencial (ou Energia) de Ionização.", "Eletronegatividade."], correctIndex: 2, explanation: { correctText: "Arrancar um elétron exige pagamento de energia! A esse preço que você paga ao átomo chamamos Energia de Ionização.", otherOptions: [] } },
+        { level: "Difícil", text: "Como a Energia de Ionização se comporta em relação ao Raio Atômico (Tamanho do átomo)?", options: ["São Diretamente Proporcionais (Quanto maior o átomo, mais difícil arrancar o elétron).", "Não possuem qualquer relação matemática entre si.", "São Inversamente Proporcionais (Quanto MENOR o átomo, MAIOR a energia necessária para arrancar o elétron, pois ele está mais perto e mais preso ao núcleo atrativo).", "O Raio atômico anula a força de ionização nos metais."], correctIndex: 2, explanation: { correctText: "O núcleo (+) segura os elétrons (-). Num átomo muito pequeno, o elétron da ponta está tão colado ao núcleo que você precisará de uma energia gigantesca para arrancá-lo. Num átomo gordo (grande), o elétron da valência está tão longe que é fácil roubá-lo.", otherOptions: [] } },
+        { level: "Médio", text: "Na tabela periódica, qual família (grupo) apresenta as MAIORES Energias de Ionização no seu respectivo período, justamente por detestarem perder a sua estabilidade?", options: ["Os Metais Alcalinos.", "Os Halogênios.", "Os Gases Nobres.", "Os Metais de Transição."], correctIndex: 2, explanation: { correctText: "Cuidado com a rasteira! Os Gases Nobres não entram na Eletronegatividade, mas SÃO os campeões na Energia de Ionização. Como eles são perfeitos, se tentares arrancar o elétron de um gás nobre, o preço de energia será astronômico.", otherOptions: ["Metais alcalinos são os que têm a MENOR energia de ionização (querem perder o elétron)."] } },
+        { level: "Fácil", text: "Ao compararmos os metais e os não-metais (ametais) quanto à Energia de Ionização, podemos afirmar que:", options: ["Os metais possuem alta energia de ionização, pois seguram fortemente os seus elétrons.", "Os ametais possuem ALTA energia de ionização, pois desejam ganhar elétrons e resistem fortemente a perdê-los.", "Ambos possuem a mesma resistência à ionização.", "Os metais não participam deste processo."], correctIndex: 1, explanation: { correctText: "Os ametais (lado direito) querem roubar elétrons para o octeto. Arrancar um elétron deles custa caríssimo (alta energia). Já os metais querem dar o elétron de graça (baixa energia de ionização).", otherOptions: [] } },
+        { level: "Médio", text: "A propriedade chamada de 'Eletropositividade' (ou Caráter Metálico) é exatamente o oposto da Eletronegatividade. O que ela mede e em que direção cresce na tabela?", options: ["Mede a tendência de GANHAR elétrons e cresce para CIMA e para a DIREITA.", "Mede a tendência de PERDER elétrons (ceder) e cresce para BAIXO e para a ESQUERDA (acompanhando o Raio Atômico).", "Mede a atração magnética e não cresce em direção nenhuma.", "Mede o peso dos prótons e cresce apenas no centro."], correctIndex: 1, explanation: { correctText: "Eletropositividade é a vontade de ficar Positivo (perder o elétron). Quanto maior for o átomo (para baixo e esquerda), mais solto fica o elétron e mais fácil é de doá-lo (alto caráter metálico).", otherOptions: [] } },
+        { level: "Fácil", text: "A Afinidade Eletrônica (ou Eletroafinidade) é a energia envolvida no processo inverso da ionização. Ou seja, ela é a energia que o átomo:", options: ["Libera (geralmente) quando 'ganha/recebe' um elétron, demonstrando a sua afinidade por ele.", "Absorve para conseguir destruir um nêutron.", "Usa para se unir a um gás nobre no vácuo.", "Gasta para conseguir manter o seu raio atômico fixo."], correctIndex: 0, explanation: { correctText: "Afinidade = Gostar. Quando um átomo como o Cloro ganha um elétron, ele fica tão feliz (estável) que libera energia térmica. Essa é a Eletroafinidade.", otherOptions: [] } },
+        { level: "Médio", text: "Se um átomo X possui um raio atômico MUITO MENOR que um átomo Y do mesmo período, podemos prever que a Eletronegatividade de X será:", options: ["Menor que a de Y.", "Maior que a de Y, pois átomos menores atraem elétrons de ligações com mais força.", "Igual a de Y, pois estão no mesmo período.", "Nula, pois é um gás."], correctIndex: 1, explanation: { correctText: "A Eletronegatividade e o Raio Atômico andam na contramão! O menor átomo da rua é sempre o maior ladrão de elétrons.", otherOptions: [] } },
+        { level: "Difícil", text: "Ao retirar o PRIMEIRO elétron de um átomo de Magnésio, gastamos a '1ª Energia de Ionização'. Se tentarmos retirar o SEGUNDO elétron logo de seguida (do íon Mg⁺), a '2ª Energia de Ionização' será:", options: ["Sempre MENOR que a primeira, pois o átomo já está acostumado a perder.", "Sempre MAIOR que a primeira. Ao perder um elétron, o raio encolhe e o núcleo puxa os elétrons restantes com mais brutalidade.", "Exatamente igual à primeira, pois é o mesmo elemento químico.", "Zero, pois os elétrons fogem naturalmente."], correctIndex: 1, explanation: { correctText: "As energias de ionização sucessivas crescem sempre! Cada vez que roubas um elétron, o átomo fica mais pequeno e defende os elétrons que restam com muito mais violência.", otherOptions: [] } },
+        { level: "Fácil", text: "Numa avaliação do ENEM, os três elementos mais Eletronegativos da tabela (os campeões do cabo de guerra) são habitualmente lembrados pelo macete sonoro 'F O N'. Quais são eles por ordem decrescente?", options: ["Ferro, Ouro, Níquel.", "Flúor (F), Oxigênio (O) e Nitrogênio (N).", "Fósforo, Ósmio, Neônio.", "Flúor, Ouro, Neônio."], correctIndex: 1, explanation: { correctText: "Flúor, Oxigênio e Nitrogênio são os 3 maiores ladrões de elétrons da química. Decorar a sequência F > O > N salva pontos garantidos nas provas!", otherOptions: [] } },
+        { level: "Médio", text: "Entre Sódio (Na, Grupo 1) e Cloro (Cl, Grupo 17), ambos no 3º Período da tabela periódica, qual deles apresenta o MAIOR Raio Atômico?", options: ["O Cloro, pois está mais à direita e tem mais elétrons.", "O Sódio, pois está mais à esquerda no período (menor atração nuclear efetiva sobre as 3 camadas).", "Ambos têm o mesmo raio pois estão no mesmo período.", "O Cloro, porque os ametais são naturalmente maiores."], correctIndex: 1, explanation: { correctText: "O Sódio fica à extrema esquerda. O Cloro, na extrema direita, tem mais prótons (maior Z), que puxam a eletrosfera para o centro, tornando o Cloro menor que o Sódio.", otherOptions: [] } },
+        { level: "Difícil", text: "Um aluno analisa a formação do ânion Óxido (O²⁻) a partir do Oxigênio neutro. Comparando os dois, quem possui o MAIOR raio e porquê?", options: ["O átomo Neutro, porque o íon perde energia térmica.", "O Ânion O²⁻, porque o ganho de elétrons numa mesma camada aumenta a repulsão eletrostática, forçando a nuvem a inchar.", "São rigorosamente iguais, pois o número de prótons (Z=8) é o mesmo.", "O Neutro, porque o núcleo puxa mais forte o gás livre."], correctIndex: 1, explanation: { correctText: "Todo Ânion é MAIOR que seu átomo de origem. Ao colocar mais hóspedes negativos numa casa lotada, eles brigam (repelem-se), e a casa é forçada a expandir o seu tamanho (raio aumenta).", otherOptions: [] } },
+        { level: "Médio", text: "Quando comparamos as propriedades de Potássio (K, período 4) e Lítio (Li, período 2), pertencentes ao mesmo grupo (Metais Alcalinos), qual das seguintes afirmações é verdadeira?", options: ["O Lítio tem MAIOR raio atômico que o Potássio.", "O Potássio tem MENOR eletropositividade.", "O Lítio possui MAIOR energia de ionização que o Potássio, pois o Lítio é menor e segura os seus elétrons com mais força.", "Ambos não conduzem calor de forma iônica."], correctIndex: 2, explanation: { correctText: "Como o Lítio tem apenas 2 camadas, o elétron de valência dele sofre grande atração do núcleo. Roubá-lo custa mais caro (Maior Ionização). O Potássio é grandalhão (4 camadas), doa o elétron facilmente.", otherOptions: [] } },
+        { level: "Fácil", text: "Que propriedade periódica NÃO cresce com a 'seta' que aponta para cima e direita da tabela?", options: ["Raio Atômico.", "Energia de Ionização.", "Afinidade Eletrônica.", "Eletronegatividade."], correctIndex: 0, explanation: { correctText: "O Raio Atômico é sempre o 'do contra'. Ele cresce para BAIXO e para a ESQUERDA.", otherOptions: ["Todas as outras crescem para cima e para a direita."] } },
+        { level: "Difícil", text: "Numa série isoeletrônica (ex: O²⁻, F⁻, Ne, Na⁺, Mg²⁺), todos têm 10 elétrons. O que dita quem será o MAIOR ou o MENOR desta série em termos de tamanho (raio)?", options: ["O número de elétrons, que é falso no núcleo.", "O número de prótons (Z). Quem tiver MAIS prótons puxará a nuvem de 10 elétrons com mais força, sendo o MENOR. (O Mg²⁺ é o menor da série).", "A presença térmica de isótopos instáveis quânticos.", "O raio é igual para todos porque têm os mesmos 10 elétrons no total."], correctIndex: 1, explanation: { correctText: "Na guerra da Isoeletrônica, todos têm o mesmo exército de elétrons. Vence (fica menor) quem tiver o núcleo mais pesado (maior Z) para os puxar para o centro! O Magnésio tem Z=12, encolhe a nuvem toda.", otherOptions: [""] } },
+        { level: "Médio", text: "O gás Hélio (He) é notório na química por possuir o valor MÁXIMO da tabela em relação a qual propriedade?", options: ["Raio atômico de gás livre.", "Eletropositividade iônica.", "Energia de Ionização (É a conta mais alta de energia que podes pagar para retirar o primeiro elétron).", "Eletronegatividade orgânica."], correctIndex: 2, explanation: { correctText: "O Hélio é o menor átomo da tabela e tem o octeto completo (dueto, no seu caso). Ele recusa-se a perder elétrons, possuindo a 1ª Energia de Ionização mais alta e insuperável do universo atômico conhecido.", otherOptions: ["Eletronegatividade não é medida para gases nobres."] } },
+        { level: "Fácil", text: "O Frâncio (Fr) e o Flúor (F) representam os extremos opostos geométricos na tabela (Inferior Esquerdo vs Superior Direito). Conclui-se que o Frâncio é o campeão de (____) e o Flúor o campeão de (____).", options: ["Eletronegatividade / Raio Atômico.", "Eletropositividade (Caráter Metálico) e Raio / Eletronegatividade.", "Ionização nula / Eletropositividade nula.", "Ductilidade gasosa / Afinidade metálica rica."], correctIndex: 1, explanation: { correctText: "O Frâncio é enorme e adora dar elétrons (Eletropositivo). O Flúor é pequenino e adora roubar elétrons (Eletronegativo). Ficam nas quinas opostas perfeitas da tabela.", otherOptions: [] } },
+        { level: "Médio", text: "Como se deve entender a relação geral entre o Caráter Metálico (tendência de se comportar como um metal) e a Eletropositividade?", options: ["São exatamente a mesma coisa. Crescem juntos para baixo e esquerda.", "São opostos completos estruturais.", "Caráter metálico não tem relação com eletricidade ou íons.", "O caráter metálico é uma medida de fusão quente térmica cega nula."], correctIndex: 0, explanation: { correctText: "Ser metal significa gostar de formar Cátions (ceder elétrons). Isso é a exata definição de Eletropositividade! Andam de mãos dadas.", otherOptions: [] } },
+        { level: "Difícil", text: "Existe uma 'anomalia' teórica ou inversão ligeira nos valores da Energia de Ionização quando avançamos do Grupo 2 (Alcalinoterrosos, terminam em s²) para o Grupo 13 (terminam em p¹). Por que o Boro (G13) tem uma ionização ligeiramente MENOR que a do Berílio (G2)?", options: ["Porque o núcleo de Boro foi destruído em radiação franca.", "Porque o elétron do subnível 'p' (Grupo 13) está ligeiramente mais afastado e num nível de energia mais alto, sendo um pouco mais fácil de retirar do que o subnível 's²' completo e estável do Grupo 2.", "Porque o Grupo 13 é na verdade uma família de gases inertes disfarçados livres moles.", "Porque ametais têm ionização invertida por gravitação densa rica clara mole."], correctIndex: 1, explanation: { correctText: "É um detalhe fino do ensino médio/vestibular avançado. O subnível s² é muito fechado e protegido. O único elétron que caiu no subnível 'p¹' do Boro fica meio exposto, baixando o preço da energia de ionização ali.", otherOptions: [] } },
+        { level: "Médio", text: "Analisando o Iodo (I) e o Cloro (Cl), membros da família dos Halogênios (Grupo 17). O Cloro está no 3º período e o Iodo no 5º período. Qual deles atrai elétrons de uma ligação com mais força (Maior Eletronegatividade)?", options: ["O Iodo, por ser maior e ter mais braços atômicos para puxar.", "O Cloro, pois possui MENOR raio atômico, fazendo com que o seu núcleo atue muito perto dos elétrons que deseja roubar.", "Empatam, por estarem na mesma coluna.", "O Iodo, pois tem eletroafinidade inversa profunda."], correctIndex: 1, explanation: { correctText: "A eletronegatividade cresce para CIMA. O Cloro é um átomo menor (menos camadas), então o ímã do seu núcleo atua mais intensamente para fora.", otherOptions: [""] } },
+        { level: "Fácil", text: "Sabemos que os cátions 'emagrecem' ao doar elétrons. Se um Cátion Cobre Cu⁺ for induzido a perder mais um elétron e se tornar Cobre Cu²⁺. O novo raio atômico do Cu²⁺ será:", options: ["Menor que o do Cu⁺.", "Maior que o do Cu⁺.", "Exatamente igual ao estado sólido.", "Explosivo e instável sem raio mensurável."], correctIndex: 0, explanation: { correctText: "Quanto mais elétrons perder, MAIS a força atrativa do núcleo encolhe a nuvem remanescente. Logo, Raio do Cu > Raio do Cu⁺ > Raio do Cu²⁺.", otherOptions: [] } },
+        { level: "Difícil", text: "A Afinidade Eletrônica mede o calor liberado quando um átomo ganha um elétron. Sendo assim, qual grupo de elementos terá os valores mais altos e felizes de Afinidade Eletrônica na tabela inteira?", options: ["Os Gases Nobres.", "Os Metais Alcalinos do Grupo 1 (ex: Sódio).", "Os Halogênios do Grupo 17 (ex: Cloro, Flúor), pois a entrada desse 1 elétron sela a perfeição e o octeto, libertando máxima energia.", "Os Semimetais soltos de valência."], correctIndex: 2, explanation: { correctText: "Os Halogênios são sedentos por 1 único elétron para ficarem iguais a um gás nobre. Quando finalmente recebem esse elétron na ligação iônica, eles liberam a maior cota de energia térmica de alívio da tabela.", otherOptions: ["Metais e gases nobres têm afinidade baixíssima ou quase nula."] } },
+        { level: "Médio", text: "Em um gráfico de vestibular, nota-se que os 'picos' dos gráficos de Energia de Ionização máxima ocorrem de forma cíclica (periódica). Qual o nome do grupo que está sempre nos picos isolados mais altos de cada período?", options: ["Gases Nobres.", "Halogênios.", "Metais de Transição.", "Metais Alcalinoterrosos."], correctIndex: 0, explanation: { correctText: "A cada vez que se avança num período até à direita, a Energia de Ionização sobe, culminando nos Gases Nobres (última coluna), que cobram o preço máximo por elétron arrancado. Formam picos numéricos claríssimos em gráficos.", otherOptions: [] } },
+        { level: "Fácil", text: "Conclusão e Regra Visual Básica: Todas as setas que representam propriedades periódicas crescem SEMPRE na direção diametralmente OPOSTA à de qual grande propriedade geométrica atômica?", options: ["Ao Volume da Eletroafinidade Mútua.", "Ao Raio Atômico (Tamanho) do elemento.", "À Reatividade Química dos Gases.", "Ao Ponto de Fusão Nuclear Cego."], correctIndex: 1, explanation: { correctText: "O macete sagrado: Raio atômico cresce para Esquerda/Baixo. TODAS as outras propriedades (Eletronegatividade, Eletropositividade invertida, E. Ionização, Eletroafinidade) crescem na base para Cima/Direita (ou acompanham os opostos diretos baseados puramente no tamanho). Átomo pequeno atrai mais!", otherOptions: [] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_propriedades_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Perfeito!' : '❌ Erro Periódico!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#E11D48', '#BE123C', '#2563EB', '#F59E0B'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 MESTRE DAS PROPRIEDADES!</strong> O seu entendimento sobre os tamanhos atômicos e as setas de crescimento está impecável para o ENEM!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONFUSÃO NO RAIO!</strong> Você foi avaliado abaixo da meta (80%). Lembre-se que o Raio Atômico cresce ao contrário de tudo (para a esquerda e para baixo).
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

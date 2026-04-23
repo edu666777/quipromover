@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Ligação Covalente - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: LIGAÇÃO COVALENTE (Esmeralda e Violeta) --- */
+        :root {
+            --bg-color: #ECFDF5; 
+            --text-color: #064E3B; 
+            --border-color: #047857; 
+            --white: #FFFFFF;
+            
+            --theme-light: #D1FAE5; 
+            --theme-medium: #10B981; 
+            --theme-dark: #059669; 
+            --theme-contrast: #8B5CF6; 
+            --theme-accent: #F59E0B; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #E0E7FF;
+            --correct-border: #4338CA;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: #F8FAFC; border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #F5F3FF; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #5B21B6; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #2563EB; color: #1E3A8A; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #4338CA; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🔗</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Ligações Químicas: Covalente (Molecular)</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Compartilhamento, Dativa, Molécula)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🤝 1. O Que é a Ligação Covalente?</div>
+                <article class="theory-box search-target">
+                    <h3>O Poder do Compartilhamento</h3>
+                    <p>A Ligação Covalente (ou Molecular) ocorre quando os átomos envolvidos <strong>compartilham pares de elétrons</strong>. Ninguém quer doar, todos querem ganhar!</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Quem compartilha?</strong> Acontece fundamentalmente entre <strong>Ametais com Ametais</strong>, <strong>Hidrogênio com Ametal</strong>, ou <strong>Hidrogênio com Hidrogênio</strong>.</li>
+                        <li><strong>Por que compartilham?</strong> Como ambos possuem alta Eletronegatividade (querem atrair elétrons), nenhum tem força suficiente para roubar o elétron do outro. A solução pacífica é sobrepor as eletrosferas e "dividir" os elétrons, formando uma <strong>Molécula</strong>.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔗 2. Simples, Dupla ou Tripla?</div>
+                <article class="theory-box search-target">
+                    <h3>A Matemática dos Pares</h3>
+                    <p>Cada ligação covalente é formada por <strong>1 par de elétrons (2 elétrons no total)</strong>.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="280" height="160" viewBox="0 0 280 160">
+                            <!-- Ligação Simples (H2) -->
+                            <circle cx="100" cy="30" r="15" fill="#E0F2FE" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="100" y="35" font-size="12" font-weight="900" fill="#1D4ED8" text-anchor="middle">H</text>
+                            
+                            <circle cx="180" cy="30" r="15" fill="#E0F2FE" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="180" y="35" font-size="12" font-weight="900" fill="#1D4ED8" text-anchor="middle">H</text>
+                            
+                            <line x1="120" y1="30" x2="160" y2="30" stroke="#059669" stroke-width="3"/>
+                            <text x="140" y="20" font-size="10" font-weight="800" fill="#059669" text-anchor="middle">Simples (1 par)</text>
+
+                            <!-- Ligação Dupla (O2) -->
+                            <circle cx="100" cy="80" r="15" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+                            <text x="100" y="85" font-size="12" font-weight="900" fill="#BE123C" text-anchor="middle">O</text>
+                            
+                            <circle cx="180" cy="80" r="15" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+                            <text x="180" y="85" font-size="12" font-weight="900" fill="#BE123C" text-anchor="middle">O</text>
+                            
+                            <line x1="120" y1="75" x2="160" y2="75" stroke="#059669" stroke-width="3"/>
+                            <line x1="120" y1="85" x2="160" y2="85" stroke="#059669" stroke-width="3"/>
+                            <text x="140" y="65" font-size="10" font-weight="800" fill="#059669" text-anchor="middle">Dupla (2 pares)</text>
+
+                            <!-- Ligação Tripla (N2) -->
+                            <circle cx="100" cy="130" r="15" fill="#F3E8FF" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="100" y="135" font-size="12" font-weight="900" fill="#4C1D95" text-anchor="middle">N</text>
+                            
+                            <circle cx="180" cy="130" r="15" fill="#F3E8FF" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="180" y="135" font-size="12" font-weight="900" fill="#4C1D95" text-anchor="middle">N</text>
+                            
+                            <line x1="120" y1="120" x2="160" y2="120" stroke="#059669" stroke-width="3"/>
+                            <line x1="120" y1="130" x2="160" y2="130" stroke="#059669" stroke-width="3"/>
+                            <line x1="120" y1="140" x2="160" y2="140" stroke="#059669" stroke-width="3"/>
+                            <text x="140" y="110" font-size="10" font-weight="800" fill="#059669" text-anchor="middle">Tripla (3 pares)</text>
+                        </svg>
+                    </div>
+
+                    <p>O número de ligações depende de quantos elétrons faltam para atingir o octeto: O Nitrogênio (N) tem 5 elétrons, logo, faltam 3. Portanto, faz 3 ligações.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🎁 3. Ligação Covalente Dativa (Coordenada)</div>
+                <article class="theory-box search-target">
+                    <h3>O Empréstimo Generoso</h3>
+                    <p>Ocorre quando um átomo já atingiu a estabilidade (já tem 8 elétrons) e ainda possui <strong>pares de elétrons livres</strong>. Ele pode "emprestar" um par inteiro para um átomo vizinho que precise exatamente de 2 elétrons para fechar o octeto.</p>
+                    
+                    <div class="highlight-box purple">
+                        <strong>O Ozônio (O₃):</strong> É o exemplo clássico. O Oxigênio central faz uma dupla com um vizinho (ambos ficam com 8). Para segurar o terceiro oxigênio (que tem 6 e precisa de 2), o central faz uma <strong>ligação dativa</strong>, doando temporariamente o seu par livre.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🌡️ 4. Propriedades: Moleculares vs. Reticulares</div>
+                <article class="theory-box search-target">
+                    <h3>A Diferença de Tamanho</h3>
+                    <p>Os compostos com ligações covalentes dividem-se em dois mundos completamente diferentes:</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Substâncias Moleculares (ex: H₂O, Açúcar, CO₂):</strong> Formam moléculas finitas e isoladas. Possuem <strong>Baixos Pontos de Fusão e Ebulição</strong> (muitas são líquidas ou gasosas a 25ºC) pois a força entre as moléculas (intermolecular) é muito fraca.</li>
+                        <li><strong>Covalentes Reticulares/Macromoléculas (ex: Diamante, Sílica, Grafite):</strong> Não formam moléculas isoladas. Formam uma rede 3D gigantesca apenas de ligações covalentes (átomo a átomo). Possuem <strong>Altíssimos Pontos de Fusão e Ebulição</strong> (são sólidos muito duros).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚡ 5. Condutividade Elétrica</div>
+                <article class="theory-box search-target">
+                    <h3>Geralmente Isolantes, MAS...</h3>
+                    <p>Compostos covalentes não têm cátions, não têm ânions e não têm mar de elétrons livres. Logo, a regra geral é: <strong>NÃO conduzem eletricidade em nenhum estado físico</strong> (são excelentes isolantes, como o plástico e a borracha).</p>
+                    
+                    <div class="highlight-box" style="background-color: #FEF2F2; border-left-color: #EF4444; color: #9F1239;">
+                        <strong>Exceção 1 (Ácidos na Água):</strong> O Ácido Clorídrico (HCl) é covalente gasoso e isolante. Mas, quando jogado na água, sofre <strong>Ionização</strong>. A água quebra a molécula forçadamente, criando íons (H⁺ e Cl⁻), passando a conduzir eletricidade!
+                    </div>
+
+                    <div class="highlight-box" style="background-color: #FFF7ED; border-left-color: #F59E0B; color: #9A3412; margin-top: 10px;">
+                        <strong>Exceção 2 (O Grafite):</strong> O Grafite (sólido reticular de Carbono) possui elétrons deslocalizados entre as suas placas ('nuvem Pi'). É o <strong>único ametal sólido</strong> capaz de conduzir brilhantemente a eletricidade (usado em baterias).
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre Compartilhamento, Fórmulas, Dativas e Exceções Moleculares. Acerte <strong>80% (24/30)</strong> para dominar!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Ligação Covalente PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Enquanto a ligação iônica envolve a transferência definitiva de elétrons, a ligação covalente baseia-se em qual processo fundamental?", options: ["Na repulsão magnética do núcleo.", "No compartilhamento de pares de elétrons entre os átomos.", "Na doação de prótons atômicos.", "Na cristalização de gases nobres."], correctIndex: 1, explanation: { correctText: "A essência da ligação covalente é o compartilhamento. As eletrosferas se sobrepõem e os elétrons passam a girar ao redor de ambos os núcleos, satisfazendo a regra do octeto para os dois simultaneamente.", otherOptions: [] } },
+        { level: "Fácil", text: "A ligação covalente ocorre predominantemente entre elementos que possuem alta eletronegatividade e que precisam de elétrons. Entre que tipos de elementos da tabela periódica esta ligação acontece?", options: ["Entre um Metal e um Ametal.", "Apenas entre Metais Alcalinos.", "Entre Ametais (Não-Metais) entre si, e entre o Hidrogênio e os Ametais.", "Entre Gases Nobres inertes."], correctIndex: 2, explanation: { correctText: "Ametais e Hidrogênio adoram ganhar elétrons. Quando dois 'ladrões' de elétrons se encontram, nenhum consegue roubar do outro. A única solução química é partilhar o prêmio.", otherOptions: [] } },
+        { level: "Médio", text: "Por que razão os átomos que participam numa ligação covalente optam por 'compartilhar' elétrons em vez de transferi-los (como ocorre na iônica)?", options: ["Porque as suas massas atômicas são muito grandes.", "Porque as suas Eletronegatividades são altas e muito semelhantes, não havendo força suficiente de um lado para arrancar definitivamente o elétron do outro.", "Porque eles não possuem nêutrons suficientes no núcleo.", "Porque a temperatura de fusão os obriga a partilhar."], correctIndex: 1, explanation: { correctText: "Na ligação covalente, o 'cabo de guerra' é muito equilibrado. Com eletronegatividades altas e próximas, ninguém perde o elétron, então ele fica no meio (compartilhado).", otherOptions: [] } },
+        { level: "Fácil", text: "A menor unidade funcional e isolada de um composto covalente, capaz de existir de forma independente na natureza (como o H₂O ou o CO₂), recebe o nome técnico de:", options: ["Íon.", "Retículo Cristalino.", "Molécula.", "Cátion."], correctIndex: 2, explanation: { correctText: "A palavra 'Molécula' é de uso EXCLUSIVO para compostos formados por ligações covalentes que têm um tamanho finito e fechado (H₂O tem exatamente 3 átomos e acabou).", otherOptions: ["Retículo cristalino é das ligações iônicas."] } },
+        { level: "Médio", text: "Na representação estrutural das ligações covalentes, um traço simples (—) entre dois átomos indica:", options: ["O compartilhamento de 1 par de elétrons (ou seja, 2 elétrons envolvidos).", "O compartilhamento de 1 elétron apenas.", "A transferência de um próton.", "A repulsão iônica nula."], correctIndex: 0, explanation: { correctText: "Cada traço representa uma ligação. E cada ligação covalente é formada sempre por um PAR (2) elétrons. Portanto, um traço (—) = 2 elétrons.", otherOptions: [] } },
+        { level: "Fácil", text: "O gás oxigênio que respiramos é a molécula diatômica O₂. O oxigênio pertence à família 16 (Calcogênios) e tem 6 elétrons de valência. Quantas ligações eles precisam fazer entre si e como se chama esse tipo de ligação?", options: ["Uma ligação tripla.", "Duas ligações simples separadas.", "Uma Ligação Covalente Dupla (O=O), compartilhando 2 pares de elétrons.", "Uma transferência iônica de 2 elétrons."], correctIndex: 2, explanation: { correctText: "Para quem tem 6, faltam 2 elétrons para o octeto (8). Logo, os dois oxigênios compartilham 2 pares de elétrons entre eles, formando uma Dupla (=).", otherOptions: [] } },
+        { level: "Médio", text: "O gás nitrogênio (N₂) compõe 78% da nossa atmosfera e é extremamente estável e difícil de quebrar. Sabendo que o Nitrogênio pertence ao grupo 15 (5 elétrons na valência), que tipo de ligação une os dois átomos na molécula?", options: ["Uma ligação covalente simples.", "Uma Ligação Covalente Tripla (N≡N), que envolve o compartilhamento de 3 pares de elétrons (6 elétrons no total).", "Duas ligações duplas.", "Uma atração eletrostática forte."], correctIndex: 1, explanation: { correctText: "Tem 5, faltam 3 para os 8. Os átomos de Nitrogênio dão as mãos três vezes (Tripla). Ligações triplas são fortíssimas, por isso o N₂ atmosférico é tão inerte e resistente.", otherOptions: [] } },
+        { level: "Difícil", text: "Qualitativamente, o que diferencia uma 'Ligação Covalente Normal' de uma 'Ligação Covalente Dativa' (Coordenada)?", options: ["Na Dativa, os elétrons são transferidos definitivamente.", "Na Dativa, a ligação ocorre entre um metal e um gás nobre.", "Na Ligação Normal, cada átomo contribui com 1 elétron para formar o par. Na Dativa, o par de elétrons compartilhado é fornecido INTERAMENTE por um único átomo (que já está estável e tem pares livres).", "A Dativa é impossível em temperatura ambiente."], correctIndex: 2, explanation: { correctText: "Na Dativa, um átomo já 'rico' e estável (com octeto completo e pares de elétrons sobrando) atua como doador generoso do par completo para um átomo vizinho que precisa de 2 elétrons, compartilhando a nuvem sem pedir nada em troca.", otherOptions: [] } },
+        { level: "Médio", text: "A molécula de Ozônio (O₃) é o exemplo mais clássico ensinado nas escolas sobre uma ligação especial. Para que os 3 átomos de oxigênio fiquem com 8 elétrons simultaneamente, a molécula apresenta:", options: ["Três ligações duplas.", "Uma Ligação Covalente Dupla e uma Ligação Covalente Dativa (Coordenada).", "Três ligações iônicas puras.", "Uma ligação tripla e uma simples."], correctIndex: 1, explanation: { correctText: "Um O junta-se com outro O por uma Dupla (ambos ficam com 8). O terceiro O aproxima-se com apenas 6 elétrons. O átomo central (que já tem 8) empresta-lhe um par livre através de uma Dativa (O=O→O).", otherOptions: [] } },
+        { level: "Fácil", text: "O Carbono (C) pertence à Família 14 e possui 4 elétrons na camada de valência. De acordo com a teoria do octeto, qual é o número exato de ligações covalentes que o Carbono deve realizar para atingir a estabilidade máxima?", options: ["2 ligações.", "3 ligações.", "4 ligações covalentes.", "8 ligações covalentes."], correctIndex: 2, explanation: { correctText: "Tem 4, precisa de 4 para chegar aos 8 (octeto). Por isso o Carbono é tetravalente e o grande pilar da química orgânica, podendo formar cadeias imensas fazendo 4 ligações.", otherOptions: [] } },
+        { level: "Fácil", text: "A molécula de Gás Carbônico (CO₂) é formada por 1 Carbono central e 2 Oxigênios. Qual a estrutura de ligações que permite que todos os 3 átomos atinjam o octeto?", options: ["O Carbono faz uma ligação quádrupla com um dos Oxigênios.", "O Carbono faz uma Ligação Dupla com cada Oxigênio simultaneamente (O=C=O).", "Eles realizam quatro ligações simples.", "A ligação é iônica e não estrutural."], correctIndex: 1, explanation: { correctText: "O Carbono precisa de 4 ligações. O Oxigênio precisa de 2. Assim, o Carbono vira para a esquerda e faz uma dupla (=), e vira para a direita e faz outra dupla (=). O=C=O fecha a conta matemática perfeita para todos.", otherOptions: [] } },
+        { level: "Médio", text: "O Hidrogênio (H) é frequentemente ligado a ametais, como na molécula de água (H₂O). Por que motivo o Hidrogênio NÃO segue a Regra do Octeto (8 elétrons)?", options: ["Porque ele evapora facilmente.", "Porque ele segue a Regra do Dueto, estabilizando a sua única camada (K) com apenas 2 elétrons, igualando-se ao Gás Nobre Hélio.", "Porque ele tem um núcleo de antimatéria.", "Porque os seus prótons repulsam 8 elétrons."], correctIndex: 1, explanation: { correctText: "A camada K (a única que o Hidrogênio tem) é muito pequena e só cabe o máximo de 2 elétrons. Ao fazer uma única ligação simples, o H fica com 2 e atinge a felicidade cósmica.", otherOptions: [] } },
+        { level: "Médio", text: "A 'Fórmula Eletrônica de Lewis' usa pontos ao redor do símbolo do elemento (ex: H· e ·Cl:). O que esses pequenos pontos representam visualmente na química?", options: ["A quantidade total de elétrons do átomo.", "Os prótons do núcleo.", "EXCLUSIVAMENTE os elétrons da Camada de Valência (a camada mais externa que participa das reações).", "O peso atômico do isótopo."], correctIndex: 2, explanation: { correctText: "As camadas internas do átomo estão protegidas e não reagem. Lewis desenha apenas os elétrons da borda (Valência) porque são esses que vão 'trabalhar' no compartilhamento.", otherOptions: [] } },
+        { level: "Fácil", text: "Observe os compostos a seguir: NaCl, CO₂, MgF₂, H₂O, CH₄. Desta lista, selecione APENAS as substâncias que são puramente COVALENTES (Moleculares):", options: ["NaCl e MgF₂.", "CO₂, H₂O e CH₄.", "Apenas H₂O.", "Todos são covalentes."], correctIndex: 1, explanation: { correctText: "O macete: Se tem Metal no meio (Na, Mg), a ligação é Iônica. Carbono, Oxigênio e Hidrogênio são todos Ametais/H. Ametals entre si = Covalente Molecular.", otherOptions: [] } },
+        { level: "Difícil", text: "A Amônia (NH₃) é uma molécula fundamental na indústria. O Nitrogênio (N, grupo 15) faz 3 ligações simples com 3 Hidrogênios. Após estas ligações, o que sobra intacto na camada de valência do Nitrogênio?", options: ["Um próton deslocalizado.", "Nada, todos os elétrons foram usados.", "Sobra 1 par de elétrons livres (não-ligantes).", "Sobram 3 elétrons ímpares livres."], correctIndex: 2, explanation: { correctText: "O Nitrogênio tem 5 elétrons de valência originais. Ele gasta 3 para fazer as ligações simples com os Hidrogênios (5 - 3 = 2). Logo, sobram 2 elétrons (1 par) que ficam livres sentados no topo do N.", otherOptions: [] } },
+        { level: "Médio", text: "Compostos com ligações covalentes dividem-se em Substâncias Moleculares (ex: Açúcar, Água) e Substâncias Covalentes Reticulares (ex: Diamante, Quartzo). Qual a principal diferença de propriedades físicas entre eles?", options: ["Moleculares são duros; Reticulares são gases macios.", "Não há diferença, todos derretem no gelo.", "Substâncias Moleculares têm Pontos de Fusão/Ebulição BAIXOS (líquidos/gases). Substâncias Reticulares têm Pontos de Fusão ALTÍSSIMOS, formando sólidos muito duros.", "As moleculares conduzem bem a eletricidade, as reticulares não."], correctIndex: 2, explanation: { correctText: "O açúcar derrete na panela facilmente (moléculas soltas). O Diamante precisa de milhares de graus para derreter, pois ele é uma rede tridimensional inquebrável de átomos de carbono todos ligados por covalência.", otherOptions: [] } },
+        { level: "Fácil", text: "Uma garrafa de água destilada (H₂O pura a 100%) é testada num circuito elétrico com uma lâmpada. O que se observa e qual é a justificativa química?", options: ["A lâmpada acende, pois a água é o melhor condutor da natureza.", "A lâmpada acende porque as pontes de hidrogênio geram elétrons livres.", "A lâmpada NÃO acende. Compostos moleculares puros (como a H₂O) não possuem íons nem elétrons livres para conduzir corrente elétrica (são isolantes).", "A lâmpada explode por excesso de nêutrons."], correctIndex: 2, explanation: { correctText: "A água pura é um excelente ISOLANTE elétrico! A água que tomas banho só dá choque porque está cheia de sais minerais dissolvidos nela (íons livres).", otherOptions: [] } },
+        { level: "Difícil", text: "Existe uma grande EXCEÇÃO na química dos ametais quanto à condutividade elétrica no estado SÓLIDO. Qual é a substância covalente (ametal) capaz de conduzir eletricidade e que se encontra dentro dos seus lápis?", options: ["O Fósforo vermelho.", "O Enxofre amarelo.", "O Carbono na sua forma alotrópica de GRAFITE.", "A Sílica vítrea (Areia)."], correctIndex: 2, explanation: { correctText: "A Grafite do lápis é formada por placas de Carbono. Entre estas placas, existem elétrons 'deslocalizados' (nuvem Pi) que podem mover-se livremente. É o único ametal sólido que conduz eletricidade, usado nas pilhas.", otherOptions: [] } },
+        { level: "Médio", text: "Existe outra exceção clássica de condutividade! Os ÁCIDOS (ex: Ácido Clorídrico - HCl) são compostos moleculares puros e gasosos que não conduzem eletricidade. Mas quando são dissolvidos em ÁGUA, a solução passa a conduzir muita eletricidade. Qual fenômeno explica isto?", options: ["A água faz os elétrons do ácido evaporarem.", "Ocorre a IONIZAÇÃO. A água ataca a molécula covalente e quebra-a forçadamente, criando íons (H⁺ e Cl⁻) que antes não existiam, permitindo a condução.", "Ocorre a Dissociação Iônica primária do cristal.", "O hidrogênio transmuta-se num metal líquido."], correctIndex: 1, explanation: { correctText: "Atenção: Sal sofre 'Dissociação' (já tinha íons). Ácido sofre 'Ionização' (não tinha íons, a água rasga a molécula covalente e FABRICA os íons na hora). Com íons na água, a luz acende!", otherOptions: [] } },
+        { level: "Fácil", text: "Nos compostos orgânicos, o Carbono costuma ligar-se repetidamente ao Hidrogênio e ao Oxigênio. Em termos de ligações permitidas, qual é a capacidade clássica de ligações simples para os elementos C, N, O, e H?", options: ["C faz 4, N faz 3, O faz 2, H faz 1.", "C faz 2, N faz 4, O faz 1, H faz 3.", "Todos fazem 4 ligações para fecharem o quadrado orgânico.", "Eles ligam-se ao acaso sem regras matemáticas."], correctIndex: 0, explanation: { correctText: "Macete de Ouro: (HONC) -> H=1, O=2, N=3, C=4. Estas são as 'mãos' (valências) que cada um tem disponíveis para formar ligações e atingir a estabilidade.", otherOptions: [] } },
+        { level: "Médio", text: "Considere a molécula de Gás Cloro (Cl₂). Qual é a fórmula eletrônica de Lewis correta e a fórmula estrutural plana desta substância?", options: ["Uma nuvem contínua de 16 elétrons orbitando o centro. Fórmula: Cl=Cl.", "Cada Cloro tem 7 pontos. Eles partilham 1 par central. Fórmula estrutural: Cl—Cl (Ligação covalente simples).", "O Cloro perde 1 elétron formando Cl⁺ e Cl⁻.", "Eles partilham 3 pares. Fórmula: Cl≡Cl."], correctIndex: 1, explanation: { correctText: "O Cloro (Grupo 17) tem 7 elétrons. Falta 1. Eles desenham-se com 7 pontinhos e entrelaçam 1 ponto cada. A ligação de um par é um traço único (Cl—Cl).", otherOptions: [] } },
+        { level: "Difícil", text: "O Monóxido de Carbono (CO) é um gás tóxico. Sabendo que o C precisa de 4 ligações e o O precisa de 2, como eles se resolvem estando apenas os dois sozinhos na molécula de CO?", options: ["Fazendo quatro ligações covalentes simples em forma de cruz.", "O C e o O fazem uma Ligação Dupla (C=O), e depois o Oxigênio faz uma Ligação Dativa (Coordenada) emprestando um par livre para o Carbono (C=O→).", "O Carbono absorve o oxigênio num núcleo superdenso covalente.", "A molécula colapsa, pois é impossível matematicamente estabilizarem sozinhos."], correctIndex: 1, explanation: { correctText: "Exemplo clássico avançado! Na ligação dupla (C=O), o Oxigênio fica feliz com 8, mas o Carbono só fica com 6. Como o O está estável e tem pares sobrando, ele 'empresta' um par via Dativa para o C chegar a 8.", otherOptions: [] } },
+        { level: "Fácil", text: "As substâncias Moleculares (ex: Sacarose/Açúcar, Etanol/Álcool) possuem interações intra-moleculares (dentro da molécula) muito fortes (covalentes). No entanto, as interações inter-moleculares (entre uma molécula e outra molécula) são:", options: ["Muito FRAÇAS, o que explica os seus baixos pontos de fusão e por que derretem/evaporam tão facilmente.", "Muito FORTES, superando as forças dos metais na tabela de dureza.", "Inexistentes, pois elas vivem no vácuo isolado.", "Magnéticas e ligadas por gravidade nuclear."], correctIndex: 0, explanation: { correctText: "Dentro da molécula de água (H-O-H) a ligação é muito forte. Mas a ligação entre as VÁRIAS gotículas de moléculas de água (pontes de hidrogênio) é fraca, bastando 100ºC para ferver e evaporar.", otherOptions: [] } },
+        { level: "Difícil", text: "Qual das moléculas abaixo NÃO segue a regra do octeto devido a uma 'Contração do Octeto' (fica estável com menos de 8 elétrons)?", options: ["Metano (CH₄).", "Trifluoreto de Boro (BF₃).", "Dióxido de Carbono (CO₂).", "Amônia (NH₃)."], correctIndex: 1, explanation: { correctText: "O Boro (B) é do Grupo 13, tem 3 elétrons. Em moléculas normais como BF₃, ele partilha os 3 e fica estável com apenas 6 elétrons na camada de valência (Exceção clássica).", otherOptions: [] } },
+        { level: "Médio", text: "Na molécula do Ácido Cianídrico (HCN), o Carbono está no centro ligado ao Hidrogênio e ao Nitrogênio. Qual a representação exata (fórmula estrutural) das ligações nesta molécula para todos atingirem o octeto/dueto?", options: ["H=C=N", "H—C≡N", "H—C—N", "H≡C—N"], correctIndex: 1, explanation: { correctText: "O H precisa de 1 ligação. O C precisa de 4. O N precisa de 3. A solução: O H faz uma SIMPLES com o C. O C gasta as outras TRÊS que lhe faltam fazendo uma TRIPLA com o N. Resultado: H—C≡N.", otherOptions: [] } },
+        { level: "Médio", text: "Considerando a eletronegatividade (que cresce para a direita e para cima), numa ligação covalente H—F (Ácido Fluorídrico), a nuvem de elétrons compartilhada fica perfeitamente no meio ou pendente para um lado?", options: ["Fica pendente para o Flúor (F), pois ele é muito mais eletronegativo que o Hidrogênio, atraindo o par de elétrons para perto de si (formando uma ligação covalente Polar).", "Fica perfeitamente centralizada e imóvel, garantindo um equilíbrio magnético neutro.", "Fica pendente para o Hidrogênio, pois ele tem o núcleo mais pesado.", "A nuvem é destruída pela radiação do ambiente iônico."], correctIndex: 0, explanation: { correctText: "O Flúor é o rei da eletronegatividade! Embora eles compartilhem o par de elétrons, o F puxa o 'cobertor' com muito mais força para o seu lado, criando uma carga parcial negativa nele (Dipolo).", otherOptions: [] } },
+        { level: "Fácil", text: "Se dois átomos IDENTICOS se ligam (Ex: O—O no gás O₂, ou Cl—Cl), como as eletronegatividades são perfeitamente iguais, o par de elétrons fica no centro exato. Essa ligação é classificada como:", options: ["Ligação Covalente Metálica e Dúctil.", "Ligação Covalente Apolar (sem polos magnéticos).", "Ligação Iônica Neutra Escura.", "Ligação de Força Nuclear Fraca."], correctIndex: 1, explanation: { correctText: "Iguais não roubam iguais! O cabo de guerra dá empate e a nuvem de elétrons é dividida 50/50, sem criar lados positivos ou negativos na molécula. É uma ligação Apolar.", otherOptions: [] } },
+        { level: "Difícil", text: "O Fenômeno da 'Expansão do Octeto' (estabilizar com 10, 12 ou até 14 elétrons de valência) só pode ocorrer, teoricamente, em átomos localizados a partir de qual região da tabela periódica?", options: ["Apenas no 1º e 2º período letal leve.", "A partir do 3º Período (ex: Fósforo, Enxofre), pois esses elementos passam a ter os subníveis 'd' vazios disponíveis na sua eletrosfera para acomodar os elétrons excedentes.", "Apenas nos Halogênios do 2º Período puro.", "Em todos os metais alcalinos moles gasosos."], correctIndex: 1, explanation: { correctText: "A expansão exige espaço (quartos vazios). A camada L (n=2) só tem 's' e 'p' (cabem 8). A camada M (n=3) tem o subnível 'd', que pode estar vazio, mas serve para entulhar os elétrons extra (ex: SF₆).", otherOptions: [] } },
+        { level: "Médio", text: "As famosas 'Macromoléculas' ou Substâncias Covalentes Reticulares (Diamante, Sílica/Quartzo) são as substâncias de maior ponto de fusão conhecidas, rivalizando e até superando muitos metais. Porquê?", options: ["Porque as suas moléculas isoladas voam a alta velocidade térmica no vácuo gasoso.", "Porque elas NÃO formam moléculas isoladas. São uma rede 3D infinita e contínua onde CADA ÁTOMO está ligado a todos os vizinhos por ligações covalentes fortíssimas.", "Porque elas possuem um 'mar de elétrons' de altíssima tensão.", "Porque são ametais que se tornaram artificiais radioativos."], correctIndex: 1, explanation: { correctText: "Para derreter um diamante (P.F. perto de 4000 ºC), não basta separar moléculas. Você tem que QUEBRAR milhões de ligações químicas covalentes primárias entre os átomos de carbono, o que exige um calor bestial.", otherOptions: [] } },
+        { level: "Fácil", text: "A ligação que se forma entre dois átomos do elemento central orgânico Carbono (C) no etano, eteno ou etino, são classificadas estruturalmente como pertencendo à família das:", options: ["Ligações Metálicas Radioativas.", "Ligações Iônicas Solúveis em Água Salgada.", "Ligações Covalentes (Simples, Duplas ou Triplas).", "Ligações Isotônicas Frias Mansas e Ocas."], correctIndex: 2, explanation: { correctText: "Toda a Química Orgânica (baseada no Carbono) sustenta-se nas fantásticas Ligações Covalentes, permitindo a formação das infindáveis cadeias da vida.", otherOptions: [] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_covalente_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Molecular Perfeito!' : '❌ Falha de Compartilhamento!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#10B981', '#059669', '#8B5CF6', '#F59E0B'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 OCTETO CUMPRIDO!</strong> Você dominou as regras de compartilhamento de elétrons e a formação das moléculas!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ LIGAÇÃO QUEBRADA!</strong> Você foi avaliado abaixo da meta (80%). Lembre-se: Ametais compartilham elétrons (Covalente) e formam moléculas!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

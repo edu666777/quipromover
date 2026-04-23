@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Formação de Íons - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: ELETROSTÁTICA (Índigo e Âmbar) --- */
+        :root {
+            --bg-color: #F8FAFC; 
+            --text-color: #0F172A; 
+            --border-color: #1E293B; 
+            --white: #FFFFFF;
+            
+            --theme-light: #E0E7FF; 
+            --theme-medium: #6366F1; 
+            --theme-dark: #4338CA; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #EF4444; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: var(--theme-dark); font-weight: 700; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #4F46E5; color: #312E81; }
+        .highlight-box.alert { background-color: #FFE4E6; border-left-color: #E11D48; color: #881337; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">⚡</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Formação de Íons (Cátions e Ânions)</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Cátion, Ânion, Octeto)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">⚖️ 1. O que são Íons?</div>
+                <article class="theory-box search-target">
+                    <h3>O Desequilíbrio Elétrico</h3>
+                    <p>Um átomo no seu estado natural é <strong>Eletricamente Neutro</strong>: o número de Prótons (+) no núcleo é rigorosamente igual ao número de Elétrons (-) na eletrosfera.</p>
+                    <p>Quando um átomo ganha ou perde elétrons durante uma reação química, o balanço de cargas é quebrado e ele transforma-se num <strong>Íon</strong> (espécie química com carga elétrica).</p>
+                    
+                    <div class="highlight-box alert">
+                        <strong>REGRA DE OURO:</strong> O núcleo atômico <strong>NUNCA</strong> se altera na formação de um íon! O número de Prótons permanece sempre intocável. Apenas os elétrons da última camada (valência) podem ser perdidos ou ganhos.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">➕ 2. Cátions (Íons Positivos)</div>
+                <article class="theory-box search-target">
+                    <h3>Perder para Ficar Positivo</h3>
+                    <p>Um <strong>Cátion</strong> forma-se quando um átomo neutro <strong>PERDE elétrons</strong>. Como os elétrons são cargas negativas, livrar-se deles faz com que os prótons (positivos) passem a dominar a conta matemática do átomo.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="300" height="150" viewBox="0 0 300 150">
+                            <!-- Átomo Neutro -->
+                            <circle cx="60" cy="75" r="40" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4"/>
+                            <circle cx="60" cy="75" r="10" fill="#EF4444" stroke="#042F2E" stroke-width="2"/>
+                            <text x="60" y="79" font-size="12" font-weight="900" fill="#FFF" text-anchor="middle">+</text>
+                            <circle cx="60" cy="35" r="6" fill="#3B82F6" stroke="#042F2E" stroke-width="1"/>
+                            
+                            <text x="60" y="140" font-size="12" font-weight="800" fill="#475569" text-anchor="middle">Átomo Neutro</text>
+
+                            <!-- Seta -->
+                            <path d="M 120 75 L 170 75" fill="none" stroke="#F59E0B" stroke-width="3" marker-end="url(#arrow)"/>
+                            <text x="145" y="65" font-size="10" font-weight="800" fill="#F59E0B" text-anchor="middle">Perde 1 e-</text>
+
+                            <!-- Cátion -->
+                            <circle cx="230" cy="75" r="25" fill="none" stroke="#EF4444" stroke-width="2"/>
+                            <circle cx="230" cy="75" r="10" fill="#EF4444" stroke="#042F2E" stroke-width="2"/>
+                            <text x="230" y="79" font-size="12" font-weight="900" fill="#FFF" text-anchor="middle">+</text>
+                            
+                            <text x="230" y="140" font-size="12" font-weight="800" fill="#EF4444" text-anchor="middle">Cátion (+)</text>
+
+                            <defs>
+                                <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F59E0B"/></marker>
+                            </defs>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); text-align: center;">O Cátion é menor que o átomo de origem, pois perde a sua camada externa.</p>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Quem forma Cátions?</strong> Os <strong>Metais</strong> (ex: Sódio, Ferro, Cálcio) têm forte tendência para perder elétrons.</li>
+                        <li><strong>Exemplo:</strong> Na → Na⁺ + 1 e⁻ (Sódio perde 1 elétron e fica com carga +1).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">➖ 3. Ânions (Íons Negativos)</div>
+                <article class="theory-box search-target">
+                    <h3>Ganhar Dívidas</h3>
+                    <p>Um <strong>Ânion</strong> forma-se quando um átomo neutro <strong>GANHA elétrons</strong>. Ao capturar mais cargas negativas do exterior, o balanço fica negativo e o átomo incha de tamanho (repulsão na eletrosfera).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="300" height="150" viewBox="0 0 300 150">
+                            <!-- Átomo Neutro -->
+                            <circle cx="60" cy="75" r="30" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4"/>
+                            <circle cx="60" cy="75" r="10" fill="#EF4444" stroke="#042F2E" stroke-width="2"/>
+                            <text x="60" y="79" font-size="12" font-weight="900" fill="#FFF" text-anchor="middle">+</text>
+                            
+                            <text x="60" y="140" font-size="12" font-weight="800" fill="#475569" text-anchor="middle">Átomo Neutro</text>
+
+                            <!-- Seta -->
+                            <path d="M 110 75 L 160 75" fill="none" stroke="#3B82F6" stroke-width="3" marker-end="url(#arrow-blue)"/>
+                            <text x="135" y="65" font-size="10" font-weight="800" fill="#3B82F6" text-anchor="middle">Ganha 1 e-</text>
+
+                            <!-- Ânion -->
+                            <circle cx="230" cy="75" r="45" fill="none" stroke="#3B82F6" stroke-width="2"/>
+                            <circle cx="230" cy="75" r="10" fill="#EF4444" stroke="#042F2E" stroke-width="2"/>
+                            <text x="230" y="79" font-size="12" font-weight="900" fill="#FFF" text-anchor="middle">+</text>
+                            <circle cx="230" cy="30" r="6" fill="#3B82F6" stroke="#042F2E" stroke-width="1"/>
+                            
+                            <text x="230" y="140" font-size="12" font-weight="800" fill="#3B82F6" text-anchor="middle">Ânion (-)</text>
+
+                            <defs>
+                                <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3B82F6"/></marker>
+                            </defs>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); text-align: center;">O Ânion é maior que o átomo de origem devido à repulsão eletrônica.</p>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Quem forma Ânions?</strong> Os <strong>Não-Metais (Ametais)</strong> (ex: Cloro, Oxigênio, Flúor) têm enorme facilidade e desejo de capturar elétrons.</li>
+                        <li><strong>Exemplo:</strong> Cl + 1 e⁻ → Cl⁻ (Cloro ganha 1 elétron e fica com carga -1).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🎯 4. A Regra do Octeto</div>
+                <article class="theory-box search-target">
+                    <h3>A Busca pela Estabilidade</h3>
+                    <p>Por que razão os átomos têm este trabalho todo de dar e roubar elétrons? Para atingirem a perfeição estrutural dos <strong>Gases Nobres</strong>.</p>
+                    
+                    <div class="highlight-box blue">
+                        A Regra do Octeto afirma que um átomo só atinge a estabilidade máxima quando possuir exatamente <strong>8 elétrons</strong> na sua última camada (Camada de Valência).
+                    </div>
+                    
+                    <p style="margin-top: 10px;">Para chegarem aos 8 elétrons, eles formam Íons. Por exemplo, o Sódio (Na) tem 1 elétron na última camada. É muito mais fácil "doar" esse elétron embora (virando Cátion Na⁺) e ficar com a camada anterior completa (que já tem 8), do que tentar capturar 7 elétrons de alguém.</p>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - IFCE</h2>
+                <p style="color: var(--theme-contrast); font-size: 0.95rem; font-weight:600;">
+                    30 questões fundamentais sobre Balanço de Cargas, Regra do Octeto e Tamanho Iônico. Acerte <strong>80% (24/30)</strong> para dominar a eletrostática!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - IFCE Foco: Formação de Íons) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "O que é, por definição estrita na química, um Íon?", options: ["Um átomo neutro que alterou o seu número de prótons no núcleo.", "Uma espécie química eletricamente carregada, resultante da perda ou ganho de elétrons por um átomo.", "Uma molécula fundida através de aquecimento extremo no laboratório.", "Um isótopo instável que emite radiação alfa."], correctIndex: 1, explanation: { correctText: "Qualquer átomo que não tenha carga zero (ou seja, onde a quantidade de Prótons é diferente da de Elétrons) recebe o nome de Íon.", otherOptions: ["Prótons NUNCA se perdem ou ganham numa reação química comum (apenas em reações nucleares).", "Isótopos dizem respeito à massa e nêutrons, não à carga.", "Uma molécula fundida não é necessariamente um íon."] } },
+        { level: "Fácil", text: "Quando um átomo neutro de Cálcio (Ca) se transforma no íon Cálcio (Ca²⁺), podemos afirmar com absoluta certeza que ele:", options: ["Ganhou 2 prótons no seu núcleo.", "Ganhou 2 elétrons na sua eletrosfera.", "Perdeu 2 prótons do seu núcleo.", "Perdeu 2 elétrons da sua eletrosfera."], correctIndex: 3, explanation: { correctText: "Como os elétrons têm carga NEGATIVA, a única forma de o átomo ficar com saldo Positivo (+2) é descartando 2 'dívidas' (perdendo 2 elétrons da eletrosfera).", otherOptions: ["Nunca se altera o número de prótons para formar um íon comum!", "Ganhar elétrons tornaria o íon negativo (Ca²⁻).", "Perder prótons mudaria o elemento químico."] } },
+        { level: "Fácil", text: "Os íons carregados negativamente, resultantes do GANHO de elétrons, são tecnicamente denominados de:", options: ["Cátions.", "Isótopos.", "Ânions.", "Gases Nobres."], correctIndex: 2, explanation: { correctText: "Ânion (ou Íon negativo) é a espécie química que recebeu elétrons extra. Lembre-se da dica: 'Â'nion = 'A'diciona negatividade.", otherOptions: ["Cátions são íons com carga positiva.", "Isótopos dizem respeito aos nêutrons.", "Gases Nobres são neutros e altamente estáveis."] } },
+        { level: "Médio", text: "A famosa 'Regra do Octeto' explica o motivo pelo qual os átomos formam íons. Qual é o principal objetivo de um átomo ao ceder ou capturar elétrons nas reações químicas?", options: ["Ficar com exatamente 8 elétrons na sua camada de valência (última camada), adquirindo a estabilidade estrutural de um Gás Nobre.", "Transformar o seu núcleo para conseguir criar fusão nuclear e gerar luz térmica.", "Ficar com 8 prótons no núcleo para atingir a estabilidade de um metal precioso.", "Criar um forte campo magnético para atrair outros núcleos."], correctIndex: 0, explanation: { correctText: "A natureza procura sempre a máxima estabilidade. Os gases nobres (que nascem com 8 elétrons de valência) são os mais estáveis da química. Os restantes átomos dão ou recebem elétrons para atingirem esse mesmo estado de perfeição.", otherOptions: ["A regra do octeto não envolve reações no núcleo.", "Não altera os prótons.", "Não envolve campos magnéticos isolados."] } },
+        { level: "Médio", text: "Um átomo X, no seu estado fundamental, possui o Número Atômico (Z) igual a 11. Quantos elétrons tem a eletrosfera deste átomo na sua forma NEUTRA (antes de se tornar um íon)?", options: ["22 elétrons.", "0 elétrons.", "11 elétrons.", "12 elétrons."], correctIndex: 2, explanation: { correctText: "O Estado Fundamental (Átomo Neutro) significa que a carga total é zero. Se o Z = 11 (possui 11 Prótons de carga positiva), tem de possuir exatamente 11 Elétrons de carga negativa para anular as cargas.", otherOptions: ["12 elétrons indicaria um ânion.", "22 elétrons seria o dobro da carga.", "Zero elétrons indicaria que ele perdeu toda a eletrosfera."] } },
+        { level: "Difícil", text: "O elemento Alumínio (Al) tem Número Atômico Z=13. Analisando a distribuição dos seus elétrons nas camadas (K=2, L=8, M=3), qual será o caminho energeticamente mais favorável para o Alumínio atingir o tão desejado Octeto?", options: ["Ganhar 5 elétrons de outro átomo para completar a sua camada M (ficando com 8).", "Perder os seus 3 elétrons da camada M (Valência), transformando-se num Cátion Al³⁺, fazendo com que a camada L (que já tem 8) passe a ser a sua última camada.", "Partilhar os seus prótons com elementos não metálicos.", "Perder 1 próton para se transmutar no elemento Magnésio."], correctIndex: 1, explanation: { correctText: "Para os metais que possuem 1, 2 ou 3 elétrons na camada de valência, a natureza atua pela via mais fácil: é energeticamente mais vantajoso ceder esses poucos elétrons do que roubar 5 elétrons de outros átomos. Ao perder 3 cargas negativas, forma o íon Al³⁺.", otherOptions: ["Roubar 5 elétrons exigiria uma energia brutal.", "Átomos não partilham prótons.", "A perda de prótons ocorre apenas em decaimento radioativo."] } },
+        { level: "Fácil", text: "Como se designa a força química invisível que mantém os Cátions e os Ânions fortemente unidos após a transferência de elétrons (por exemplo, na formação do cristal de sal comum, NaCl)?", options: ["Força Gravitacional Quântica.", "Ligação Metálica.", "Força Eletrostática de atração entre cargas de sinais opostos (Ligação Iônica).", "Força Nuclear Forte."], correctIndex: 2, explanation: { correctText: "Cargas de sinais opostos atraem-se intensamente. Quando o Sódio se torna um Cátion (+) e o Cloro se torna um Ânion (-), eles atraem-se magneticamente através de forças eletrostáticas, originando a Ligação Iônica.", otherOptions: ["Força nuclear atua apenas dentro do núcleo.", "Gravitação é demasiado fraca ao nível atômico.", "Ligação Metálica ocorre entre metais neutros."] } },
+        { level: "Médio", text: "O átomo neutro de Enxofre (S) tem 16 prótons. Ao formar o íon S²⁻ (Sulfeto), qual será o número exato de elétrons presentes na sua eletrosfera?", options: ["14 elétrons.", "18 elétrons.", "16 elétrons.", "2 elétrons."], correctIndex: 1, explanation: { correctText: "O sinal ²⁻ (dois menos) significa que o átomo se tornou um Ânion e GANHOU 2 elétrons adicionais. Se no seu estado neutro ele possuía 16 elétrons, agora possuirá: 16 + 2 = 18 elétrons.", otherOptions: ["14 elétrons ocorreria se ele tivesse perdido elétrons (S²⁺).", "16 elétrons é a contagem do átomo neutro original.", "2 elétrons não tem relação direta com a soma total."] } },
+        { level: "Médio", text: "O Flúor (F) pertence ao Grupo 17 da tabela periódica (Halogênios). Ele possui 7 elétrons na sua última camada de valência. Para seguir fielmente a regra do octeto, qual será a sua tendência natural?", options: ["Perder todos os 7 elétrons de uma só vez numa reação endotérmica.", "Partilhar a totalidade do seu núcleo com outro átomo.", "Ganhar 1 único elétron, transformando-se num forte Ânion F⁻ (Fluoreto).", "Permanecer no estado neutro por já estar quase estável."], correctIndex: 2, explanation: { correctText: "Os átomos com 7 elétrons de valência estão a apenas um elétron de atingir a estabilidade perfeita. Por isso, a sua tendência mais forte é capturar esse elétron em falta de outro átomo, formando um ânion de carga -1.", otherOptions: ["Perder 7 elétrons exigiria uma energia colossal.", "O núcleo não participa ativamente nestas ligações químicas.", "Não ficará neutro pois a instabilidade dos 7 elétrons é alta."] } },
+        { level: "Difícil", text: "Relativamente ao tamanho (Raio Iônico), o que acontece fisicamente ao volume da eletrosfera quando um átomo neutro de Sódio (Na) se transforma no Cátion de Sódio (Na⁺)?", options: ["O Cátion fica visivelmente MAIOR, pois a expansão térmica aumenta a distância entre órbitas.", "O tamanho não se altera, dado que a física quântica garante o raio atômico fixo.", "O Cátion fica consideravelmente MENOR, pois perdeu elétrons (geralmente toda a camada de valência) e a força atrativa do núcleo puxa a eletrosfera restante com mais intensidade.", "O Cátion duplica de tamanho devido ao peso absoluto dos prótons no núcleo."], correctIndex: 2, explanation: { correctText: "Ao transformar-se num cátion, o átomo perde elétrons e, muitas vezes, esvazia completamente a sua última camada. Com menos elétrons na nuvem, a atração dos prótons do núcleo torna-se mais eficaz, provocando uma contração do raio do íon.", otherOptions: ["O aumento ocorreria apenas na formação de um ânion.", "O tamanho altera-se sempre na formação de íons.", "Os prótons não sofrem alteração de peso ou volume nesta reação."] } },
+        { level: "Difícil", text: "Por outro lado, o que ocorre ao Tamanho (Raio Iônico) de um átomo neutro de Cloro (Cl) quando este captura um elétron extra e se transforma no Ânion Cloreto (Cl⁻)?", options: ["O Ânion fica visivelmente MAIOR. A entrada de elétrons numa eletrosfera já preenchida gera maior repulsão entre eles, forçando a nuvem a expandir-se para os acomodar.", "O Ânion fica MENOR, pois a gravidade eletromagnética contrai as órbitas da nuvem.", "O tamanho permanece estritamente igual ao do gás nobre mais próximo.", "O seu volume é anulado e torna-se um ponto de massa neutra."], correctIndex: 0, explanation: { correctText: "Regra do Raio dos Ânions: Ao ganhar elétrons adicionais, o número de cargas negativas na nuvem aumenta, o que intensifica a repulsão mútua entre os elétrons. Para estabilizar essa repulsão, a eletrosfera incha e o raio do íon aumenta.", otherOptions: ["O íon não fica menor.", "O tamanho nunca permanece inalterado.", "A anulação do volume contraria as leis da matéria."] } },
+        { level: "Fácil", text: "A palavra 'Cátion' refere-se a um íon com carga Positiva (+). Entre as grandes categorias da tabela periódica, qual é o grupo que possui maior tendência natural para formar cátions?", options: ["Os Gases Nobres.", "Os Não-Metais (Ametais).", "Os semimetais metaloides.", "Os Metais (Ferro, Ouro, Sódio, Lítio, etc.)."], correctIndex: 3, explanation: { correctText: "Os Metais caracterizam-se por possuírem poucos elétrons na camada de valência (1, 2 ou 3). Por esta razão, a sua tendência química principal é doar esses elétrons, resultando sempre em íons positivos (Cátions).", otherOptions: ["Gases Nobres são inertes.", "Não-Metais tendem a formar Ânions (ganhar elétrons).", "Semimetais têm um comportamento misto."] } },
+        { level: "Médio", text: "Espécies Isoeletrônicas são uma métrica muito testada nos exames de química. Duas partículas diferentes são chamadas 'Isoeletrônicas' se possuírem rigorosamente o mesmo número de:", options: ["Prótons no seu núcleo central.", "Elétrons totais na sua eletrosfera.", "Massa atômica (soma de prótons e nêutrons).", "Ligações covalentes ativas."], correctIndex: 1, explanation: { correctText: "O prefixo 'Iso' significa igual, e 'eletrônica' refere-se aos elétrons. Por exemplo, o íon Na⁺ e o átomo neutro do Gás Neônio (Ne) são isoeletrônicos, pois ambos possuem exatamente 10 elétrons na sua nuvem.", otherOptions: ["Átomos com o mesmo número de prótons são Isótopos.", "Átomos com a mesma massa atômica são Isóbaros.", "Ligações covalentes não definem esta nomenclatura."] } },
+        { level: "Médio", text: "Para forçar a remoção de um elétron da eletrosfera de um átomo e transformá-lo num Cátion, o laboratório tem de fornecer energia. Qual é o nome correto desta energia necessária?", options: ["Eletronegatividade da Valência.", "Energia de Ionização (ou Potencial de Ionização).", "Entalpia de Vaporização.", "Afinidade Eletrônica Ativa."], correctIndex: 1, explanation: { correctText: "A Energia de Ionização é definida como a quantidade exata de energia que deve ser fornecida a um átomo neutro, no estado gasoso, para lhe 'arrancar' um elétron da sua camada de valência.", otherOptions: ["A Eletronegatividade é a força oposta (a tendência para atrair elétrons).", "A Entalpia de Vaporização refere-se à mudança de estado líquido para gás.", "A Afinidade Eletrônica é a energia libertada quando um átomo ganha um elétron."] } },
+        { level: "Fácil", text: "As bebidas isotônicas esportivas contêm eletrólitos essenciais. Na fórmula química, o íon Potássio surge representado como K⁺. O que nos indica, de forma técnica, o símbolo '+' (sem número associado)?", options: ["Que o átomo se tornou num Ânion ao ganhar 1 próton extra.", "Que o átomo perdeu a totalidade da sua eletrosfera.", "Que ele é um Cátion que perdeu exatamente 1 (um) Elétron da sua valência.", "Que a molécula se uniu a um átomo de hidrogênio livre."], correctIndex: 2, explanation: { correctText: "Na notação internacional de íons, a presença de um sinal '+' isolado subentende '+1'. Isto significa que o átomo cedeu um elétron, resultando num saldo positivo de 1 próton de vantagem no núcleo.", otherOptions: ["Se tivesse perdido 2 elétrons, seria K²⁺.", "Os prótons não são ganhos nestas reações.", "A eletrosfera nunca é totalmente perdida em química de bancada."] } },
+        { level: "Difícil", text: "Considere o Cátion Ferro(III), frequentemente presente na ferrugem, representado quimicamente por Fe³⁺. Sendo o seu Número Atômico Z=26, qual é a contagem final de partículas (Prótons e Elétrons) presentes NESTE íon específico?", options: ["29 Prótons e 26 Elétrons.", "26 Prótons e 26 Elétrons.", "26 Prótons e 23 Elétrons.", "23 Prótons e 26 Elétrons."], correctIndex: 2, explanation: { correctText: "O Número Atômico (Z=26) dita que haverá sempre 26 Prótons, pois o núcleo nunca se altera na ionização. O expoente ³⁺ indica que o átomo perdeu 3 elétrons. Assim, o cálculo será: 26 elétrons originais - 3 elétrons = 23 Elétrons restantes na eletrosfera.", otherOptions: ["26 prótons e 26 elétrons corresponderia ao átomo neutro de Ferro.", "Ter 29 prótons significaria que se tratava de um átomo de Cobre (Cu).", "O núcleo nunca perde prótons."] } },
+        { level: "Médio", text: "O átomo de Oxigênio (Z=8) necessita de capturar elétrons para atingir a configuração de um Gás Nobre. Para concretizar a regra do Octeto, ele precisa de receber mais 2 elétrons. Após este processo, qual será a representação correta do íon formado?", options: ["O²⁺", "O²⁻", "O⁸", "O₂"], correctIndex: 1, explanation: { correctText: "Ao ganhar elétrons, o átomo está a adicionar partículas de carga NEGATIVA. Ao incorporar 2 elétrons na sua eletrosfera, o saldo global fica com excesso de 2 cargas negativas, sendo representado pelo símbolo O²⁻.", otherOptions: ["O símbolo O²⁺ indicaria que o oxigênio tinha perdido 2 elétrons, o que não ocorre naturalmente neste elemento.", "A notação O₂ diz respeito à molécula de gás oxigênio, não ao íon isolado.", "O⁸ não é uma notação química válida."] } },
+        { level: "Fácil", text: "Na simbologia química padrão (IUPAC), em que local do símbolo do elemento (por exemplo, Cálcio 'Ca') se deve posicionar o número correspondente à Carga do Íon?", options: ["Na parte inferior esquerda, como índice subscrito (ex: ₂Ca).", "Centrado sobre a letra do elemento (ex: C²a).", "Na parte superior direita, como expoente sobrescrito (ex: Ca²⁺).", "No alinhamento frontal, antes da letra principal (ex: +2Ca)."], correctIndex: 2, explanation: { correctText: "A carga do Íon (o seu estado de oxidação aparente) deve ser sempre grafada no formato de sobrescrito, no canto superior direito do símbolo químico do elemento.", otherOptions: ["A posição inferior esquerda é reservada para o Número Atômico (Z).", "A posição inferior direita é utilizada para indicar a atomicidade na molécula (ex: H₂O).", "O formato frontal é incorreto na notação moderna."] } },
+        { level: "Médio", text: "Um aluno do ensino médio analisa as partículas de uma amostra isolada no laboratório e registra as seguintes quantidades: 17 Prótons, 18 Nêutrons e 18 Elétrons. A que espécie química corresponde esta análise?", options: ["A um Cátion de carga +1, ditado pela massa dos nêutrons.", "A um Átomo Neutro em repouso absoluto.", "A um Ânion de carga -1, devido ao desequilíbrio entre elétrons e prótons (18 e⁻ vs 17 p⁺).", "A um Isótopo instável que não possui eletrosfera."], correctIndex: 2, explanation: { correctText: "O balanço de cargas é direto: existem 17 Prótons (Cargas Positivas) e 18 Elétrons (Cargas Negativas). Existe um excesso exato de 1 carga negativa no saldo final, classificando a espécie como um Ânion de carga (-1).", otherOptions: ["Os nêutrons não têm carga elétrica, pelo que não interferem no cálculo do íon.", "Para ser neutro teria de ter exatamente 17 elétrons.", "Todos os íons possuem eletrosfera."] } },
+        { level: "Difícil", text: "Os Gases Nobres (ex: Hélio, Neônio, Argônio), localizados no Grupo 18 da Tabela Periódica, são conhecidos pela sua natureza inerte. Qual é a explicação física fundamental para que a formação de íons por parte destes elementos seja um evento raríssimo?", options: ["Porque as suas eletrosferas são desprovidas de campo magnético atrativo.", "Porque a força nuclear dos seus isótopos impede a passagem de energia térmica.", "Porque a sua Camada de Valência já se encontra totalmente preenchida com a lotação máxima (geralmente 8 elétrons). Estão no pico da estabilidade do Octeto.", "Porque a sua constituição atômica anula a força gravitacional entre prótons."], correctIndex: 2, explanation: { correctText: "Os Gases Nobres representam a estabilidade química perfeita. Eles já possuem a sua camada de valência otimizada de origem. Não sentem necessidade energética de ceder ou capturar elétrons a outros elementos, o que os torna quase inertes na formação de íons ou compostos.", otherOptions: ["As eletrosferas funcionam pelas mesmas regras eletrostáticas.", "A gravitação não é relevante neste contexto subatômico.", "O núcleo não influencia diretamente esta inércia reativa."] } },
+        { level: "Médio", text: "Os Metais Alcalinos (Grupo 1) e os Halogênios (Grupo 17) apresentam elevada reatividade entre si, como no caso do Sódio (Na) e Cloro (Cl). Qual é o mecanismo químico base pelo qual eles atingem a estabilidade do Octeto nesta interação?", options: ["Ambos libertam elétrons para a atmosfera, ficando neutros após a reação.", "O Metal (Sódio) transfere o seu elétron de valência diretamente para o Não-Metal (Cloro), formando um Cátion Na⁺ e um Ânion Cl⁻, que depois se atraem eletrostaticamente.", "Ambos absorvem elétrons diretamente do núcleo atômico alheio.", "A estabilidade ocorre através da fusão física dos seus núcleos pesados."], correctIndex: 1, explanation: { correctText: "Trata-se de uma transferência direta e eficaz de elétrons. O Metal liberta-se da carga negativa para estabilizar, enquanto o Não-Metal captura essa mesma carga. A diferença de polaridade resultante (+ e -) cria uma forte força atrativa que une os íons (Ligação Iônica).", otherOptions: ["Eles não fundem núcleos, apenas trocam elétrons periféricos.", "Não absorvem elétrons dos núcleos.", "Elétrons libertados não desaparecem na atmosfera."] } },
+        { level: "Fácil", text: "Sabendo que um Ânion se caracteriza pelo ganho de carga negativa na sua eletrosfera, qual será a interação esperada caso este ânion seja aproximado de uma outra espécie química que também possua carga negativa?", options: ["Ocorrerá uma atração magnética irresistível entre eles.", "Ocorrerá uma intensa Força de Repulsão Eletrostática, visto que cargas elétricas com o mesmo sinal (Menos e Menos) repelem-se.", "Eles fundir-se-ão para partilhar o excesso eletrônico.", "Não ocorrerá qualquer interação, mantendo-se a inércia."], correctIndex: 1, explanation: { correctText: "A lei fundamental da Eletrostática dita que cargas opostas se atraem, mas cargas idênticas repelem-se com vigor. Assim, aproximar um ânion (-) de outro elemento com carga negativa resultará obrigatoriamente numa forte força repulsiva.", otherOptions: ["A atração só ocorre com sinais contrários (+ e -).", "Ânions não tendem a fundir-se facilmente devido a esta repulsão.", "A interação é sempre evidente ao nível subatômico."] } },
+        { level: "Difícil", text: "Um teste à inversão do balanço químico: Uma partícula X apresenta no seu registro uma Carga Final de +2 e possui um total de 18 Elétrons a orbitar na sua nuvem. Baseado nestes dados matemáticos, qual é obrigatoriamente o Número Atômico original (número de prótons) deste Átomo X?", options: ["20 Prótons no Núcleo.", "16 Prótons no Núcleo.", "18 Prótons no Núcleo.", "36 Prótons no Núcleo."], correctIndex: 0, explanation: { correctText: "Se a carga do íon é de +2, conclui-se que o átomo original PERDEU 2 elétrons para atingir a marca dos atuais 18 elétrons. Para descobrir a identidade inicial neutra, basta devolver esses 2 elétrons: 18 + 2 = 20. Num átomo neutro, os 20 elétrons correspondem exatamente a 20 Prótons no núcleo (Logo, Z=20).", otherOptions: ["16 prótons representaria um Ânion que tinha ganho 2 elétrons para chegar a 18.", "18 prótons seria um gás nobre neutro sem qualquer carga.", "A lógica matemática não suporta a duplicação direta."] } },
+        { level: "Médio", text: "No metabolismo humano, a Hemoglobina transporta o Oxigênio auxiliada pela presença vital do íon de Ferro bivalente, representado por Fe²⁺. Do ponto de vista estritamente químico, o que representa este íon isolado?", options: ["Representa um átomo de ferro que agregou 2 nêutrons adicionais no processo respiratório.", "Representa o átomo base do elemento Ferro que, durante uma interação reativa, cedeu 2 elétrons da sua camada de valência.", "Representa a partilha estrutural de 2 prótons com o elemento cobre adjacente.", "Representa a perda de 2 cargas positivas resultantes da ionização do sangue."], correctIndex: 1, explanation: { correctText: "O íon Fe²⁺ (cátion) origina-se exclusivamente quando o átomo de Ferro neutro perde 2 partículas negativas (elétrons) do seu invólucro eletrônico, assumindo assim uma carga positiva preponderante no balanço final.", otherOptions: ["As interações iônicas normais não envolvem a adição de nêutrons.", "Os átomos não partilham prótons nas reações da biologia humana.", "O sinal positivo implica perda de carga negativa (elétrons), não de prótons."] } },
+        { level: "Fácil", text: "Durante a formação de qualquer Íon (seja ele um Cátion ou um Ânion), em que zona anatômica específica do átomo ocorrem fisicamente estas adições ou subtrações de partículas?", options: ["Exclusivamente na camada mais periférica da Eletrosfera (a chamada Camada de Valência).", "Profundamente no Núcleo atômico, alterando a estrutura densa da massa.", "Simultaneamente no Núcleo e na primeira órbita (Camada K).", "No interior dos nêutrons, libertando radiação iônica."], correctIndex: 0, explanation: { correctText: "A reatividade de formação de íons é um processo estritamente periférico. Os átomos cedem ou capturam elétrons na sua 'capa' externa (a eletrosfera de valência), mantendo o núcleo sempre selado e intacto durante as reações químicas padrão.", otherOptions: ["Mexer no núcleo despoletaria reações nucleares severas (fissão/fusão), não íons comuns.", "Os nêutrons são insensíveis à adição ou subtração de elétrons periféricos.", "A camada K está demasiado profunda para ser a primeira a reagir."] } },
+        { level: "Difícil", text: "Existe um grupo de elementos na Tabela Periódica que se opõe vigorosamente à formação de Cátions, sendo os especialistas absolutos em capturar elétrons para se transformarem em Ânions (normalmente com carga -1) devido à presença de 7 elétrons de valência. Como se designa este grupo?", options: ["Os Metais Alcalinoterrosos.", "Os Gases Nobres.", "A Família dos Halogênios (ex: Flúor, Cloro, Bromo, Iodo).", "A Família dos Calcogênios."], correctIndex: 2, explanation: { correctText: "A Família dos Halogênios (Grupo 17) caracteriza-se por possuir 7 elétrons na última camada. Devido a esta proximidade com o octeto, a sua eletronegatividade é máxima: a sua única meta química é atrair ferozmente 1 elétron extra para estabilizar como Ânions (-1).", otherOptions: ["Os Alcalinoterrosos (Grupo 2) tendem a perder elétrons, formando cátions +2.", "Os Calcogênios (Grupo 16) necessitam de 2 elétrons, tendendo a formar ânions -2.", "Gases Nobres são quimicamente inertes."] } },
+        { level: "Médio", text: "Ao compararmos o Átomo de Gás Neônio (Ne, Z=10), o Cátion de Sódio (Na⁺, derivado de Z=11) e o Ânion de Flúor (F⁻, derivado de Z=9). Qual é a característica estrutural que une matematicamente estas três espécies?", options: ["São Isótopos do mesmo elemento de transição.", "Possuem rigorosamente a mesma Eletrosfera! Todos apresentam um saldo exato de 10 Elétrons após os ajustamentos iônicos, sendo considerados uma 'Série Isoeletrônica'.", "Partilham o mesmo número de nêutrons no seu núcleo denso.", "Todos apresentam uma massa atômica nula."], correctIndex: 1, explanation: { correctText: "A análise matemática comprova a isoeletrônica: O Neônio tem 10 elétrons naturalmente. O Sódio (Z=11) ao perder 1 e⁻ fica com 10. O Flúor (Z=9) ao ganhar 1 e⁻ fica com 10. Apesar de terem núcleos e massas diferentes, as suas nuvens eletrônicas são matematicamente idênticas.", otherOptions: ["Isótopos teriam obrigatoriamente de ser átomos do mesmo elemento (mesmo Z).", "O número de nêutrons difere consoante o isótopo de cada um.", "Nenhum átomo tem massa atômica nula."] } },
+        { level: "Fácil", text: "Num laboratório de física, uma Partícula 'A' apresenta 20 prótons e 18 elétrons na sua constituição. Uma Partícula 'B' apresenta 17 prótons e 18 elétrons. Face aos dados estruturais, como se classificam quimicamente as partículas A e B, respectivamente?", options: ["A é um Cátion Positivo e B é um Ânion Negativo.", "A é um Gás Nobre e B é um Metal Alcalino.", "Ambas são Ânions Negativos de alta energia.", "A é um Átomo Neutro e B é um Cátion Positivo."], correctIndex: 0, explanation: { correctText: "Efetuando o balanço de cargas: A Partícula 'A' tem 20(+) e 18(-), logo o saldo é +2, sendo um Cátion. A Partícula 'B' tem 17(+) e 18(-), logo o saldo é -1 (ganham os elétrons), sendo classificada como Ânion.", otherOptions: ["A matemática das cargas exclui a classificação como neutros.", "Os gases nobres possuem um saldo neutro.", "Ambas as opções contradizem o cálculo aritmético direto das partículas."] } },
+        { level: "Difícil", text: "A estabilidade e a economia energética da natureza ditam as regras da ionização. Por que motivo é praticamente impossível encontrar na Terra íons extremamente carregados, como um Cátion de carga (+5) ou um Ânion de carga (-5)?", options: ["Porque as tabelas termodinâmicas esgotam a classificação limite nos gases nobres.", "Devido aos limites energéticos e repulsivos da matéria. Remover sucessivamente mais do que 3 elétrons requer uma Energia de Ionização colossal, tal como forçar 5 elétrons extras gera uma repulsão magnética insuportável para a nuvem.", "Porque os prótons perdem a sua carga nuclear forte ao tentar segurar os orbitais excessivos.", "Porque os íons com essas cargas colapsam rapidamente e transmutam-se em hidrogênio sólido."], correctIndex: 1, explanation: { correctText: "O processo de ionização tem um custo. Formar cátions de carga +1 ou +2 é energeticamente viável. Porém, tentar arrancar o 4º ou 5º elétron de um núcleo que já está altamente positivo exige uma quantidade de energia absurda. Da mesma forma, adicionar demasiados elétrons causa repulsão estrutural crítica na eletrosfera.", otherOptions: ["A transmutação para hidrogênio não ocorre em química iônica.", "Os prótons não perdem a carga forte.", "O limite não é imposto por tabelas visuais, mas pela mecânica da energia de repulsão e atração."] } },
+        { level: "Médio", text: "Experiência de condutibilidade elétrica: O Sal de Cozinha no estado sólido (NaCl puro em cristais secos) atua como um isolante elétrico e não conduz corrente. Contudo, quando o sal é derretido a altas temperaturas e se transforma em líquido, torna-se um excelente condutor elétrico (acendendo uma lâmpada num circuito). Qual é a explicação iônica para este fenômeno?", options: ["Os prótons dos elementos separam-se do núcleo e iniciam um fluxo livre na solução ígnea.", "A radiação térmica injetada destrói as barreiras do octeto de estabilidade neutra.", "A Mobilidade dos Íons Livres. No cristal sólido, o Na⁺ e o Cl⁻ estão presos numa grade rígida devido à atração. Ao fundir a matéria, os íons separam-se e ficam livres para se mover no líquido, transportando a corrente elétrica pelo circuito.", "Os elétrons do meio exterior evaporam devido à fusão de nêutrons e emitem luz própria invisível."], correctIndex: 2, explanation: { correctText: "Para que haja condução de eletricidade num composto, é imperativo que existam cargas elétricas móveis (livres). Apenas ao derreter (fusão) ou dissolver em água (dissolução) as ligações sólidas do sal se quebram, libertando os cátions e os ânions que atuarão como 'transportadores' da corrente elétrica.", otherOptions: ["A eletricidade não é conduzida por prótons livres nestes meios.", "As barreiras do octeto não são destruídas.", "Não ocorre evaporação ou emissão de luz invisível pela eletrosfera solta."] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_ioes_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Químico Correto!' : '❌ Desvio Eletrostático!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#6366F1', '#4338CA', '#F59E0B', '#EF4444'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 ELETROSTÁTICA DOMINADA!</strong> Sua matemática iônica está impecável. Você compreende a diferença entre Cátions e Ânions perfeitamente.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ DESEQUILÍBRIO DE CARGAS!</strong> Você foi avaliado abaixo da meta (80%). Revise a lógica de que "Perder Elétrons significa ficar Positivo".
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Semelhanças Atômicas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: SUBATÔMICO (Fúcsia e Ciano) --- */
+        :root {
+            --bg-color: #FDF4FF; 
+            --text-color: #4A044E; 
+            --border-color: #701A75; 
+            --white: #FFFFFF;
+            
+            --theme-light: #FAE8FF; 
+            --theme-medium: #D946EF; 
+            --theme-dark: #A21CAF; 
+            --theme-contrast: #06B6D4; 
+            --theme-accent: #F59E0B; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #CFFAFE;
+            --correct-border: #0891B2;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.cyan { background-color: #ECFEFF; border-left-color: #06B6D4; color: #164E63; }
+        
+        .mnemonic-letter { font-size: 1.8rem; font-weight: 900; color: var(--theme-contrast); display: inline-block; transform: translateY(2px); text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #0F766E; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧬</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Semelhanças Atômicas</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Isótopos, Massa, Prótons)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🆔 1. Identidade do Átomo</div>
+                <article class="theory-box search-target">
+                    <h3>O RG Químico</h3>
+                    <p>Antes de comparar átomos, precisamos lembrar as grandezas fundamentais que os definem na notação química:</p>
+                    
+                    <span class="inline-example">Massa (A) = Prótons (Z) + Nêutrons (n)</span>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Z (Número Atômico):</strong> É o número de <strong>Prótons</strong>. É a identidade do elemento. Se Z muda, o elemento químico muda!</li>
+                        <li><strong>A (Número de Massa):</strong> É o peso do núcleo. A soma de Prótons + Nêutrons. O elétron não entra na conta porque a sua massa é desprezível.</li>
+                        <li><strong>n (Nêutrons):</strong> Para achar os nêutrons, basta subtrair a Massa pelo Número Atômico: <code>n = A - Z</code>.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔴 2. IsótoPos (Mesmo Z)</div>
+                <article class="theory-box search-target">
+                    <h3>Gêmeos de Massas Diferentes</h3>
+                    <p>Átomos Isóto<span class="mnemonic-letter">p</span>os possuem o mesmo número de <strong>P</strong>rótons (mesmo elemento químico), mas números de massa (A) diferentes porque possuem quantidades diferentes de nêutrons.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="280" height="100" viewBox="0 0 280 100">
+                            <!-- C-12 -->
+                            <text x="40" y="30" font-size="16" font-weight="900" fill="#06B6D4">12</text>
+                            <text x="60" y="55" font-size="32" font-weight="900" fill="#4A044E">C</text>
+                            <text x="40" y="70" font-size="16" font-weight="900" fill="#06B6D4">6</text>
+                            <text x="50" y="90" font-size="12" font-weight="bold" fill="#701A75">6 nêutrons</text>
+
+                            <!-- C-13 -->
+                            <text x="130" y="30" font-size="16" font-weight="900" fill="#06B6D4">13</text>
+                            <text x="150" y="55" font-size="32" font-weight="900" fill="#4A044E">C</text>
+                            <text x="130" y="70" font-size="16" font-weight="900" fill="#06B6D4">6</text>
+                            <text x="140" y="90" font-size="12" font-weight="bold" fill="#701A75">7 nêutrons</text>
+
+                            <!-- C-14 -->
+                            <text x="220" y="30" font-size="16" font-weight="900" fill="#06B6D4">14</text>
+                            <text x="240" y="55" font-size="32" font-weight="900" fill="#4A044E">C</text>
+                            <text x="220" y="70" font-size="16" font-weight="900" fill="#06B6D4">6</text>
+                            <text x="230" y="90" font-size="12" font-weight="bold" fill="#701A75">8 nêutrons</text>
+                        </svg>
+                    </div>
+
+                    <div class="highlight-box cyan">
+                        <strong>Propriedades:</strong> Como têm os mesmos prótons e elétrons, as propriedades <strong>QUÍMICAS</strong> são IGUAIS. Mas como as massas diferem, as propriedades <strong>FÍSICAS</strong> (como densidade e radioatividade) são DIFERENTES.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚖️ 3. IsóbAros (Mesmo A)</div>
+                <article class="theory-box search-target">
+                    <h3>Mesmo Peso, Famílias Diferentes</h3>
+                    <p>Átomos Isób<span class="mnemonic-letter">a</span>ros possuem o mesmo número de M<span class="mnemonic-letter">a</span>ssa (A), mas números atômicos (Z) diferentes. São elementos químicos totalmente distintos que, por coincidência, "pesam" o mesmo.</p>
+                    
+                    <span class="inline-example">Ex: Cálcio (Z=20, A=40) e Argônio (Z=18, A=40)</span>
+                    
+                    <p style="margin-top:10px;">Por serem elementos diferentes, todas as suas propriedades (físicas e químicas) são diferentes.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔵 4. IsótoNos (Mesmo n)</div>
+                <article class="theory-box search-target">
+                    <h3>Empate nos Nêutrons</h3>
+                    <p>Átomos Isóto<span class="mnemonic-letter">n</span>os possuem o mesmo número de <strong>N</strong>êutrons (n), mas diferem na massa (A) e no número atômico (Z).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="220" height="80" viewBox="0 0 220 80">
+                            <!-- Boro -->
+                            <text x="30" y="30" font-size="16" font-weight="900" fill="#4A044E">11</text>
+                            <text x="50" y="55" font-size="32" font-weight="900" fill="#A21CAF">B</text>
+                            <text x="30" y="70" font-size="16" font-weight="900" fill="#4A044E">5</text>
+                            
+                            <!-- Carbono -->
+                            <text x="160" y="30" font-size="16" font-weight="900" fill="#4A044E">12</text>
+                            <text x="180" y="55" font-size="32" font-weight="900" fill="#A21CAF">C</text>
+                            <text x="160" y="70" font-size="16" font-weight="900" fill="#4A044E">6</text>
+
+                            <!-- Cálculo central -->
+                            <text x="80" y="45" font-size="14" font-weight="bold" fill="#06B6D4">11 - 5 = 6n</text>
+                            <text x="100" y="65" font-size="14" font-weight="bold" fill="#06B6D4">12 - 6 = 6n</text>
+                        </svg>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚡ 5. Isoeletrônicos (Mesmo e-)</div>
+                <article class="theory-box search-target">
+                    <h3>Mesma Eletrosfera</h3>
+                    <p>Espécies Iso<span class="mnemonic-letter">e</span>letrônicas possuem o mesmo número de <strong>E</strong>létrons. Isso geralmente acontece quando comparamos íons (cátions e ânions) com gases nobres.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Neônio Neutro (Ne):</strong> Z=10. Tem 10 elétrons.</li>
+                        <li><strong>Sódio Cátion (Na⁺):</strong> Z=11. Perdeu 1 elétron. Fica com 10 elétrons.</li>
+                        <li><strong>Oxigênio Ânion (O²⁻):</strong> Z=8. Ganhou 2 elétrons. Fica com 10 elétrons.</li>
+                    </ul>
+                    <p style="margin-top:10px; font-weight: 700; color: var(--theme-dark);">Ne, Na⁺ e O²⁻ são todos isoeletrônicos!</p>
+                </article>
+            </section>
+
+            <!-- NOVO BLOCO: RESUMO RÁPIDO -->
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-contrast);">📌 Resumo Rápido (Macetes)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast); border-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Revise Antes da Prova!</h3>
+                    <p>Lembre-se sempre das letras maiúsculas no meio das palavras para nunca mais esquecer as semelhanças atômicas no ENEM:</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 15px; text-align: center;">
+                        <div style="background-color: #FDF4FF; border: 2px solid #D946EF; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #A21CAF; line-height: 1;">P</span><br>
+                            <strong style="color: #701A75; font-size: 1rem;">IsótoPos</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Mesmos Prótons</span>
+                        </div>
+                        <div style="background-color: #ECFEFF; border: 2px solid #06B6D4; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #0891B2; line-height: 1;">A</span><br>
+                            <strong style="color: #164E63; font-size: 1rem;">IsóbAros</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Mesma Massa</span>
+                        </div>
+                        <div style="background-color: #FFF7ED; border: 2px solid #F59E0B; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #D97706; line-height: 1;">N</span><br>
+                            <strong style="color: #92400E; font-size: 1rem;">IsótoNos</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Mesmos Nêutrons</span>
+                        </div>
+                        <div style="background-color: #F0FDF4; border: 2px solid #10B981; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #059669; line-height: 1;">E</span><br>
+                            <strong style="color: #064E3B; font-size: 0.95rem;">Isoeletrônicos</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Mesmos Elétrons</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões essenciais sobre Isótopos, Isóbaros, Isótonos e Isoeletrônicos. Acerte <strong>80% (24/30)</strong> para dominar as semelhanças atômicas!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Semelhanças Atômicas PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Na notação química de um elemento, o que representa a letra 'Z' e qual a sua importância fundamental?", options: ["Representa a Massa Atômica, que define o peso do átomo.", "Representa o Número de Nêutrons, que define a radioatividade.", "Representa o Número Atômico (quantidade de prótons), que é o 'RG' da identidade do elemento químico.", "Representa a Zona Eletrosférica, onde ficam os elétrons."], correctIndex: 2, explanation: { correctText: "O Número Atômico (Z) é a quantidade de prótons no núcleo. É ele que define qual é o elemento químico. Se Z=6, é sempre Carbono.", otherOptions: ["A massa atômica é representada por 'A'.", "Nêutrons são representados por 'n'.", "Zona eletrosférica não é Z."] } },
+        { level: "Fácil", text: "A massa atômica (A) de um átomo é calculada pela soma matemática de quais partículas subatômicas?", options: ["Elétrons + Nêutrons.", "Prótons + Elétrons.", "Apenas os Prótons.", "Prótons + Nêutrons."], correctIndex: 3, explanation: { correctText: "A fórmula universal é A = Z + n (Massa = Prótons + Nêutrons). A massa do elétron é tão pequena que é ignorada (desprezível) neste cálculo.", otherOptions: ["Os elétrons não pesam na balança atômica da química básica."] } },
+        { level: "Fácil", text: "Átomos que pertencem ao mesmo elemento químico (possuem o mesmo número de PRÓTONS), mas que apresentam diferentes números de massa, são chamados de:", options: ["Isóbaros.", "Isótopos.", "Isótonos.", "Isoeletrônicos."], correctIndex: 1, explanation: { correctText: "A dica da letra: IsótoPos têm o mesmo número de Prótons (P). Como a quantidade de nêutrons varia, a massa (A) também fica diferente.", otherOptions: ["Isóbaros = mesma massa (A).", "Isótonos = mesmos nêutrons (N)."] } },
+        { level: "Médio", text: "O Hidrogênio é o único elemento cujos isótopos possuem nomes próprios. Qual das opções abaixo apresenta corretamente os três isótopos naturais do Hidrogênio?", options: ["Prótio, Deutério e Trítio.", "Hélio, Lítio e Berílio.", "Alfa, Beta e Gama.", "Cátion, Ânion e Nêutron."], correctIndex: 0, explanation: { correctText: "O Hidrogênio possui o Prótio (massa 1, zero nêutrons), o Deutério (massa 2, um nêutron) e o Trítio (massa 3, radioativo, dois nêutrons). Todos têm Z=1.", otherOptions: ["Hélio, Lítio são outros elementos.", "Alfa, Beta, Gama são radiações."] } },
+        { level: "Fácil", text: "Átomos Isóbaros são espécies químicas que apresentam obrigatoriamente:", options: ["O mesmo número atômico (Z).", "O mesmo número de Massa (A).", "O mesmo número de Nêutrons (n).", "O mesmo número de Elétrons (e)."], correctIndex: 1, explanation: { correctText: "A dica da letra: IsóbAros têm o mesmo número de Massa (A). Por terem a mesma massa, pertencem a elementos químicos diferentes.", otherOptions: ["Mesmo Z = Isótopos.", "Mesmo n = Isótonos."] } },
+        { level: "Fácil", text: "Para descobrirmos se dois átomos são Isótonos, devemos verificar se eles possuem a mesma quantidade de:", options: ["Prótons.", "Massa.", "Elétrons.", "Nêutrons."], correctIndex: 3, explanation: { correctText: "A dica da letra: IsótoNos têm o mesmo número de Nêutrons (N).", otherOptions: ["Mesmo Z = Isótopos.", "Mesmo e = Isoeletrônicos."] } },
+        { level: "Médio", text: "Dois átomos genéricos X e Y são classificados como isótopos. Com base nesta afirmação, podemos concluir garantidamente que eles pertencem:", options: ["A elementos químicos diferentes.", "À mesma família de massa nuclear.", "Ao mesmo elemento químico, pois possuem o mesmo número atômico.", "Aos gases nobres inertes."], correctIndex: 2, explanation: { correctText: "Isótopos têm o mesmo número de Prótons (Z). Como o número de prótons é a identidade do elemento, isótopos são sempre átomos do mesmo elemento químico.", otherOptions: ["Isóbaros e Isótonos é que são de elementos diferentes."] } },
+        { level: "Fácil", text: "Na natureza, encontramos o Carbono-12 e o Carbono-14. Eles têm o mesmo número atômico (Z=6), mas massas diferentes (12 e 14). Eles são exemplos clássicos de:", options: ["Isóbaros.", "Isoeletrônicos.", "Isótopos.", "Isótonos."], correctIndex: 2, explanation: { correctText: "Por serem do mesmo elemento (Carbono, Z=6) com massas diferentes, são Isótopos perfeitos. O Carbono-14 tem 2 nêutrons a mais.", otherOptions: [""] } },
+        { level: "Médio", text: "Os isóbaros pertencem a elementos químicos diferentes (Z diferentes). Como consequência estrutural disso, eles possuem propriedades químicas:", options: ["Exatamente iguais.", "Diferentes.", "Nulas e inertes.", "Idênticas às dos gases nobres."], correctIndex: 1, explanation: { correctText: "Propriedades químicas são ditadas pelo número atômico e pelos elétrons. Como Isóbaros são de elementos diferentes, eles reagem de forma totalmente diferente na química.", otherOptions: ["Somente Isótopos têm propriedades químicas iguais."] } },
+        { level: "Médio", text: "Um átomo de Cálcio tem Z=20 e A=40. Um átomo de Argônio tem Z=18 e A=40. A relação química entre o Cálcio e o Argônio nestas condições é de:", options: ["Isótopos.", "Isótonos.", "Isóbaros.", "Alótropos."], correctIndex: 2, explanation: { correctText: "Ambos possuem o número de Massa (A) igual a 40. Logo, são Isóbaros (mesma massa, mas elementos diferentes).", otherOptions: ["Z são diferentes (não são isótopos).", "Nêutrons são 20 e 22 (não são isótonos)."] } },
+        { level: "Fácil", text: "Espécies químicas que são classificadas como 'Isoeletrônicas' devem obrigatoriamente apresentar o mesmo número de:", options: ["Elétrons na sua eletrosfera.", "Prótons no seu núcleo.", "Nêutrons em repouso.", "Níveis de energia vazios."], correctIndex: 0, explanation: { correctText: "Iso (Igual) + Eletrônicos (Elétrons). Espécies isoeletrônicas têm rigorosamente a mesma contagem total de elétrons.", otherOptions: [""] } },
+        { level: "Difícil", text: "O Gás Neônio (Ne) possui Z=10 e é neutro. Qual dos íons abaixo é isoeletrônico do Neônio?", options: ["O ânion Cl- (Z=17).", "O cátion Ca2+ (Z=20).", "O cátion Na+ (Z=11).", "O átomo neutro de Argônio (Z=18)."], correctIndex: 2, explanation: { correctText: "O Neônio neutro tem 10 elétrons. O Sódio (Na) tem Z=11. Quando vira cátion Na+, ele perde 1 elétron (11 - 1 = 10 elétrons). Logo, Na+ e Ne têm 10 elétrons (isoeletrônicos).", otherOptions: ["Cl- tem 18.", "Ca2+ tem 18.", "Ar tem 18."] } },
+        { level: "Médio", text: "Um átomo A possui Z=15 e A=31. Um átomo B possui Z=16 e A=32. Qual é a semelhança atômica entre A e B?", options: ["São Isóbaros.", "São Isótonos.", "São Isótopos.", "Não possuem semelhança alguma."], correctIndex: 1, explanation: { correctText: "Vamos calcular os nêutrons (n = A - Z). Para A: 31 - 15 = 16 nêutrons. Para B: 32 - 16 = 16 nêutrons. Como empatam nos nêutrons, são Isótonos.", otherOptions: ["Z não é igual. A não é igual."] } },
+        { level: "Médio", text: "O trítio é um isótopo radioativo do hidrogênio, representado com massa A=3 e número atômico Z=1. Quantos nêutrons possui o núcleo do trítio?", options: ["1 nêutron.", "0 nêutrons.", "2 nêutrons.", "3 nêutrons."], correctIndex: 2, explanation: { correctText: "A matemática é n = A - Z. Portanto, n = 3 - 1 = 2 nêutrons. (O prótio tem 0, o deutério tem 1, e o trítio tem 2).", otherOptions: [""] } },
+        { level: "Difícil", text: "Átomos que são isótonos (mesmo número de nêutrons) pertencem obrigatoriamente a elementos químicos diferentes. Assim sendo, as suas propriedades físicas e químicas são:", options: ["Físicas iguais e Químicas diferentes.", "Químicas iguais e Físicas diferentes.", "Totalmente Diferentes (tanto físicas quanto químicas).", "Idênticas em todos os aspectos."], correctIndex: 2, explanation: { correctText: "Como são elementos diferentes (Z diferentes), a reatividade (química) e o peso/densidade (física) mudam. Só os isótopos têm a química igual.", otherOptions: ["Apenas os isótopos mantêm propriedades químicas iguais."] } },
+        { level: "Médio", text: "O cátion Cálcio Ca2+ (Z=20) e o átomo de Gás Argônio Ar (Z=18) apresentam uma semelhança notável nas suas eletrosferas. Eles são:", options: ["Isóbaros estruturais.", "Isoeletrônicos.", "Isótopos radioativos.", "Isótonos iônicos."], correctIndex: 1, explanation: { correctText: "O Cálcio neutro tem 20 elétrons. O íon Ca2+ perdeu 2 elétrons, ficando com 18. O Argônio neutro (Z=18) também tem 18 elétrons. Portanto, ambos têm 18 e- (isoeletrônicos).", otherOptions: [""] } },
+        { level: "Fácil", text: "Uma dica mnemônica comum no vestibular é olhar para a letra maiúscula de destaque nos nomes das semelhanças. Na palavra 'IsóToPos', a letra 'P' lembra diretamente o fato de que esses átomos têm o mesmo número de:", options: ["Prótons.", "Pesos.", "Pósitrons.", "Partículas."], correctIndex: 0, explanation: { correctText: "P de Prótons! É o macete infalível para não esquecer no ENEM.", otherOptions: ["IsóbAros (A = Massa). IsótoNos (N = Nêutrons)."] } },
+        { level: "Difícil", text: "Dois átomos A e B são ISÓBAROS. O átomo A tem Z=20 e 20 nêutrons. Se o átomo B tem Z=19, qual é o número de nêutrons do átomo B?", options: ["21 nêutrons.", "20 nêutrons.", "19 nêutrons.", "40 nêutrons."], correctIndex: 0, explanation: { correctText: "Passo 1: Achar a massa de A. A = Z + n (20 + 20 = 40). Passo 2: Se são isóbaros, a massa de B também é 40. Passo 3: Achar os nêutrons de B. n = A - Z (40 - 19 = 21 nêutrons).", otherOptions: [""] } },
+        { level: "Médio", text: "O Urânio é usado como combustível nuclear. Qual é a diferença física estrutural FUNDAMENTAL entre os isótopos U-235 e U-238?", options: ["O número de prótons no núcleo.", "O número de elétrons na camada de valência.", "Apenas o número de Nêutrons, que faz o U-238 ser mais pesado.", "Eles pertencem a elementos químicos diferentes."], correctIndex: 2, explanation: { correctText: "Por serem isótopos (ambos são Urânio, Z=92), os prótons e elétrons são iguais. A diferença na massa atômica (235 vs 238) é devida unicamente à presença de 3 nêutrons a mais no U-238.", otherOptions: ["Z nunca muda para isótopos do mesmo elemento."] } },
+        { level: "Difícil", text: "Um elemento X é ISÓTOPO do elemento Y (Z=11, A=23) e simultaneamente ISÓTONO do elemento Z (Z=12, A=25). Qual é o número de massa (A) do elemento X?", options: ["24.", "23.", "25.", "11."], correctIndex: 0, explanation: { correctText: "Quebra-cabeça: X é isótopo de Y, logo tem o mesmo Z. O Z de X é 11. X é isótono de Z. Nêutrons de Z = 25 - 12 = 13 nêutrons. Logo, X tem 13 nêutrons. Massa de X = Z(11) + n(13) = 24.", otherOptions: [""] } },
+        { level: "Médio", text: "Os isótopos de um mesmo elemento químico compartilham o mesmo número atômico. Por causa disso, as suas propriedades químicas são idênticas. Porém, como as massas diferem, as suas propriedades FÍSICAS são:", options: ["Totalmente iguais e indistinguíveis.", "Diferentes (ex: densidade, ponto de fusão, massa).", "Nulas no vácuo.", "Idênticas às dos isóbaros vizinhos."], correctIndex: 1, explanation: { correctText: "Isótopos reagem quimicamente igual (o oxigênio-16 e o oxigênio-18 formam água H2O perfeitamente). Mas o oxigênio-18 formará uma água ligeiramente mais pesada (física diferente).", otherOptions: [""] } },
+        { level: "Difícil", text: "Um ânion X⁻ (carga -1) possui 18 elétrons na eletrosfera e número de massa (A) igual a 35. Qual é o seu número atômico (Z) e o seu número de nêutrons (n), respectivamente?", options: ["Z=18 e n=17.", "Z=17 e n=18.", "Z=19 e n=16.", "Z=17 e n=35."], correctIndex: 1, explanation: { correctText: "Se o ânion de carga -1 (ganhou 1 elétron) tem 18 elétrons, o átomo neutro original tinha 17 elétrons. Logo, Z=17. Para os nêutrons: n = A - Z (35 - 17 = 18 nêutrons).", otherOptions: ["Errar a conta da carga invertida é a maior rasteira do ENEM."] } },
+        { level: "Difícil", text: "Dois átomos isótonos A e B apresentam números de massa iguais a 40 e 42, respectivamente. Se o número atômico de A é 20, qual é o número atômico do átomo B?", options: ["22.", "20.", "18.", "42."], correctIndex: 0, explanation: { correctText: "Passo 1: Nêutrons de A = 40 - 20 = 20n. Passo 2: Se são isótonos, B também tem 20n. Passo 3: O número atômico (Z) de B será A - n = 42 - 20 = 22. Z=22.", otherOptions: [""] } },
+        { level: "Médio", text: "A 'Água Pesada', usada em reatores nucleares, é formada por Oxigênio e pelo isótopo Deutério (H-2) do hidrogênio. Quantos nêutrons tem o núcleo de um átomo de Deutério?", options: ["0 nêutrons.", "1 nêutron.", "2 nêutrons.", "3 nêutrons."], correctIndex: 1, explanation: { correctText: "O Deutério tem massa A=2 e o hidrogênio tem sempre Z=1. Calculando: n = 2 - 1 = 1 nêutron.", otherOptions: ["O Prótio tem 0 nêutrons. O Trítio tem 2 nêutrons."] } },
+        { level: "Fácil", text: "A massa de um elétron é matematicamente considerada desprezível. Portanto, ao afirmar que dois átomos são ISÓBAROS, estamos a garantir que a soma dos seus Prótons e Nêutrons é:", options: ["Diferente.", "Metade do valor do núcleo.", "Exatamente Igual.", "O dobro do número atômico."], correctIndex: 2, explanation: { correctText: "Isóbaros = mesma Massa (A). E como a Massa é exatamente a soma de (Prótons + Nêutrons), o valor desta soma tem de dar um empate perfeito.", otherOptions: [""] } },
+        { level: "Médio", text: "Na notação de um elemento, a massa (A) fica em cima e o próton (Z) embaixo. Se você observar os isótopos do Cloro: Cl-35 e Cl-37. A diferença prática na estrutura nuclear deles reside exclusivamente em:", options: ["2 elétrons de valência a mais no Cl-37.", "2 prótons a mais no Cl-37.", "2 nêutrons a mais no Cl-37.", "Uma carga iônica diferente."], correctIndex: 2, explanation: { correctText: "Isótopos (mesmo Cloro, logo mesmo Z). A diferença na massa (37 - 35 = 2) vem única e exclusivamente do excesso de 2 nêutrons no Cloro-37.", otherOptions: ["Se tivesse mais prótons, não seria Cloro.", "Elétrons não dão peso na notação da massa."] } },
+        { level: "Difícil", text: "Analisando os íons: N³⁻ (Z=7), O²⁻ (Z=8) e F⁻ (Z=9). O que podemos afirmar inquestionavelmente sobre todos eles?", options: ["São isótopos do mesmo não-metal.", "São isótonos perfeitos.", "São todos isoeletrônicos (possuem 10 elétrons na eletrosfera).", "São isóbaros de massa 16."], correctIndex: 2, explanation: { correctText: "Balanço das cargas: N (7+3=10e-), O (8+2=10e-), F (9+1=10e-). Todos atingiram a estabilidade do Gás Nobre Neônio, somando exatamente 10 elétrons.", otherOptions: ["Não são isótopos pois os Z são 7, 8 e 9 (elementos diferentes)."] } },
+        { level: "Fácil", text: "Ao observar dois átomos no papel com as seguintes configurações: (Z=6, A=12) e (Z=6, A=14). Esta representação mostra de imediato:", options: ["O mesmo elemento químico na forma de isótopos.", "Dois elementos químicos isóbaros.", "Espécies isoeletrônicas metálicas.", "Um caso de transmutação radioativa."], correctIndex: 0, explanation: { correctText: "Mesmo Z (6) = Mesmo elemento químico (Carbono). Massas diferentes (12 e 14) confirmam que são Isótopos (gêmeos de massa diferente).", otherOptions: [""] } },
+        { level: "Médio", text: "O famoso Carbono-14 é radioativo e muito usado por arqueólogos para a datação de fósseis antigos. Ele difere do seu isótopo mais comum, o Carbono-12, apenas pelo fato de possuir no seu núcleo:", options: ["14 prótons em vez de 12.", "2 elétrons orbitais a mais.", "2 nêutrons a mais, o que o torna pesado e instável.", "Um núcleo puramente vazio."], correctIndex: 2, explanation: { correctText: "Isótopos (mesmo Z=6). C-12 tem 6 nêutrons (12-6). C-14 tem 8 nêutrons (14-6). Esse peso excessivo dos 2 nêutrons gera a instabilidade e a radioatividade para a datação.", otherOptions: ["Se tivesse 14 prótons seria o elemento Silício."] } },
+        { level: "Difícil", text: "O Cátion Al³⁺ (Derivado do Z=13) e o Ânion O²⁻ (Derivado do Z=8) são considerados Isoeletrônicos pela IUPAC?", options: ["Sim, pois ambos estabilizaram a sua eletrosfera com 10 elétrons totais no final do processo iônico.", "Não, pois cátions nunca podem ser isoeletrônicos de ânions.", "Não, pois as suas massas atômicas são muito desiguais.", "Sim, porque ambos são isótonos nulos."], correctIndex: 0, explanation: { correctText: "A matemática confirma! Alumínio (13 - 3 perdidos = 10 elétrons). Oxigênio (8 + 2 ganhos = 10 elétrons). O Cátion e o Ânion podem, sim, empatar no número de elétrons e ser isoeletrônicos.", otherOptions: ["Massas e prótons não importam na isoeletrônica, apenas a contagem final da nuvem."] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_semelhancas_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Químico Correto!' : '❌ Desvio Estrutural!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#D946EF', '#A21CAF', '#06B6D4', '#F59E0B'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 DOMÍNIO ATÔMICO!</strong> Sua interpretação da estrutura atômica está fantástica. Você domina o conceito das semelhanças e a matemática do núcleo!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONFUSÃO NO NÚCLEO!</strong> Você foi avaliado abaixo da meta (80%). Revise o conceito de "IsótoPos" (Prótons) e "IsótoNos" (Nêutrons).
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

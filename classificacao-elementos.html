@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Classificação dos Elementos - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: CLASSIFICAÇÃO (Esmeralda e Roxo) --- */
+        :root {
+            --bg-color: #F0FDF4; 
+            --text-color: #064E3B; 
+            --border-color: #047857; 
+            --white: #FFFFFF;
+            
+            --theme-light: #D1FAE5; 
+            --theme-medium: #10B981; 
+            --theme-dark: #059669; 
+            --theme-contrast: #8B5CF6; 
+            --theme-accent: #F59E0B; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #CFFAFE;
+            --correct-border: #0891B2;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.purple { background-color: #F3E8FF; border-left-color: #8B5CF6; color: #4C1D95; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #0891B2; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">💎</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Classificação dos Elementos</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Metais, Ametais, Mercúrio)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🛡️ 1. Os Metais (A Maioria)</div>
+                <article class="theory-box search-target">
+                    <h3>Os "Reis" da Tabela</h3>
+                    <p>Os <strong>Metais</strong> dominam a Tabela Periódica, compondo cerca de 75% de todos os elementos conhecidos (ficam à esquerda e no centro).</p>
+                    
+                    <div class="visual-area" style="background-color: #ECFDF5;">
+                        <svg width="280" height="120" viewBox="0 0 280 120">
+                            <!-- Ícone de Metal Brilhante -->
+                            <rect x="100" y="30" width="80" height="60" rx="5" fill="#9CA3AF" stroke="#064E3B" stroke-width="3"/>
+                            <polygon points="100,90 120,30 140,30 120,90" fill="#FFFFFF" opacity="0.5"/>
+                            <text x="140" y="65" font-size="16" font-weight="900" fill="#064E3B" text-anchor="middle">Fe, Cu, Au</text>
+                            
+                            <!-- Efeito de Brilho -->
+                            <path d="M 165 20 L 175 10 M 185 25 L 195 15 M 175 40 L 190 40" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark);">Brilho, Condução e Resistência.</p>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Estado Físico:</strong> São todos <strong>SÓLIDOS</strong> à temperatura ambiente (25 ºC). <strong style="color: #E11D48;">A única exceção é o Mercúrio (Hg), que é o único metal LÍQUIDO!</strong></li>
+                        <li><strong>Propriedades Físicas:</strong> Possuem brilho metálico, são excelentes condutores de calor e eletricidade, são <strong>Maleáveis</strong> (podem ser transformados em chapas) e <strong>Dúcteis</strong> (podem ser transformados em fios, como o cobre).</li>
+                        <li><strong>Tendência Química:</strong> Têm poucos elétrons na última camada e adoram <strong>PERDER elétrons</strong> para formar <strong>Cátions (+)</strong>.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">💨 2. Os Ametais (Não-Metais)</div>
+                <article class="theory-box search-target">
+                    <h3>Os Opostos dos Metais</h3>
+                    <p>Os <strong>Ametais</strong> (ou Não-metais) ficam no canto direito superior da tabela. Eles são exatamente o oposto dos metais em quase tudo.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Estado Físico:</strong> Podem ser encontrados nos 3 estados à temperatura ambiente. Sólidos (Carbono, Enxofre, Fósforo), Gasosos (Oxigênio, Nitrogênio) e <strong>Líquido (Apenas o Bromo - Br)</strong>.</li>
+                        <li><strong>Propriedades Físicas:</strong> Não têm brilho (são opacos), são péssimos condutores de calor e eletricidade (isolantes) e, quando sólidos, são quebradiços (não são maleáveis nem dúcteis). <br><em>Exceção: O Carbono na forma de Grafite conduz bem a eletricidade!</em></li>
+                        <li><strong>Tendência Química:</strong> Têm muitos elétrons na valência e adoram <strong>GANHAR elétrons</strong> para formar <strong>Ânions (-)</strong>.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">💻 3. Os Semimetais (Metaloides)</div>
+                <article class="theory-box search-target">
+                    <h3>O Grupo do Meio-Termo</h3>
+                    <p>Antigamente, havia uma "escadinha" na tabela que separava os metais dos ametais. Os elementos que tocavam nessa escada eram os <strong>Semimetais</strong>.</p>
+                    
+                    <div class="highlight-box purple">
+                        <strong>Nota Importante:</strong> A IUPAC já não usa o termo "Semimetal" oficialmente, dividindo-os entre metais e ametais. No entanto, os vestibulares ainda cobram este conceito por causa de uma propriedade vital: eles são <strong>Semicondutores</strong>.
+                    </div>
+                    
+                    <p style="margin-top: 10px;">O <strong>Silício (Si)</strong> e o <strong>Germânio (Ge)</strong> são os mais famosos. Eles não conduzem eletricidade tão bem como o cobre, nem são isolantes como o plástico. Esta condução "controlada" é a base de toda a tecnologia mundial (chips de computadores e telemóveis)!</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">👑 4. Os Gases Nobres</div>
+                <article class="theory-box search-target">
+                    <h3>Os Aristocratas Inertes</h3>
+                    <p>Localizados no Grupo 18 (extrema direita), os Gases Nobres (Hélio, Neônio, Argônio...) já possuem 8 elétrons na camada de valência (ou 2, no caso do Hélio).</p>
+                    <p>Como já atingiram a estabilidade perfeita do Octeto, a sua principal característica é a <strong>Inércia Química</strong>: eles praticamente não reagem com nenhum outro elemento na natureza, sendo encontrados sempre na forma de átomos isolados.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔬 5. Elementos Naturais vs. Artificiais</div>
+                <article class="theory-box search-target">
+                    <h3>Até onde vai a Natureza?</h3>
+                    <p>A Tabela Periódica está dividida entre elementos que existem naturalmente na Terra e aqueles que tiveram de ser criados pelo homem em reatores nucleares (Sintéticos/Artificiais).</p>
+                    
+                    <div class="visual-area" style="background-color: #FFFBEB;">
+                        <svg width="300" height="100" viewBox="0 0 300 100">
+                            <line x1="20" y1="50" x2="280" y2="50" stroke="#0F172A" stroke-width="4"/>
+                            
+                            <circle cx="150" cy="50" r="10" fill="#EF4444"/>
+                            <text x="150" y="30" font-size="14" font-weight="900" fill="#EF4444" text-anchor="middle">Z = 92 (Urânio)</text>
+
+                            <!-- Cisurânicos -->
+                            <path d="M 140 65 L 20 65 L 20 55" fill="none" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+                            <text x="80" y="85" font-size="12" font-weight="800" fill="#3B82F6" text-anchor="middle">Cisurânicos</text>
+
+                            <!-- Transurânicos -->
+                            <path d="M 160 65 L 280 65 L 280 55" fill="none" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrow-amber)"/>
+                            <text x="220" y="85" font-size="12" font-weight="800" fill="#F59E0B" text-anchor="middle">Transurânicos</text>
+
+                            <defs>
+                                <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3B82F6"/></marker>
+                                <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F59E0B"/></marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>O Marco Zero (Z=92):</strong> O Urânio (Z=92) é o último elemento natural significativo encontrado na Terra. Praticamente tudo até ele é natural.</li>
+                        <li><strong>Transurânicos:</strong> Elementos com Z maior que 92 (Z > 92). Vêm *depois* do Urânio. São <strong>TODOS Artificiais</strong> (ex: Plutônio, Amerício).</li>
+                        <li><strong>Cisurânicos:</strong> Elementos Artificiais com Z menor que 92 (Z < 92). Vêm *antes* do Urânio. Existem apenas quatro na tabela: o Tecnécio (Tc), o Promécio (Pm), o Astato (At) e o Frâncio (Fr).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões essenciais sobre Metais, Ametais, Estados Físicos e Elementos Artificiais. Acerte <strong>80% (24/30)</strong> para avançar!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Classificação dos Elementos PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Ao observar uma Tabela Periódica colorida nas escolas, notamos que um determinado grupo ocupa a esmagadora maioria do espaço (cerca de 75% da tabela), cobrindo o lado esquerdo e o centro. Que grupo de elementos é este?", options: ["Ametais.", "Gases Nobres.", "Semimetais.", "Metais."], correctIndex: 3, explanation: { correctText: "Os Metais são a classe mais abundante do universo químico conhecido na Terra, englobando os metais alcalinos, alcalinoterrosos, metais de transição e metais de transição interna.", otherOptions: ["Os ametais são minoria e ficam no canto direito."] } },
+        { level: "Fácil", text: "Em condições ambientes (25 ºC e 1 atm), quase todos os metais encontrados na natureza apresentam-se no estado sólido (ferro, ouro, cobre). Qual é o ÚNICO metal que é encontrado no estado líquido à temperatura ambiente?", options: ["Bromo (Br).", "Gálio (Ga).", "Mercúrio (Hg).", "Césio (Cs)."], correctIndex: 2, explanation: { correctText: "O Mercúrio (Hg) é a exceção à regra de ouro dos metais. É um metal líquido prateado clássico, muito usado nos antigos termômetros.", otherOptions: ["O bromo é líquido, mas é um Ametal.", "O Gálio derrete na mão (a cerca de 30ºC), mas a 25ºC ainda é sólido."] } },
+        { level: "Médio", text: "As indústrias elétricas dependem massivamente de materiais que consigam ser puxados e esticados até formarem fios muito finos sem quebrarem (como os fios de cobre). Qual é o nome desta propriedade física típica dos metais?", options: ["Maleabilidade.", "Ductilidade.", "Condutibilidade.", "Eletronegatividade."], correctIndex: 1, explanation: { correctText: "Ductilidade é a capacidade de um material ser transformado em fios (dutos). É uma propriedade marcante dos metais.", otherOptions: ["Maleabilidade é a capacidade de formar chapas/lâminas finas."] } },
+        { level: "Médio", text: "Se um ourives pega um pedaço de ouro e o martela repetidamente até formar uma folha ou lâmina finíssima para revestir um relógio, ele está a explorar qual propriedade metálica?", options: ["Ductilidade.", "Ponto de fusão elevado.", "Maleabilidade.", "Tenacidade."], correctIndex: 2, explanation: { correctText: "Maleabilidade vem da capacidade de ser moldado/martelado em chapas finas sem se estilhaçar. O ouro é o metal mais maleável da tabela.", otherOptions: [""] } },
+        { level: "Fácil", text: "Quimicamente, como podemos prever o comportamento de um Metal quando ele se cruza com um Ametal numa reação química (como o Na reagindo com o Cl)?", options: ["O Metal tende a GANHAR elétrons para formar um Ânion.", "O Metal tende a PERDER elétrons para formar um Cátion.", "Ambos partilham o núcleo atômico de forma covalente.", "Os metais não reagem com ametais na natureza."], correctIndex: 1, explanation: { correctText: "Os metais têm poucos elétrons na camada de valência (1, 2 ou 3) e o seu objetivo de vida química é doar/perder esses elétrons, assumindo cargas positivas (Cátions).", otherOptions: [""] } },
+        { level: "Fácil", text: "Os Ametais (Não-Metais) estão localizados na zona superior direita da tabela periódica. Qual das propriedades abaixo caracteriza de forma clássica um Ametal no estado sólido?", options: ["Possuem alto brilho metálico reflexivo.", "São excelentes condutores de corrente elétrica.", "São extremamente maleáveis e dúcteis.", "São quebradiços e atuam como isolantes térmicos e elétricos."], correctIndex: 3, explanation: { correctText: "Os Ametais são o oposto dos metais: não brilham (são opacos), não conduzem eletricidade (são isolantes) e, se tentares martelar um ametal sólido (como o enxofre), ele quebra-se em pó (são quebradiços).", otherOptions: ["Todas as outras descrevem metais."] } },
+        { level: "Difícil", text: "Há uma exceção muito famosa nas regras de condutibilidade dos Ametais, muito cobrada no ENEM. Existe uma forma de um elemento não-metálico que conduz eletricidade incrivelmente bem e é usado em pilhas e baterias. Que ametal e em que forma é esse?", options: ["O Enxofre na forma rômbica.", "O Oxigênio no estado líquido.", "O Carbono na forma alotrópica de Grafite.", "O Fósforo na forma branca."], correctIndex: 2, explanation: { correctText: "Embora os ametais sejam isolantes, o Carbono-Grafite (o mesmo do lápis) tem elétrons deslocalizados nas suas placas que o tornam um excelente condutor de eletricidade.", otherOptions: ["O diamante (outra forma do carbono) é isolante."] } },
+        { level: "Médio", text: "Enquanto a maioria dos ametais são gases (como O₂, N₂, Cl₂) ou sólidos (C, S, P) à temperatura ambiente, existe apenas UM Ametal que se encontra no estado LÍQUIDO em condições normais. Qual é?", options: ["Flúor (F).", "Mercúrio (Hg).", "Bromo (Br).", "Iodo (I)."], correctIndex: 2, explanation: { correctText: "O Bromo (Br₂) é um líquido vermelho-acastanhado intenso e volátil à temperatura ambiente. É o único não-metal líquido da tabela.", otherOptions: ["Mercúrio é líquido, mas é Metal.", "Flúor é gás.", "Iodo é sólido."] } },
+        { level: "Fácil", text: "Qual é a tendência química principal dos Ametais (Não-metais) quando participam em ligações iônicas com metais?", options: ["Doar todos os seus elétrons para o núcleo.", "Perder elétrons e formar Cátions.", "Ganhar elétrons na camada de valência para formar Ânions.", "Emitir radiação beta para estabilizar."], correctIndex: 2, explanation: { correctText: "Como estão do lado direito da tabela, os ametais têm muitos elétrons de valência (5, 6, 7). É mais fácil e favorável roubar/ganhar elétrons para fechar o octeto, formando íons negativos (Ânions).", otherOptions: [""] } },
+        { level: "Fácil", text: "O Hidrogênio (H) está posicionado fisicamente no Grupo 1 (coluna dos Metais Alcalinos). Contudo, devido às suas propriedades físicas (gás altamente inflamável) e químicas, ele deve ser classificado corretamente como:", options: ["Um Metal Alcalino muito leve.", "Um Metal de Transição.", "Um Semimetal.", "Um elemento com propriedades atípicas, que se assemelha mais aos Ametais."], correctIndex: 3, explanation: { correctText: "O Hidrogênio é a grande exceção da tabela. Ele é um gás e comporta-se predominantemente como um não-metal (ametal), não fazendo parte da família química dos metais alcalinos apesar de estar na mesma coluna.", otherOptions: [""] } },
+        { level: "Médio", text: "Qual é a característica física que torna os 'Semimetais' (Metaloides) tão valiosos para a indústria tecnológica moderna (fabricação de microchips, celulares e processadores)?", options: ["Eles são supercondutores perfeitos sem nenhuma resistência ao calor.", "Eles são Semicondutores, ou seja, a sua condutividade elétrica é intermediária e pode ser controlada (ligada/desligada).", "Eles são isolantes absolutos que não derretem no fogo.", "Eles são gases nobres cristalizados."], correctIndex: 1, explanation: { correctText: "A magia do Silício (Si) e do Germânio (Ge) é que eles não são nem condutores totais nem isolantes totais. A capacidade de controlar quando a corrente passa (estado binário 1 ou 0) é a base de toda a computação digital.", otherOptions: [""] } },
+        { level: "Fácil", text: "Um grupo seleto de elementos fica isolado na extrema direita da Tabela Periódica (Grupo 18). Eles são encontrados na natureza como gases monoatômicos e não reagem com facilidade. São conhecidos como:", options: ["Ametais reativos.", "Gases Nobres (ou inertes).", "Metais Alcalinos Gasosos.", "Halogênios."], correctIndex: 1, explanation: { correctText: "A nobreza destes gases (Hélio, Neônio, Argônio...) vem da sua estabilidade química (regra do octeto completa), tornando-os inertes (sem vontade de se misturar com os plebeus da tabela).", otherOptions: [""] } },
+        { level: "Médio", text: "Como o Urânio (Z=92) é o último elemento natural significativo encontrado no planeta Terra, os elementos pesados que vêm depois dele (Z > 92), criados em aceleradores de partículas, recebem a classificação de:", options: ["Elementos Cisurânicos.", "Elementos Fosseis.", "Elementos Transurânicos.", "Elementos Lantanídeos."], correctIndex: 2, explanation: { correctText: "O prefixo 'Trans' significa 'além de'. Elementos Transurânicos são todos aqueles cujo Número Atômico (Z) é maior do que 92. São todos artificiais e radioativos (ex: Plutônio, Amerício).", otherOptions: ["Cisurânicos vêm antes do Urânio."] } },
+        { level: "Difícil", text: "Apesar de quase todos os elementos ANTES do Urânio (Z < 92) serem naturais (existem na natureza), a ciência identificou quatro exceções que tiveram de ser criadas em laboratório. Estes elementos artificiais de baixo número atômico são chamados de:", options: ["Sintéticos Transurânicos.", "Elementos Cisurânicos (ex: Tecnécio e Promécio).", "Metais Alcalinos Falsos.", "Gases Nobres Artificiais."], correctIndex: 1, explanation: { correctText: "O prefixo 'Cis' significa 'do lado de cá' ou 'antes'. Os elementos Cisurânicos são artificiais, mas têm Z menor que 92. O Tecnécio (Z=43) foi o primeiro elemento artificial criado pelo homem.", otherOptions: ["Transurânicos são maiores que 92."] } },
+        { level: "Médio", text: "Os Metais podem ser subdivididos em Metais Representativos e Metais de Transição. Em qual bloco da tabela periódica os 'Metais de Transição' estão estritamente confinados?", options: ["Nas colunas das pontas (Grupos 1, 2, 13 e 14).", "Na última coluna isolada (Grupo 18).", "No grande bloco rebaixado central da tabela (Grupos 3 ao 12).", "Nas duas fileiras destacadas no rodapé da página."], correctIndex: 2, explanation: { correctText: "Os Metais de Transição ocupam o bloco 'd' da tabela (aquela parte mais baixa no meio, dos grupos 3 ao 12), onde encontramos o Ferro, Ouro, Cobre e Zinco.", otherOptions: ["As linhas do rodapé são os metais de transição INTERNA."] } },
+        { level: "Fácil", text: "Entre as opções abaixo, qual apresenta APENAS elementos classificados como Ametais (Não-Metais)?", options: ["Sódio, Ferro, Ouro.", "Oxigênio, Carbono, Fósforo.", "Silício, Germânio, Polônio.", "Hélio, Neônio, Argônio."], correctIndex: 1, explanation: { correctText: "O (Oxigênio), C (Carbono) e P (Fósforo) são todos elementos vitais para a química orgânica e ametais clássicos localizados à direita da tabela.", otherOptions: ["A 1ª opção só tem metais. A 3ª tem metaloides. A 4ª tem gases nobres."] } },
+        { level: "Médio", text: "A antiga designação 'Semimetais' ainda aparece em muitas provas. Qual é o elemento Semimetal mais famoso e abundante do mundo, utilizado exaustivamente no Vale do Silício para fazer painéis solares e circuitos eletrônicos?", options: ["Boro (B).", "Alumínio (Al).", "Silício (Si).", "Carbono (C)."], correctIndex: 2, explanation: { correctText: "O Silício (Si) é a base de toda a revolução dos computadores (o 'Vale do Silício' na Califórnia tem esse nome por causa dos chips feitos deste semimetal).", otherOptions: ["O Alumínio é metal, o Carbono é ametal."] } },
+        { level: "Difícil", text: "Se um elemento químico é encontrado na natureza como um gás diatômico muito reativo que corrói metais e que possui forte tendência a formar ânions de carga -1, ele é certamente um:", options: ["Metal Alcalino.", "Gás Nobre.", "Semimetal de Transição.", "Ametal Halogênio."], correctIndex: 3, explanation: { correctText: "Os Halogênios (F, Cl, Br, I) são ametais extremamente reativos que formam moléculas diatômicas (F₂, Cl₂) e adoram roubar 1 elétron (carga -1) dos metais.", otherOptions: ["Gases nobres não reagem. Metais alcalinos são sólidos e formam cátions +1."] } },
+        { level: "Fácil", text: "Uma característica química marcante que separa visualmente os Metais dos Ametais nas ligações é a sua eletronegatividade (vontade de atrair elétrons). Assinale a afirmação correta:", options: ["Os metais são altamente eletronegativos.", "Os ametais são altamente eletronegativos.", "Os metais não possuem elétrons.", "Ambos possuem igual força de atração eletrônica."], correctIndex: 1, explanation: { correctText: "A eletronegatividade é a 'ganância' química. Os Ametais (que estão à direita perto do Octeto) têm uma ganância brutal para puxar elétrons. Os metais são eletropositivos (não têm ganância e desapegam dos elétrons).", otherOptions: [""] } },
+        { level: "Médio", text: "Os elementos artificiais 'Transurânicos' são, na sua totalidade, radioativos e perigosos. Qual destes famosos elementos é um exemplo clássico de elemento transurânico usado como combustível nuclear e armas?", options: ["Urânio (U).", "Ferro (Fe).", "Plutônio (Pu).", "Carbono-14."], correctIndex: 2, explanation: { correctText: "O Plutônio (Pu, Z=94) vem depois do Urânio (Z=92). Foi criado artificialmente em reatores nucleares e é a base de muitas armas nucleares modernas.", otherOptions: ["O Urânio é natural (marca zero). O Ferro e o C-14 são naturais de Z baixo."] } },
+        { level: "Difícil", text: "Dois elementos X e Y encontram-se em estados opostos da tabela. X é prateado, sólido a 25ºC, conduz bem calor e reage com ácido libertando hidrogênio. Y é um gás amarelo-esverdeado e tóxico. A classificação correta de X e Y é, respectivamente:", options: ["Metal e Gás Nobre.", "Metal e Ametal.", "Ametal e Metal.", "Semimetal e Metal."], correctIndex: 1, explanation: { correctText: "O elemento X tem todas as assinaturas clássicas de um Metal (brilho prateado, sólido, condutor, reage com ácido). O elemento Y é gasoso e colorido, típico de um Ametal (como o Cloro).", otherOptions: ["Gases nobres não costumam ser descritos como tóxicos amarelos reativos (são incolores e inertes)."] } },
+        { level: "Fácil", text: "Para além do Mercúrio e do Bromo, todos os outros elementos da Tabela Periódica à temperatura ambiente (25ºC e 1atm) apresentam-se em apenas dois estados físicos:", options: ["Líquido e Plasma.", "Sólido e Gás.", "Plasma e Gás.", "Líquido e Sólido."], correctIndex: 1, explanation: { correctText: "Retirando as duas exceções líquidas (Hg e Br), toda a tabela se divide entre Sólidos (a esmagadora maioria dos metais e alguns ametais) e Gases (H, N, O, F, Cl e os Gases Nobres).", otherOptions: [""] } },
+        { level: "Médio", text: "Por que motivo a IUPAC (União Internacional de Química Pura e Aplicada) decidiu abolir o termo 'Semimetal' das classificações modernas oficiais?", options: ["Porque descobriram que os semimetais não existiam na vida real.", "Porque eles evaporaram da atmosfera.", "Porque do ponto de vista de ligações químicas estritas, as propriedades dos semimetais encaixavam melhor quer nos metais (ex: formam ligas), quer nos ametais (ex: formam ácidos).", "Porque os semimetais tornaram-se radioativos."], correctIndex: 2, explanation: { correctText: "A classificação de 'Semimetal' era baseada numa propriedade muito física (semicondutores). A química moderna percebeu que, nas reações iônicas e covalentes, elementos como o Germânio comportam-se como metais, e o Boro/Silício como ametais. A divisão em duas classes limpas (Metais/Ametais) era mais rigorosa.", otherOptions: [""] } },
+        { level: "Médio", text: "As duas séries de elementos que são desenhadas fora do corpo principal da tabela, na parte de baixo, chamam-se Lantanídeos e Actinídeos. Qual é a classificação técnica de todos eles?", options: ["Metais Alcalinoterrosos densos.", "Ametais Radioativos Naturais.", "Metais de Transição Interna.", "Gases Nobres de laboratório."], correctIndex: 2, explanation: { correctText: "O bloco 'f' inteiro lá em baixo é o lar dos Metais de Transição Interna. Apesar de estarem desenhados como notas de rodapé, eles pertencem ao buraco do Grupo 3 da tabela e são todos metais.", otherOptions: ["São todos metais, não ametais ou gases."] } },
+        { level: "Fácil", text: "O alumínio (Al) é muito usado para fazer panelas e aviões, sendo leve e não enferrujando facilmente. O ferro (Fe) enferruja rápido. O ouro (Au) não oxida de jeito nenhum. Apesar das diferenças de reatividade, o que eles têm em comum na sua classificação?", options: ["Todos são Semimetais estruturais.", "Todos são Gases inertes na fundição.", "Todos são Metais (portanto, conduzem bem calor e eletricidade).", "Todos são Elementos Transurânicos artificiais."], correctIndex: 2, explanation: { correctText: "Mesmo com diferentes resistências à oxidação (corrosão), Alumínio, Ferro e Ouro partilham a essência da classe dos Metais: têm brilho, são moldáveis e são exímios condutores térmicos e elétricos.", otherOptions: ["Nenhum deles é transurânico ou gás."] } },
+        { level: "Difícil", text: "Observe a regra de localização: A linha em 'escadinha' que separava os metais dos ametais nas antigas tabelas. Os elementos à ESQUERDA da linha são essencialmente metais. O que acontece com a característica metálica de um elemento à medida que você se desloca no mesmo período da extrema ESQUERDA para a extrema DIREITA da Tabela Periódica?", options: ["O caráter metálico AUMENTA (os elementos viram supercondutores).", "O caráter metálico DIMINUI (os elementos tornam-se ametais, perdendo brilho e condutividade).", "A massa atômica diminui drasticamente.", "O número atômico regride."], correctIndex: 1, explanation: { correctText: "O caráter metálico (a facilidade em perder elétrons e a condutividade) é máximo na extrema esquerda (alcalinos). Ao caminhar para a direita (em direção aos halogênios e gases nobres), a eletrosfera contrai, o átomo fica 'avarento' por elétrons e transforma-se num Ametal, perdendo toda a natureza metálica.", otherOptions: ["Massa e Z aumentam para a direita, não diminuem."] } },
+        { level: "Fácil", text: "Resumo Mnemônico Visual: Que letra e qual o estado físico padrão da maioria dos membros das classes principais?", options: ["Metais = Líquidos / Ametais = Plasmas.", "Metais = Sólidos Brilhantes / Ametais = Quebradiços Opacos ou Gases / Gases Nobres = Gases Inertes.", "Metais = Isolantes moles / Ametais = Condutores duros.", "Tudo é gasoso na química orgânica."], correctIndex: 1, explanation: { correctText: "A imagem mental imbatível: Metais = um bloco de aço reluzente (sólido e firme). Ametais = carvão fosco quebradiço ou gás oxigênio. Gases Nobres = hélio dentro de um balão que não explode.", otherOptions: [""] } },
+        { level: "Médio", text: "As famosas moedas antigas e medalhas de prêmios (Ouro, Prata e Bronze/Cobre) provêm todas da mesma vizinhança da Tabela Periódica. A qual grande bloco estrutural e classe pertencem estes elementos de cunhagem clássica?", options: ["Metais de Transição (Bloco D central da tabela).", "Ametais representativos.", "Metais de Transição Interna.", "Metais Alcalinos do Grupo 1."], correctIndex: 0, explanation: { correctText: "Ouro (Au), Prata (Ag) e Cobre (Cu) formam o famoso Grupo 11 da tabela, encravados mesmo no meio do bloco 'd', pertencendo à imensa classe dos Metais de Transição (conhecidos pelos seus pontos de fusão altos e estabilidade ao ar).", otherOptions: ["Metais alcalinos explodiriam se fizesses uma moeda deles e a pusesses na água."] } },
+        { level: "Difícil", text: "Se a prova do ENEM te der um elemento sintético com o Número Atômico Z = 43 (Tecnécio). Como ele é menor que 92, mas não existe na natureza, qual será a sua classificação de origem precisa?", options: ["Transurânico natural.", "Isótopo de urânio enriquecido.", "Elemento Artificial Cisurânico.", "Metal alcalino radioativo das águas."], correctIndex: 2, explanation: { correctText: "A classificação de origem atômica é severa: Z < 92 e não natural = Cisurânico (antes do Urânio). O Tecnécio é a grande estrela desta classe restrita que não ocorre na crosta terrestre, tendo sido o primeiro elemento 'feito pelo homem'.", otherOptions: ["Transurânico seria Z > 92."] } },
+        { level: "Médio", text: "Muitos estudantes de 9º ano caem na armadilha de achar que 'Ametal' significa apenas gás. Para provar o contrário e dar exemplo de um Ametal Sólido extremamente duro, que é capaz de arranhar e cortar vidros e metais, que material clássico o professor usaria?", options: ["A Esmeralda verde (Bário).", "O Quartzo de Silício.", "O Diamante (que é puramente feito do ametal Carbono).", "O Aço forjado de Tungstênio."], correctIndex: 2, explanation: { correctText: "O Carbono é um Ametal formidável. Na sua organização cristalina perfeita de rede covalente 3D, ele forma o Diamante, o material natural mais duro do planeta, provando que ametais podem construir matrizes colossais de dureza, superando os metais de transição.", otherOptions: ["Aço e Esmeralda contêm metais na sua base."] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_classificacao_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Classificação Correta!' : '❌ Erro de Grupo!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#10B981', '#059669', '#8B5CF6', '#F59E0B'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 MESTRE DOS ELEMENTOS!</strong> Você sabe distinguir perfeitamente Metais, Ametais e Gases Nobres. Domina a física dos estados na tabela!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONFUSÃO NAS PROPRIEDADES!</strong> Você foi avaliado abaixo da meta (80%). Revise as diferenças de condutividade térmica e elétrica entre os blocos.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

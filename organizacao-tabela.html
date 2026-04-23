@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Organização da Tabela Periódica - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: ESTRUTURA (Azul Marinho e Laranja) --- */
+        :root {
+            --bg-color: #F8FAFC; 
+            --text-color: #0F172A; 
+            --border-color: #1E3A8A; 
+            --white: #FFFFFF;
+            
+            --theme-light: #DBEAFE; 
+            --theme-medium: #3B82F6; 
+            --theme-dark: #1D4ED8; 
+            --theme-contrast: #F97316; 
+            --theme-accent: #10B981; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #2563EB; color: #1E3A8A; }
+
+        /* --- CSS MAPA DA TABELA PERIÓDICA --- */
+        .pt-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; padding-bottom: 15px; }
+        .pt-wrapper::-webkit-scrollbar { height: 8px; }
+        .pt-wrapper::-webkit-scrollbar-thumb { background-color: var(--theme-medium); border-radius: 4px; }
+        .pt-grid { display: grid; grid-template-columns: repeat(18, minmax(28px, 1fr)); gap: 3px; min-width: 550px; }
+        .pt-cell { border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; padding: 6px 0; color: #0F172A; border: 1px solid rgba(0,0,0,0.1); box-shadow: 1px 1px 0px rgba(0,0,0,0.15); transition: transform 0.1s; cursor: default; }
+        .pt-cell:hover { transform: scale(1.15); z-index: 10; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+        .pt-empty { background: transparent; border: none; box-shadow: none; }
+        .pt-num { background: transparent; border: none; box-shadow: none; color: var(--theme-dark); font-weight: 900; font-size: 0.65rem; align-items: flex-end; padding-bottom: 2px; text-align: center;}
+        
+        .bg-alcalino { background-color: #F87171; color: white; } 
+        .bg-alcalinoterroso { background-color: #FBBF24; color: #451A03; } 
+        .bg-transicao { background-color: #FEF08A; color: #713F12; } 
+        .bg-ametal { background-color: #34D399; color: #064E3B; } 
+        .bg-nobre { background-color: #60A5FA; color: white; } 
+        .bg-interna { background-color: #E9D5FF; color: #312E81; }
+        
+        .pt-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; font-size: 0.75rem; font-weight: 700; justify-content: center; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧱</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Organização da Tabela Periódica</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Mendeleev, Período, Família)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">📜 1. A Ordem da Tabela (Mendeleev vs Moseley)</div>
+                <article class="theory-box search-target">
+                    <h3>Como os elementos foram arrumados?</h3>
+                    <p>A Tabela Periódica não surgiu pronta. Foi um processo de tentativa e erro para organizar os elementos de forma lógica.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Dmitri Mendeleev (O Pai da Tabela - 1869):</strong> Foi o primeiro a organizar os elementos de forma brilhante, deixando espaços vazios para elementos que ainda não tinham sido descobertos. O seu critério de organização foi a <strong>Massa Atômica Crescente</strong>.</li>
+                        <li><strong>Henry Moseley (A Tabela Atual - 1913):</strong> Corrigiu algumas falhas da tabela de Mendeleev. Moseley descobriu que a identidade real do átomo é o seu próton, organizando a Tabela Periódica atual por ordem crescente de <strong>NÚMERO ATÔMICO (Z)</strong>.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📏 2. Períodos (As Linhas Horizontais)</div>
+                <article class="theory-box search-target">
+                    <h3>A Quantidade de Camadas</h3>
+                    <p>As <strong>7 Linhas Horizontais</strong> da tabela são chamadas de <strong>Períodos</strong>. Eles dizem-nos exatamente o "tamanho" do átomo.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="120" viewBox="0 0 250 120">
+                            <!-- Esboço da tabela -->
+                            <rect x="50" y="20" width="30" height="80" fill="#DBEAFE" stroke="#1E3A8A" stroke-width="2"/>
+                            <rect x="80" y="50" width="80" height="50" fill="#DBEAFE" stroke="#1E3A8A" stroke-width="2"/>
+                            <rect x="160" y="30" width="40" height="70" fill="#DBEAFE" stroke="#1E3A8A" stroke-width="2"/>
+                            
+                            <!-- Seta Horizontal -->
+                            <line x1="20" y1="80" x2="230" y2="80" stroke="#F97316" stroke-width="4" marker-end="url(#arrow-orange)"/>
+                            <text x="125" y="70" font-size="14" font-weight="900" fill="#F97316" text-anchor="middle">PERÍODOS (Horizontais)</text>
+
+                            <defs>
+                                <marker id="arrow-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F97316"/></marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <div class="highlight-box blue">
+                        <strong>O Segredo do Período:</strong> O número do período indica quantas <strong>Camadas Eletrônicas (Níveis de Energia)</strong> o átomo possui. <br>
+                        <em>Exemplo: O Sódio (Na) está no 3º Período. Logo, ele possui 3 camadas (K, L, M).</em>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🏢 3. Grupos ou Famílias (As Colunas Verticais)</div>
+                <article class="theory-box search-target">
+                    <h3>A Semelhança Química</h3>
+                    <p>As <strong>18 Colunas Verticais</strong> são chamadas de <strong>Grupos ou Famílias</strong>. Elementos da mesma família são como irmãos: comportam-se de maneira muito parecida nas reações químicas.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="130" viewBox="0 0 250 130">
+                            <!-- Esboço da tabela -->
+                            <rect x="80" y="20" width="90" height="90" fill="#DBEAFE" stroke="#1E3A8A" stroke-width="2" opacity="0.4"/>
+                            
+                            <!-- Destaque de uma coluna -->
+                            <rect x="120" y="20" width="20" height="90" fill="#3B82F6" stroke="#1E3A8A" stroke-width="2"/>
+                            
+                            <!-- Seta Vertical -->
+                            <line x1="100" y1="10" x2="100" y2="110" stroke="#10B981" stroke-width="4" marker-end="url(#arrow-green)"/>
+                            <text x="100" y="125" font-size="14" font-weight="900" fill="#059669" text-anchor="middle">FAMÍLIAS (Verticais)</text>
+
+                            <defs>
+                                <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981"/></marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <div class="highlight-box blue">
+                        <strong>O Segredo da Família:</strong> Todos os elementos da mesma família possuem a <strong>mesma quantidade de elétrons na Camada de Valência</strong> (última camada). É isso que lhes dá propriedades químicas semelhantes!
+                    </div>
+                </article>
+            </section>
+
+            <!-- NOVO BLOCO: MAPA INTERATIVO DA TABELA -->
+            <section class="content-group">
+                <div class="section-badge">🗺️ 4. O Mapa da Tabela Periódica</div>
+                <article class="theory-box search-target">
+                    <h3>Visualizando os Blocos</h3>
+                    <p>Abaixo, você tem um mapa interativo completo com todos os 118 elementos para visualizar a distribuição real dos blocos coloridos pelas famílias mais importantes.</p>
+                    
+                    <div class="pt-wrapper">
+                        <div class="pt-grid">
+                            <!-- Header Row -->
+                            <div class="pt-num">1</div><div class="pt-num">2</div><div class="pt-num">3</div><div class="pt-num">4</div><div class="pt-num">5</div><div class="pt-num">6</div><div class="pt-num">7</div><div class="pt-num">8</div><div class="pt-num">9</div><div class="pt-num">10</div><div class="pt-num">11</div><div class="pt-num">12</div><div class="pt-num">13</div><div class="pt-num">14</div><div class="pt-num">15</div><div class="pt-num">16</div><div class="pt-num">17</div><div class="pt-num">18</div>
+                            
+                            <!-- Period 1 -->
+                            <div class="pt-cell bg-alcalino" title="Hidrogênio (Ametal)">H</div>
+                            <div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div>
+                            <div class="pt-cell bg-nobre" title="Gás Nobre">He</div>
+                            
+                            <!-- Period 2 -->
+                            <div class="pt-cell bg-alcalino" title="Metal Alcalino">Li</div><div class="pt-cell bg-alcalinoterroso" title="Metal Alcalinoterroso">Be</div>
+                            <div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div>
+                            <div class="pt-cell bg-ametal">B</div><div class="pt-cell bg-ametal">C</div><div class="pt-cell bg-ametal">N</div><div class="pt-cell bg-ametal" title="Calcogênio">O</div><div class="pt-cell bg-ametal" title="Halogênio">F</div><div class="pt-cell bg-nobre" title="Gás Nobre">Ne</div>
+
+                            <!-- Period 3 -->
+                            <div class="pt-cell bg-alcalino" title="Metal Alcalino">Na</div><div class="pt-cell bg-alcalinoterroso" title="Metal Alcalinoterroso">Mg</div>
+                            <div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div>
+                            <div class="pt-cell bg-ametal">Al</div><div class="pt-cell bg-ametal">Si</div><div class="pt-cell bg-ametal">P</div><div class="pt-cell bg-ametal" title="Calcogênio">S</div><div class="pt-cell bg-ametal" title="Halogênio">Cl</div><div class="pt-cell bg-nobre" title="Gás Nobre">Ar</div>
+
+                            <!-- Period 4 -->
+                            <div class="pt-cell bg-alcalino" title="Metal Alcalino">K</div><div class="pt-cell bg-alcalinoterroso" title="Metal Alcalinoterroso">Ca</div>
+                            <div class="pt-cell bg-transicao" title="Metal de Transição">Sc</div><div class="pt-cell bg-transicao" title="Metal de Transição">Ti</div><div class="pt-cell bg-transicao" title="Metal de Transição">V</div><div class="pt-cell bg-transicao" title="Metal de Transição">Cr</div><div class="pt-cell bg-transicao" title="Metal de Transição">Mn</div><div class="pt-cell bg-transicao" title="Metal de Transição">Fe</div><div class="pt-cell bg-transicao" title="Metal de Transição">Co</div><div class="pt-cell bg-transicao" title="Metal de Transição">Ni</div><div class="pt-cell bg-transicao" title="Metal de Transição">Cu</div><div class="pt-cell bg-transicao" title="Metal de Transição">Zn</div>
+                            <div class="pt-cell bg-ametal">Ga</div><div class="pt-cell bg-ametal">Ge</div><div class="pt-cell bg-ametal">As</div><div class="pt-cell bg-ametal" title="Calcogênio">Se</div><div class="pt-cell bg-ametal" title="Halogênio">Br</div><div class="pt-cell bg-nobre" title="Gás Nobre">Kr</div>
+
+                            <!-- Period 5 -->
+                            <div class="pt-cell bg-alcalino" title="Metal Alcalino">Rb</div><div class="pt-cell bg-alcalinoterroso" title="Metal Alcalinoterroso">Sr</div>
+                            <div class="pt-cell bg-transicao" title="Metal de Transição">Y</div><div class="pt-cell bg-transicao" title="Metal de Transição">Zr</div><div class="pt-cell bg-transicao" title="Metal de Transição">Nb</div><div class="pt-cell bg-transicao" title="Metal de Transição">Mo</div><div class="pt-cell bg-transicao" title="Metal de Transição">Tc</div><div class="pt-cell bg-transicao" title="Metal de Transição">Ru</div><div class="pt-cell bg-transicao" title="Metal de Transição">Rh</div><div class="pt-cell bg-transicao" title="Metal de Transição">Pd</div><div class="pt-cell bg-transicao" title="Metal de Transição">Ag</div><div class="pt-cell bg-transicao" title="Metal de Transição">Cd</div>
+                            <div class="pt-cell bg-ametal">In</div><div class="pt-cell bg-ametal">Sn</div><div class="pt-cell bg-ametal">Sb</div><div class="pt-cell bg-ametal" title="Calcogênio">Te</div><div class="pt-cell bg-ametal" title="Halogênio">I</div><div class="pt-cell bg-nobre" title="Gás Nobre">Xe</div>
+
+                            <!-- Period 6 -->
+                            <div class="pt-cell bg-alcalino" title="Metal Alcalino">Cs</div><div class="pt-cell bg-alcalinoterroso" title="Metal Alcalinoterroso">Ba</div>
+                            <div class="pt-cell bg-interna" title="Série dos Lantanídeos">La*</div><div class="pt-cell bg-transicao" title="Metal de Transição">Hf</div><div class="pt-cell bg-transicao" title="Metal de Transição">Ta</div><div class="pt-cell bg-transicao" title="Metal de Transição">W</div><div class="pt-cell bg-transicao" title="Metal de Transição">Re</div><div class="pt-cell bg-transicao" title="Metal de Transição">Os</div><div class="pt-cell bg-transicao" title="Metal de Transição">Ir</div><div class="pt-cell bg-transicao" title="Metal de Transição">Pt</div><div class="pt-cell bg-transicao" title="Metal de Transição">Au</div><div class="pt-cell bg-transicao" title="Metal de Transição">Hg</div>
+                            <div class="pt-cell bg-ametal">Tl</div><div class="pt-cell bg-ametal">Pb</div><div class="pt-cell bg-ametal">Bi</div><div class="pt-cell bg-ametal" title="Calcogênio">Po</div><div class="pt-cell bg-ametal" title="Halogênio">At</div><div class="pt-cell bg-nobre" title="Gás Nobre">Rn</div>
+
+                            <!-- Period 7 -->
+                            <div class="pt-cell bg-alcalino" title="Metal Alcalino">Fr</div><div class="pt-cell bg-alcalinoterroso" title="Metal Alcalinoterroso">Ra</div>
+                            <div class="pt-cell bg-interna" title="Série dos Actinídeos">Ac**</div><div class="pt-cell bg-transicao" title="Metal de Transição">Rf</div><div class="pt-cell bg-transicao" title="Metal de Transição">Db</div><div class="pt-cell bg-transicao" title="Metal de Transição">Sg</div><div class="pt-cell bg-transicao" title="Metal de Transição">Bh</div><div class="pt-cell bg-transicao" title="Metal de Transição">Hs</div><div class="pt-cell bg-transicao" title="Metal de Transição">Mt</div><div class="pt-cell bg-transicao" title="Metal de Transição">Ds</div><div class="pt-cell bg-transicao" title="Metal de Transição">Rg</div><div class="pt-cell bg-transicao" title="Metal de Transição">Cn</div>
+                            <div class="pt-cell bg-ametal">Nh</div><div class="pt-cell bg-ametal">Fl</div><div class="pt-cell bg-ametal">Mc</div><div class="pt-cell bg-ametal" title="Calcogênio">Lv</div><div class="pt-cell bg-ametal" title="Halogênio">Ts</div><div class="pt-cell bg-nobre" title="Gás Nobre">Og</div>
+
+                            <!-- Spacer -->
+                            <div class="pt-empty" style="grid-column: span 18; height: 10px;"></div>
+
+                            <!-- Lantanídeos (Linha 8) -->
+                            <div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div>
+                            <div class="pt-cell bg-interna" title="Lantanídeo">Ce</div><div class="pt-cell bg-interna" title="Lantanídeo">Pr</div><div class="pt-cell bg-interna" title="Lantanídeo">Nd</div><div class="pt-cell bg-interna" title="Lantanídeo">Pm</div><div class="pt-cell bg-interna" title="Lantanídeo">Sm</div><div class="pt-cell bg-interna" title="Lantanídeo">Eu</div><div class="pt-cell bg-interna" title="Lantanídeo">Gd</div><div class="pt-cell bg-interna" title="Lantanídeo">Tb</div><div class="pt-cell bg-interna" title="Lantanídeo">Dy</div><div class="pt-cell bg-interna" title="Lantanídeo">Ho</div><div class="pt-cell bg-interna" title="Lantanídeo">Er</div><div class="pt-cell bg-interna" title="Lantanídeo">Tm</div><div class="pt-cell bg-interna" title="Lantanídeo">Yb</div><div class="pt-cell bg-interna" title="Lantanídeo">Lu</div>
+                            <div class="pt-empty"></div>
+
+                            <!-- Actinídeos (Linha 9) -->
+                            <div class="pt-empty"></div><div class="pt-empty"></div><div class="pt-empty"></div>
+                            <div class="pt-cell bg-interna" title="Actinídeo">Th</div><div class="pt-cell bg-interna" title="Actinídeo">Pa</div><div class="pt-cell bg-interna" title="Actinídeo">U</div><div class="pt-cell bg-interna" title="Actinídeo">Np</div><div class="pt-cell bg-interna" title="Actinídeo">Pu</div><div class="pt-cell bg-interna" title="Actinídeo">Am</div><div class="pt-cell bg-interna" title="Actinídeo">Cm</div><div class="pt-cell bg-interna" title="Actinídeo">Bk</div><div class="pt-cell bg-interna" title="Actinídeo">Cf</div><div class="pt-cell bg-interna" title="Actinídeo">Es</div><div class="pt-cell bg-interna" title="Actinídeo">Fm</div><div class="pt-cell bg-interna" title="Actinídeo">Md</div><div class="pt-cell bg-interna" title="Actinídeo">No</div><div class="pt-cell bg-interna" title="Actinídeo">Lr</div>
+                            <div class="pt-empty"></div>
+                        </div>
+                        <div class="pt-legend">
+                            <div class="legend-item"><div class="legend-color bg-alcalino"></div> Alcalinos (e H)</div>
+                            <div class="legend-item"><div class="legend-color bg-alcalinoterroso"></div> Alcalinoterrosos</div>
+                            <div class="legend-item"><div class="legend-color bg-transicao"></div> Metais de Transição</div>
+                            <div class="legend-item"><div class="legend-color bg-interna"></div> Transição Interna</div>
+                            <div class="legend-item"><div class="legend-color bg-ametal"></div> Ametais / Outros</div>
+                            <div class="legend-item"><div class="legend-color bg-nobre"></div> Gases Nobres</div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⭐ 5. Os Nomes das Famílias Principais</div>
+                <article class="theory-box search-target">
+                    <h3>Famílias que caem no ENEM</h3>
+                    <p>Você precisa decorar o nome das famílias das pontas da tabela (Elementos Representativos):</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Grupo 1:</strong> Metais Alcalinos (terminam em s¹, 1 elétron na valência). <em>*O Hidrogênio está aqui, mas NÃO é um metal alcalino!</em></li>
+                        <li><strong>Grupo 2:</strong> Metais Alcalinoterrosos (terminam em s², 2 elétrons).</li>
+                        <li><strong>Grupo 16:</strong> Calcogênios (terminam com 6 elétrons na valência).</li>
+                        <li><strong>Grupo 17:</strong> Halogênios (terminam com 7 elétrons na valência).</li>
+                        <li><strong>Grupo 18:</strong> Gases Nobres (Inertes, 8 elétrons na valência - regra do octeto cumprida).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- BLOCO: RESUMO RÁPIDO -->
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-contrast);">📌 Resumo Rápido (Macetes)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast); border-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Revise Antes da Prova!</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 15px; text-align: center;">
+                        <div style="background-color: #F8FAFC; border: 2px solid #F97316; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #F97316; line-height: 1;">➖</span><br>
+                            <strong style="color: #C2410C; font-size: 1.1rem;">Períodos</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Linhas (Deitadas)<br>=<br>Nº de Camadas</span>
+                        </div>
+                        <div style="background-color: #F8FAFC; border: 2px solid #10B981; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #10B981; line-height: 1;">|</span><br>
+                            <strong style="color: #059669; font-size: 1.1rem;">Famílias</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Colunas (Em pé)<br>=<br>Elétrons de Valência</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões essenciais sobre Mendeleev, Períodos, Famílias e Organização da Tabela. Acerte <strong>80% (24/30)</strong> para dominar!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Organização da Tabela PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Quem é considerado o 'pai' da Tabela Periódica, por ter criado a primeira organização estruturada e deixado espaços vazios para elementos ainda não descobertos?", options: ["Antoine Lavoisier.", "Henry Moseley.", "Dmitri Mendeleev.", "Niels Bohr."], correctIndex: 2, explanation: { correctText: "Dmitri Mendeleev (1869) organizou os elementos de forma tão brilhante que conseguiu prever as propriedades de elementos que a humanidade ainda nem tinha descoberto (como o Germânio).", otherOptions: ["Moseley aperfeiçoou a tabela depois.", "Lavoisier é o pai da química moderna.", "Bohr focou no modelo atômico."] } },
+        { level: "Médio", text: "Qual foi o critério fundamental utilizado por Dmitri Mendeleev para organizar os elementos químicos na sua primeira versão da Tabela Periódica?", options: ["Ordem crescente de Número Atômico (Z).", "Ordem crescente de Massa Atômica (A).", "A ordem alfabética dos nomes em latim.", "A quantidade de nêutrons."], correctIndex: 1, explanation: { correctText: "Mendeleev organizou a sua tabela empilhando os elementos do mais leve para o mais pesado (Massa Atômica). Só anos mais tarde isso foi corrigido.", otherOptions: ["Número atômico foi o critério de Moseley."] } },
+        { level: "Fácil", text: "Na Tabela Periódica ATUAL, estabelecida após as descobertas de Henry Moseley, os elementos químicos estão rigorosamente organizados em ordem crescente de:", options: ["Massa Atômica.", "Número de Nêutrons.", "Número de Elétrons na camada K.", "Número Atômico (Z)."], correctIndex: 3, explanation: { correctText: "A lei periódica atual diz que as propriedades dos elementos são funções periódicas dos seus Números Atômicos (quantidade de prótons no núcleo). Z=1, Z=2, Z=3...", otherOptions: ["Massa atômica era a regra velha de Mendeleev."] } },
+        { level: "Fácil", text: "As linhas horizontais (deitadas) da Tabela Periódica recebem o nome técnico de:", options: ["Famílias.", "Períodos.", "Grupos.", "Blocos Metálicos."], correctIndex: 1, explanation: { correctText: "As linhas horizontais são chamadas de Períodos. Atualmente, existem 7 períodos completos na tabela.", otherOptions: ["Famílias e Grupos são as colunas verticais."] } },
+        { level: "Fácil", text: "As colunas verticais (em pé) da Tabela Periódica recebem o nome técnico de:", options: ["Períodos.", "Níveis de Energia.", "Grupos ou Famílias.", "Séries Actinídeas."], correctIndex: 2, explanation: { correctText: "As colunas verticais são chamadas de Grupos (na IUPAC atual vão do 1 ao 18) ou Famílias (nome antigo, ex: 1A, 2A...).", otherOptions: ["Períodos são as linhas horizontais."] } },
+        { level: "Médio", text: "Do ponto de vista da estrutura do átomo, o que o número do PERÍODO indica rigorosamente sobre um elemento químico?", options: ["A sua quantidade total de elétrons.", "A quantidade de Camadas Eletrônicas (Níveis de Energia) que o átomo possui.", "O seu número de nêutrons.", "O número de elétrons apenas na última camada."], correctIndex: 1, explanation: { correctText: "Se um elemento está no 3º Período (3ª linha), significa que a sua eletrosfera possui exatamente 3 camadas ocupadas (K, L, M).", otherOptions: ["Elétrons na última camada é indicado pelo Grupo/Família."] } },
+        { level: "Médio", text: "Do ponto de vista da estrutura do átomo (especialmente nos elementos representativos), o que o GRUPO (Família) indica sobre um elemento químico?", options: ["A quantidade de elétrons na sua Camada de Valência (última camada).", "A sua massa atômica total.", "O número de camadas eletrônicas preenchidas.", "O seu estado físico à temperatura ambiente."], correctIndex: 0, explanation: { correctText: "Elementos do mesmo grupo possuem a mesma quantidade de elétrons na camada exterior. Ex: Todo mundo do Grupo 1 (Família 1A) tem 1 elétron de valência.", otherOptions: ["Número de camadas é o período."] } },
+        { level: "Fácil", text: "Por que razão os elementos que pertencem à MESMA FAMÍLIA (mesma coluna vertical) são agrupados juntos?", options: ["Porque possuem massas iguais (isóbaros).", "Porque foram descobertos no mesmo ano.", "Porque possuem propriedades químicas muito semelhantes.", "Porque têm a mesma quantidade de prótons no núcleo."], correctIndex: 2, explanation: { correctText: "Por terem o mesmo número de elétrons na última camada, eles reagem de forma muito parecida na natureza. São como 'irmãos' químicos.", otherOptions: ["Não existem elementos diferentes com a mesma quantidade de prótons."] } },
+        { level: "Fácil", text: "Quantos PERÍODOS (linhas horizontais) existem na Tabela Periódica atual oficial?", options: ["18", "7", "8", "10"], correctIndex: 1, explanation: { correctText: "Existem 7 períodos, correspondentes aos 7 níveis de energia possíveis para os átomos conhecidos (K, L, M, N, O, P, Q).", otherOptions: ["18 é o número de grupos/famílias."] } },
+        { level: "Fácil", text: "Quantos GRUPOS (colunas verticais) existem na Tabela Periódica seguindo a numeração atual recomendada pela IUPAC?", options: ["8", "7", "18", "32"], correctIndex: 2, explanation: { correctText: "A IUPAC numera os grupos de forma corrida do 1 ao 18 (substituindo a antiga numeração de 1A a 8A e 1B a 8B).", otherOptions: ["7 é o número de períodos."] } },
+        { level: "Médio", text: "O Grupo 1 da tabela periódica (antiga família 1A) recebe um nome especial. Como são conhecidos estes elementos (Lítio, Sódio, Potássio...)?", options: ["Gases Nobres.", "Halogênios.", "Metais Alcalinoterrosos.", "Metais Alcalinos."], correctIndex: 3, explanation: { correctText: "O Grupo 1 é a família dos Metais Alcalinos. Eles são altamente reativos e possuem 1 elétron na camada de valência.", otherOptions: ["Alcalinoterrosos são do Grupo 2.", "Halogênios são do Grupo 17."] } },
+        { level: "Médio", text: "O Grupo 2 da tabela periódica (antiga família 2A) é composto por elementos como Berílio, Magnésio e Cálcio. Qual o nome desta família?", options: ["Metais Alcalinoterrosos.", "Metais de Transição.", "Calcogênios.", "Halogênios."], correctIndex: 0, explanation: { correctText: "O Grupo 2 é a família dos Metais Alcalinoterrosos, que possuem 2 elétrons na camada de valência.", otherOptions: ["Transição é do grupo 3 ao 12."] } },
+        { level: "Médio", text: "O Grupo 17 (antiga família 7A), que inclui o Flúor, Cloro, Bromo e Iodo, é uma família de ametais altamente reativos. Qual é o seu nome clássico?", options: ["Gases Nobres.", "Calcogênios.", "Halogênios.", "Família do Oxigênio."], correctIndex: 2, explanation: { correctText: "O Grupo 17 são os Halogênios. Eles têm 7 elétrons de valência e adoram capturar 1 elétron para completar o octeto.", otherOptions: ["Calcogênios é o Grupo 16."] } },
+        { level: "Fácil", text: "O Grupo 18 (antiga família 8A) fica na extrema direita da tabela. Estes elementos não reagem facilmente com outros devido à sua estabilidade (octeto completo). Como são chamados?", options: ["Metais Alcalinos.", "Halogênios.", "Semimetais.", "Gases Nobres."], correctIndex: 3, explanation: { correctText: "São os Gases Nobres (Hélio, Neônio, Argônio...). Eles são a 'realeza' química, pois já são estáveis sozinhos na natureza.", otherOptions: [""] } },
+        { level: "Médio", text: "O Grupo 16 (antiga família 6A) é liderado pelo Oxigênio e pelo Enxofre. Qual é o nome oficial desta família?", options: ["Calcogênios.", "Halogênios.", "Gases Nobres.", "Família do Nitrogênio."], correctIndex: 0, explanation: { correctText: "O Grupo 16 são os Calcogênios ('formadores de minérios'). Possuem 6 elétrons na camada de valência.", otherOptions: ["A família do Nitrogênio é o Grupo 15."] } },
+        { level: "Difícil", text: "Um elemento químico X possui uma distribuição eletrônica distribuída em 3 camadas e possui 2 elétrons na sua camada de valência. Em qual posição exata da tabela periódica ele se encontra?", options: ["3º Período, Grupo 1.", "2º Período, Grupo 3.", "3º Período, Grupo 2 (Metais Alcalinoterrosos).", "Grupo 18, 3º Período."], correctIndex: 2, explanation: { correctText: "O número de camadas (3) dita o Período -> 3º Período. O número de elétrons de valência (2) dita o Grupo para os representativos -> Grupo 2.", otherOptions: ["Se tivesse 1 elétron seria Grupo 1."] } },
+        { level: "Médio", text: "Os elementos do bloco central da tabela periódica (Grupos 3 ao 12), que costumam formar compostos coloridos, recebem a classificação geral de:", options: ["Elementos Representativos.", "Gases Nobres.", "Halogênios.", "Metais de Transição."], correctIndex: 3, explanation: { correctText: "O 'buraco' central da tabela abriga os Metais de Transição (ex: Ferro, Ouro, Cobre). A sua distribuição eletrônica termina no subnível 'd'.", otherOptions: ["Representativos são os das pontas (terminam em s ou p)."] } },
+        { level: "Fácil", text: "Os elementos que ficam nas duas colunas da esquerda (Grupos 1 e 2) e nas seis colunas da direita (Grupos 13 a 18) são chamados em conjunto de:", options: ["Elementos de Transição Interna.", "Elementos Representativos.", "Elementos Radioativos.", "Lantanídeos."], correctIndex: 1, explanation: { correctText: "Eles 'representam' a forma mais clara e previsível das propriedades químicas da tabela. As suas configurações terminam em subníveis s ou p.", otherOptions: [""] } },
+        { level: "Difícil", text: "O Hidrogênio (H) está localizado na caixa do Grupo 1 (em cima do Lítio), pois tem 1 elétron de valência (1s¹). No entanto, qual a sua verdadeira família química?", options: ["Ele é um Metal Alcalino legítimo.", "Ele é um Gás Nobre disfarçado.", "O Hidrogênio NÃO possui família. Ele é um elemento atípico, um 'órfão' químico com propriedades únicas.", "Ele é um Halogênio deslocado."], correctIndex: 2, explanation: { correctText: "Rasteira clássica de vestibular! O Hidrogênio fica no Grupo 1 por questões numéricas, mas as suas propriedades são de um gás ametal inflamável. Ele não é um Metal Alcalino.", otherOptions: [""] } },
+        { level: "Médio", text: "Todo elemento químico cuja distribuição eletrônica fundamental terminar em s¹ (ex: 3s¹, 4s¹) pertencerá obrigatoriamente a qual grupo da tabela?", options: ["Grupo 1 (Metais Alcalinos).", "Grupo 2 (Metais Alcalinoterrosos).", "Grupo 17 (Halogênios).", "Grupo 18 (Gases Nobres)."], correctIndex: 0, explanation: { correctText: "O subnível 's¹' indica que há apenas 1 elétron na camada de valência. Isso é a assinatura química de todo o Grupo 1.", otherOptions: ["s² seria Grupo 2.", "p⁵ seria Halogênios."] } },
+        { level: "Fácil", text: "A esmagadora maioria dos elementos químicos da Tabela Periódica (localizados à esquerda e no centro) classifica-se como:", options: ["Ametais (Não-metais).", "Gases Nobres.", "Líquidos em temperatura ambiente.", "Metais."], correctIndex: 3, explanation: { correctText: "Cerca de 75% da tabela periódica é formada por Metais (bons condutores de calor e eletricidade, sólidos e maleáveis).", otherOptions: ["Os Ametais são uma minoria no canto direito superior."] } },
+        { level: "Fácil", text: "Os elementos químicos são organizados na tabela não para decorar, mas sim porque as suas propriedades variam de forma previsível. O que significa afirmar que um elemento é um 'Gás Nobre'?", options: ["Que ele reage violentamente com a água.", "Que ele conduz eletricidade de forma perfeita.", "Que a sua eletrosfera é instável e emite radiação.", "Que ele possui a camada de valência completa (estável) e praticamente não reage com outros elementos na natureza."], correctIndex: 3, explanation: { correctText: "Gases Nobres (Grupo 18) já possuem o Octeto completo. A sua inércia química é a sua maior marca.", otherOptions: ["Metais alcalinos é que reagem violentamente com a água."] } },
+        { level: "Difícil", text: "Aquelas duas linhas horizontais que ficam separadas e 'penduradas' na parte de baixo da Tabela Periódica (Lantanídeos e Actinídeos) pertencem oficialmente a qual grupo e região?", options: ["Pertencem ao Grupo 1.", "São chamados de Elementos de Transição Interna e deveriam estar encaixados no Grupo 3 dos períodos 6 e 7.", "São os verdadeiros Halogênios.", "Estão fora da tabela porque não existem na Terra."], correctIndex: 1, explanation: { correctText: "Eles são puxados para baixo apenas para a tabela não ficar visualmente comprida demais e desproporcional. Todos eles cabem no Grupo 3 (bloco 'f' e 'f' transição interna).", otherOptions: ["Muitos existem na Terra (como o Urânio)."] } },
+        { level: "Médio", text: "O Carbono (C) é o elemento base da vida e dá nome à sua família (Família do Carbono). Qual é o Grupo (número) que o Carbono encabeça?", options: ["Grupo 14 (antiga 4A).", "Grupo 16 (antiga 6A).", "Grupo 12.", "Grupo 1."], correctIndex: 0, explanation: { correctText: "O Carbono está no Grupo 14, o que significa que ele possui 4 elétrons na camada de valência (e faz 4 ligações químicas).", otherOptions: ["Grupo 16 é o Oxigênio."] } },
+        { level: "Fácil", text: "A série dos Actinídeos (a última linha pendurada na tabela) é famosa mundialmente porque grande parte dos seus membros, incluindo o Urânio (U) e o Plutônio (Pu), são conhecidos por serem:", options: ["Metais preciosos de joalheria.", "Gases inodoros.", "Elementos altamente Radioativos e muitos deles artificiais (feitos em laboratório).", "Isolantes térmicos perfeitos."], correctIndex: 2, explanation: { correctText: "Os Actinídeos são átomos com núcleos muito pesados e instáveis, o que gera o decaimento radioativo usado em reatores e bombas nucleares.", otherOptions: ["Apenas ouro, prata e platina são usados em joias dessa forma."] } },
+        { level: "Médio", text: "Os Halogênios (Grupo 17), como o Cloro e o Flúor, possuem 7 elétrons na camada de valência. Por causa disso, ao se combinarem com metais, a sua tendência é:", options: ["Doar 7 elétrons para virarem cátions.", "Não fazer nada, pois já são estáveis.", "Ganhar 1 elétron extra para completar o Octeto (virando Ânions).", "Transformarem-se em metais."], correctIndex: 2, explanation: { correctText: "A Regra do Octeto diz que átomos querem 8 elétrons na valência. Como têm 7, é muito mais fácil roubar 1 elétron (ganhar carga negativa) do que ceder 7.", otherOptions: [""] } },
+        { level: "Difícil", text: "O elemento Magnésio (Mg) tem Número Atômico Z=12. Fazendo a sua distribuição (K=2, L=8, M=2), podemos afirmar perfeitamente que ele está no:", options: ["2º Período, Grupo 12.", "3º Período, Grupo 2 (Metal Alcalinoterroso).", "2º Período, Grupo 3.", "3º Período, Grupo 1 (Metal Alcalino)."], correctIndex: 1, explanation: { correctText: "Possui 3 camadas (K, L, M) -> 3º Período. Possui 2 elétrons de valência na última camada -> Grupo 2 (Metais Alcalinoterrosos).", otherOptions: [""] } },
+        { level: "Fácil", text: "Nas questões do ENEM, saber usar a Tabela Periódica como um mapa é essencial. Se te pedirem para encontrar elementos com comportamento químico MUITO parecido com o do Cálcio (Ca), tu deves procurar elementos que estejam:", options: ["No mesmo Período (linha horizontal) do Cálcio.", "Na mesma Massa que o Cálcio.", "Na mesma Família/Grupo (coluna vertical) do Cálcio.", "No mesmo lado em que estão os Ametais."], correctIndex: 2, explanation: { correctText: "A semelhança química 'mora' na mesma Família (coluna vertical), pois todos os membros da família têm os mesmos elétrons na ponta para fazer ligações.", otherOptions: ["Estar na mesma linha só significa ter o mesmo número de camadas, não química igual."] } },
+        { level: "Médio", text: "Se um elemento é um 'Metal Alcalino', podemos afirmar logo de cara, sem olhar para a tabela, que a sua camada de valência possui exatamente:", options: ["1 elétron.", "2 elétrons.", "7 elétrons.", "8 elétrons."], correctIndex: 0, explanation: { correctText: "Metais Alcalinos são o Grupo 1. O nome do grupo (no caso dos representativos clássicos) avisa quantos elétrons há na ponta: Grupo 1 = 1 elétron.", otherOptions: ["2 elétrons são Alcalinoterrosos.", "7 são Halogênios."] } },
+        { level: "Fácil", text: "Mnemônica visual da aula: Quando o professor fala sobre 'Períodos' e 'Famílias' na Lousa, para que direção os teus olhos devem correr na tabela?", options: ["Períodos = Na diagonal / Famílias = Em zigue-zague.", "Períodos = Colunas (em pé) / Famílias = Linhas (deitadas).", "Períodos = Linhas (deitadas) / Famílias = Colunas (em pé).", "É tudo aleatório."], correctIndex: 2, explanation: { correctText: "A base de toda a organização: Períodos são as 7 linhas horizontais (deitadas). Famílias/Grupos são as 18 colunas verticais (em pé).", otherOptions: ["Trocar esses eixos é o erro mais comum nos testes!"] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_org_tabela_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Resposta Certa!' : '❌ Erro Estrutural!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#1D4ED8', '#F97316', '#10B981', '#3B82F6'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 DOMÍNIO ABSOLUTO DA TABELA!</strong> Você compreende perfeitamente a diferença entre Períodos e Grupos e sabe localizar os elementos!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONFUSÃO NOS BLOCOS!</strong> Você foi avaliado abaixo da meta (80%). Revise o conceito de Períodos (Linhas horizontais) e Famílias (Colunas verticais).
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

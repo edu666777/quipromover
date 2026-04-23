@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Leis Ponderais - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F8FAFC; 
+            --text-color: #0F172A; 
+            --border-color: #312E81; 
+            --white: #FFFFFF;
+            
+            --theme-light: #E0E7FF; 
+            --theme-medium: #6366F1; 
+            --theme-dark: #4338CA; 
+            --theme-contrast: #10B981; 
+            --theme-accent: #F59E0B; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #92400E; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #3B82F6; color: #1E3A8A; }
+        .highlight-box.green { background-color: #ECFDF5; border-left-color: #10B981; color: #064E3B; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #FFE4E6; border-color: #E11D48; color: #9F1239; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">⚖️</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">As Leis Ponderais</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Lavoisier, Proust, Massas)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">⚖️ 1. Lei de Lavoisier</div>
+                <article class="theory-box search-target">
+                    <h3>Lei da Conservação das Massas</h3>
+                    <p>Antoine Lavoisier, o "Pai da Química Moderna", postulou que numa reação química que ocorre num <strong>sistema fechado</strong>, a massa total dos reagentes é SEMPRE igual à massa total dos produtos.</p>
+                    <div class="highlight-box">
+                        <strong>A Famosa Frase:</strong> "Na natureza, nada se cria, nada se perde, tudo se transforma."
+                    </div>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="120" viewBox="0 0 250 120">
+                            <!-- Balança base -->
+                            <line x1="125" y1="100" x2="125" y2="30" stroke="#312E81" stroke-width="4"/>
+                            <polygon points="105,120 145,120 125,100" fill="#4338CA"/>
+                            <!-- Braço -->
+                            <line x1="50" y1="30" x2="200" y2="30" stroke="#312E81" stroke-width="4"/>
+                            
+                            <!-- Prato Esquerdo (Reagentes) -->
+                            <path d="M 30 60 Q 50 80 70 60" fill="none" stroke="#312E81" stroke-width="2"/>
+                            <line x1="30" y1="60" x2="50" y2="30" stroke="#312E81" stroke-width="1"/>
+                            <line x1="70" y1="60" x2="50" y2="30" stroke="#312E81" stroke-width="1"/>
+                            <!-- Pesos Esquerda -->
+                            <rect x="35" y="45" width="15" height="15" fill="#10B981"/>
+                            <rect x="52" y="45" width="15" height="15" fill="#F59E0B"/>
+                            <text x="50" y="95" font-size="12" font-weight="bold" fill="#1E293B" text-anchor="middle">10g + 5g</text>
+
+                            <!-- Prato Direito (Produtos) -->
+                            <path d="M 180 60 Q 200 80 220 60" fill="none" stroke="#312E81" stroke-width="2"/>
+                            <line x1="180" y1="60" x2="200" y2="30" stroke="#312E81" stroke-width="1"/>
+                            <line x1="220" y1="60" x2="200" y2="30" stroke="#312E81" stroke-width="1"/>
+                            <!-- Peso Direita -->
+                            <rect x="190" y="40" width="20" height="20" fill="#6366F1"/>
+                            <text x="200" y="95" font-size="12" font-weight="bold" fill="#1E293B" text-anchor="middle">15g</text>
+                        </svg>
+                    </div>
+                    <p><em>Atenção:</em> Se queimar papel (sistema aberto), a massa parece diminuir porque o CO₂ escapa para o ar. Mas se a experiência for feita numa redoma fechada, a massa não muda 1 grama sequer!</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🍰 2. Lei de Proust</div>
+                <article class="theory-box search-target">
+                    <h3>Lei das Proporções Constantes</h3>
+                    <p>Joseph Proust descobriu que uma substância composta é formada por elementos que estão sempre na <strong>mesma proporção de massa</strong>, não importando a origem da substância ou como foi preparada.</p>
+                    
+                    <div class="highlight-box blue">
+                        <strong>A Lógica da "Receita do Bolo":</strong> Se para fazer 1 bolo precisas de 2 ovos e 1 copo de leite... para fazer 2 bolos precisas EXATAMENTE do DOBRO (4 ovos e 2 copos de leite).
+                    </div>
+
+                    <div class="visual-area" style="background-color: #F0FDF4; border-color: #10B981;">
+                        <span style="font-weight: 800; color: #065F46; margin-bottom: 10px;">Formação da Água (H₂O)</span>
+                        <table style="width: 100%; text-align: center; border-collapse: collapse; font-weight: 600;">
+                            <tr style="border-bottom: 2px solid #10B981;">
+                                <td style="padding: 5px;">Hidrogênio</td>
+                                <td style="padding: 5px;">Oxigênio</td>
+                                <td style="padding: 5px;">Água</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px;">2 g</td>
+                                <td style="padding: 5px;">16 g</td>
+                                <td style="padding: 5px; color: #059669;">18 g</td>
+                            </tr>
+                            <tr style="background-color: #D1FAE5;">
+                                <td style="padding: 5px;">4 g (x2)</td>
+                                <td style="padding: 5px;">32 g (x2)</td>
+                                <td style="padding: 5px; color: #059669;">36 g (x2)</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <p>Se colocares 3g de Hidrogênio com 16g de Oxigênio, a água vai usar os mesmos 2g de Hidrogênio e vai <strong>sobrar 1g</strong> de Hidrogênio no final (Reagente em Excesso).</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔀 3. Lei de Dalton</div>
+                <article class="theory-box search-target">
+                    <h3>Lei das Proporções Múltiplas</h3>
+                    <p>John Dalton postulou que quando dois elementos (A e B) se combinam para formar <strong>MÚLTIPLOS compostos diferentes</strong>, se mantivermos a massa de A constante, as massas de B que se combinam com A formarão uma relação de números inteiros e pequenos.</p>
+                    
+                    <div class="highlight-box green">
+                        <strong>Exemplo Clássico (CO e CO₂):</strong><br>
+                        - Monóxido de Carbono (CO): 12g de Carbono reagem com <strong>16g</strong> de Oxigênio.<br>
+                        - Dióxido de Carbono (CO₂): 12g de Carbono reagem com <strong>32g</strong> de Oxigênio.<br>
+                        Mantendo o Carbono fixo (12g), a massa do Oxigênio no CO₂ é exatamente o <strong>dobro</strong> da massa no CO (32/16 = 2).
+                    </div>
+                </article>
+            </section>
+
+            <!-- BLOCO: RESUMO RÁPIDO -->
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-contrast);">📌 Resumo Rápido (Macetes)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast); border-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Memorize as Leis</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 15px; text-align: center;">
+                        <div style="background-color: #F8FAFC; border: 2px solid #3B82F6; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.5rem; font-weight: 900; color: #1D4ED8; line-height: 1;">A + B = C</span><br>
+                            <strong style="color: #1E3A8A; font-size: 1.1rem;">Lavoisier</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Conservação de Massa.<br>(Sistema Fechado)</span>
+                        </div>
+                        <div style="background-color: #F8FAFC; border: 2px solid #10B981; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.5rem; font-weight: 900; color: #059669; line-height: 1;">(x2)</span><br>
+                            <strong style="color: #064E3B; font-size: 1.1rem;">Proust</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Proporção Constante.<br>(A Receita do Bolo)</span>
+                        </div>
+                        <div style="background-color: #F8FAFC; border: 2px solid #8B5CF6; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.5rem; font-weight: 900; color: #6D28D9; line-height: 1;">SO₂ / SO₃</span><br>
+                            <strong style="color: #4C1D95; font-size: 1.1rem;">Dalton</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Proporções Múltiplas.<br>(Compostos Diferentes)</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões rigorosas sobre Lavoisier, Proust e Dalton. Acerte <strong>80% (24/30)</strong> para dominar os cálculos estequiométricos iniciais!
+                </p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    const questionsDatabase = [
+        { level: "Fácil", text: "Quem é o autor da famosa frase 'Na natureza, nada se cria, nada se perde, tudo se transforma'?", options: ["Joseph Proust.", "John Dalton.", "Antoine Lavoisier.", "Amedeo Avogadro."], correctIndex: 2, explanation: { correctText: "Esta é a Lei de Conservação das Massas, postulada pelo químico francês Antoine Lavoisier no século XVIII.", otherOptions: [] } },
+        { level: "Fácil", text: "Segundo a Lei de Lavoisier, numa reação química que ocorre num sistema fechado, a massa total dos reagentes é:", options: ["Sempre maior que a massa dos produtos.", "Sempre igual à massa total dos produtos.", "Sempre menor que a massa dos produtos.", "Dependente da temperatura da reação."], correctIndex: 1, explanation: { correctText: "A massa conserva-se perfeitamente. Se inicias uma reação com 100g de reagentes totais, no final terás obrigatoriamente 100g de produtos totais.", otherOptions: [] } },
+        { level: "Médio", text: "Ao queimar uma folha de papel num prato aberto, um aluno nota que as cinzas pesam muito menos que o papel original. Ele conclui que a Lei de Lavoisier falhou. Onde está o erro de raciocínio do aluno?", options: ["A Lei de Lavoisier só funciona para líquidos.", "A Lei de Lavoisier está errada na química orgânica.", "Ao queimar papel (sistema aberto), o oxigênio do ar reage e gases (como o CO2) escapam para a atmosfera. Se todo o gás consumido e libertado fosse pesado num sistema fechado, a massa seria idêntica.", "A cinza é mais pesada, a balança é que estava errada."], correctIndex: 2, explanation: { correctText: "Lavoisier exige um SISTEMA FECHADO sempre que gases estão envolvidos (seja como reagentes ou produtos) para que a balança capte a massa do ar que participou na reação.", otherOptions: [] } },
+        { level: "Médio", text: "Numa experiência, 12 gramas de Carbono reagem completamente com 32 gramas de Oxigênio para formar Gás Carbônico (CO2). Qual a massa de CO2 formada?", options: ["44 gramas.", "12 gramas.", "32 gramas.", "20 gramas."], correctIndex: 0, explanation: { correctText: "Pela Lei de Lavoisier: Massa dos Reagentes = Massa dos Produtos. 12g + 32g = 44g de CO2.", otherOptions: [] } },
+        { level: "Difícil", text: "Uma palha de aço (bombril) é pesada numa balança de precisão e depois é queimada num prato aberto. Após a queima, nota-se que o resíduo sólido (óxido de ferro) pesa MAIS do que a palha de aço original. Porquê?", options: ["Porque a ferrugem gera prótons adicionais.", "Porque o ferro liga-se quimicamente ao oxigênio do ar (que também tem massa) durante a combustão. A massa final é a soma do ferro + oxigênio absorvido.", "Porque o fogo solidifica a matéria.", "Porque a balança sofreu interferência magnética."], correctIndex: 1, explanation: { correctText: "Este é o clássico experimento que confundia os alquimistas. O metal ao queimar 'rouba' o oxigênio do ar. O pó final é Ferro + Oxigênio, logo tem de ser mais pesado que o Ferro sozinho.", otherOptions: [] } },
+        { level: "Fácil", text: "Numa reação química, 2 gramas de Hidrogênio reagem com 16 gramas de Oxigênio para formar 18 gramas de Água. Se quisermos formar 36 gramas de Água, de quantos gramas de Hidrogênio e Oxigênio precisaremos, respectivamente?", options: ["2g e 16g.", "4g e 32g.", "8g e 64g.", "1g e 8g."], correctIndex: 1, explanation: { correctText: "Lei de Proust (Proporções Constantes). Se queremos o dobro de água (36g), temos de dobrar a 'receita': 2x2 = 4g de H, e 16x2 = 32g de O.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual lei pondal afirma que 'Toda substância pura apresenta sempre a mesma composição em massa de seus elementos, independentemente da sua origem'?", options: ["Lei de Lavoisier.", "Lei de Dalton.", "Lei de Proust.", "Lei de Avogadro."], correctIndex: 2, explanation: { correctText: "A Lei de Proust (Proporções Constantes ou Definidas) é a 'receita do bolo'. A água tem sempre 11% de H e 89% de O em massa, quer seja do rio ou da torneira.", otherOptions: [] } },
+        { level: "Médio", text: "Sabe-se que 4g de Cálcio reagem com 1,6g de Oxigênio para formar Óxido de Cálcio (CaO). Se colocarmos 4g de Cálcio junto com 3g de Oxigênio, o que irá acontecer?", options: ["Formar-se-ão 7g de CaO sem sobras.", "A reação não ocorre devido ao excesso.", "Formar-se-ão 5,6g de CaO e irá sobrar (ficar em excesso) 1,4g de Oxigênio que não reagiu.", "Formar-se-ão 5,6g de CaO e irá sobrar 1,4g de Cálcio."], correctIndex: 2, explanation: { correctText: "Pela Lei de Proust, a proporção é fixa. Os 4g de Cálcio só 'aceitam' 1,6g de Oxigênio. O oxigênio que puseres a mais (3 - 1.6 = 1.4g) não reage e sobra no copo (Excesso).", otherOptions: [] } },
+        { level: "Fácil", text: "A Lei de Lavoisier fala da soma das massas, enquanto a Lei de Proust fala de:", options: ["Velocidade da reação.", "Diferença de cores.", "Proporções em massa constantes (a receita).", "Quantidade de calor."], correctIndex: 2, explanation: { correctText: "Proust é o autor das 'Proporções'. A receita nunca muda.", otherOptions: [] } },
+        { level: "Médio", text: "Na reação A + B -> C + D, sabe-se que 10g de A reagem com 20g de B, produzindo 5g de C. Qual será a massa de D formada?", options: ["15g.", "20g.", "25g.", "30g."], correctIndex: 2, explanation: { correctText: "Lavoisier: Reagentes (10+20 = 30g). Os produtos têm de somar 30g. Se C tem 5g, então D tem de ter 25g (5+25 = 30).", otherOptions: [] } },
+        { level: "Médio", text: "John Dalton postulou uma Lei Ponderal observando que os mesmos dois elementos podem formar MÚLTIPLOS compostos diferentes (como o Monóxido de Carbono - CO e o Dióxido de Carbono - CO2). Como é conhecida a sua lei?", options: ["Lei da Conservação de Massas.", "Lei das Proporções Múltiplas.", "Lei das Proporções Constantes.", "Lei Volumétrica."], correctIndex: 1, explanation: { correctText: "Lei de Dalton = Proporções Múltiplas. Elementos podem combinar-se em proporções diferentes (1:1, 1:2) para criar produtos totalmente distintos.", otherOptions: [] } },
+        { level: "Difícil", text: "No monóxido de carbono (CO), 12g de C unem-se a 16g de O. No dióxido de carbono (CO2), 12g de C unem-se a 32g de O. Mantendo a massa do Carbono fixa (12g), a relação entre as massas de Oxigênio que reagiram nos dois compostos (32 / 16) é:", options: ["Um número fracionário irracional.", "Um número inteiro e pequeno (2).", "Zero.", "Depende da pressão atmosférica."], correctIndex: 1, explanation: { correctText: "A essência da Lei de Dalton: Se fixares a massa de um elemento, as massas do outro elemento que formam os vários compostos mantêm uma relação matemática de números inteiros pequenos (1, 2, 3...).", otherOptions: [] } },
+        { level: "Médio", text: "Seja a reação: 28g de N2 + Xg de H2 -> 34g de NH3. Qual o valor de X?", options: ["2g.", "4g.", "6g.", "8g."], correctIndex: 2, explanation: { correctText: "Pela Lei de Lavoisier: 28 + X = 34. Portanto, X = 34 - 28 = 6g.", otherOptions: [] } },
+        { level: "Fácil", text: "Um aluno afirma que a água de um rio em Portugal e a água derretida de um glaciar no Polo Sul, após purificadas, têm a mesma exata proporção de Hidrogênio e Oxigênio. Que lei valida isto?", options: ["A Lei de Newton.", "A Lei de Lavoisier.", "A Lei de Dalton.", "A Lei de Proust."], correctIndex: 3, explanation: { correctText: "Lei de Proust (Proporções Definidas). A origem ou o método de obtenção de uma substância pura não altera a sua receita química.", otherOptions: [] } },
+        { level: "Médio", text: "Sabendo que 14g de Nitrogênio precisam de 3g de Hidrogênio para reagir totalmente. Se num reator colocarmos 28g de Nitrogênio e 10g de Hidrogênio, qual será o reagente em EXCESSO e quanto vai sobrar?", options: ["O Nitrogênio estará em excesso em 14g.", "O Hidrogênio estará em excesso e sobrarão 4g.", "Ambos reagem totalmente, não sobra nada.", "O Hidrogênio estará em excesso e sobrarão 7g."], correctIndex: 1, explanation: { correctText: "Proust dita: A receita base é 14g N para 3g H. Como colocamos 28g de N (o dobro), precisaremos do dobro de H (3x2 = 6g). Colocamos 10g de H, mas só vamos usar 6g. Sobram 4g de Hidrogênio no reator.", otherOptions: [] } },
+        { level: "Difícil", text: "O Enxofre (S) e o Oxigênio (O) podem formar dois gases tóxicos: o SO2 e o SO3. No SO2, 32g de S reagem com 32g de O. Pela Lei de Dalton, no SO3, mantendo as mesmas 32g de S fixas, qual deverá ser a massa do Oxigênio?", options: ["32g.", "48g.", "64g.", "16g."], correctIndex: 1, explanation: { correctText: "No SO2 (2 oxigênios) = 32g (cada O pesa 16). No SO3 temos 3 oxigênios. Mantendo o S fixo, os 3 oxigênios pesarão 3 x 16 = 48g.", otherOptions: [] } },
+        { level: "Médio", text: "Num sistema FECHADO, ocorre a decomposição de 100g de calcário (CaCO3) produzindo 56g de cal viva (CaO) e uma massa X de gás carbônico (CO2). Pode-se afirmar que o valor de X é:", options: ["Zero, pois é um gás.", "156g.", "44g.", "Não pode ser calculado."], correctIndex: 2, explanation: { correctText: "Sistema fechado garante que a balança não mente. Lavoisier diz que Reagente = Produtos. 100 = 56 + X. Logo, X = 44g de CO2.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das leis ponderais NÃO se aplica à formação de um ÚNICO composto, sendo utilizada apenas quando observamos a formação de compostos MÚLTIPLOS (diferentes) usando os mesmos elementos bases?", options: ["Lei de Lavoisier.", "Lei de Proust.", "Lei de Dalton.", "Lei das Massas."], correctIndex: 2, explanation: { correctText: "Proust foca-se NUMA substância (ex: só H2O). Dalton compara DUAS ou mais substâncias (H2O e H2O2) para ver os múltiplos.", otherOptions: [] } },
+        { level: "Médio", text: "Seja a reação A + B -> C. Em 3 experimentos diferentes, usamos: Exp 1 (2g A + 4g B = 6g C). Exp 2 (4g A + 8g B = 12g C). Exp 3 (10g A + 20g B = 30g C). O fato de o produto C poder ser previsto dobrando ou multiplicando os reagentes comprova qual lei?", options: ["Lei de Dalton.", "Lei de Lavoisier.", "Lei de Proust.", "Lei de Gay-Lussac."], correctIndex: 2, explanation: { correctText: "A possibilidade de ampliar ou reduzir a receita mantendo a proporção (2 para 4, 4 para 8, 10 para 20) é a evidência experimental da Lei das Proporções Constantes de Proust.", otherOptions: [] } },
+        { level: "Difícil", text: "As leis ponderais referem-se estritamente à massa. Existe também a Lei de Gay-Lussac, que estabelece uma lei para outra grandeza em reações de gases a pressão e temperatura constantes. Que grandeza é essa?", options: ["Densidade.", "Volume.", "Cor.", "Velocidade."], correctIndex: 1, explanation: { correctText: "Gay-Lussac postulou a Lei Volumétrica. Ele notou que os volumes de gases que reagem e são produzidos mantêm uma proporção de números inteiros e pequenos (ex: 1 litro de O2 + 2 litros de H2 = 2 litros de vapor de água).", otherOptions: [] } },
+        { level: "Médio", text: "Reagindo 3g de Carbono com 8g de Oxigênio, obtém-se 11g de Gás Carbônico. Qual a percentagem em massa do Carbono nesta molécula?", options: ["Cerca de 27%.", "Cerca de 50%.", "Cerca de 72%.", "100%."], correctIndex: 0, explanation: { correctText: "Basta uma regra de três simples. Se a massa total é 11g (100%), então 3g de Carbono representam: (3 / 11) * 100 ≈ 27.27%.", otherOptions: [] } },
+        { level: "Fácil", text: "Um padeiro errou a receita de Proust para o bolo. Ele usou os ovos certos, mas colocou o triplo da farinha exigida. O que a lei de Proust garante que irá acontecer no nível atômico com a farinha extra?", options: ["A farinha vai transformar-se num novo elemento.", "A farinha em excesso NÃO vai reagir e ficará sobrando no recipiente, pois a proporção consumida é rígida e não absorve excedentes.", "A reação química anula-se e não forma produto nenhum.", "O bolo ficará radioativo."], correctIndex: 1, explanation: { correctText: "Qualquer reagente fora da proporção exata vira EXCESSO. Ele fica inerte e sobra misturado nos produtos finais sem ter reagido.", otherOptions: [] } },
+        { level: "Difícil", text: "Decompondo-se 36g de água, formam-se 4g de hidrogênio e 32g de oxigênio. Quantos gramas de água são necessários para se obter 16g de oxigênio?", options: ["18g.", "9g.", "36g.", "20g."], correctIndex: 0, explanation: { correctText: "Matemática de Proust: Se 36g de água geram 32g de oxigênio... Para gerar metade do oxigênio (16g), basta quebrar metade da água (18g).", otherOptions: [] } },
+        { level: "Fácil", text: "Os elementos químicos reagem segundo as Leis Ponderais. Qual o significado de 'Ponderais' nestas leis?", options: ["Relativas ao tempo de reação.", "Relativas à massa (peso) das substâncias que participam nas reações químicas.", "Relativas à mudança de cor luminosa.", "Relativas aos íons formados."], correctIndex: 1, explanation: { correctText: "A palavra 'Ponderal' vem de peso/massa (como em 'balança ponderal'). Lavoisier, Proust e Dalton basearam-se exaustivamente em balanças de precisão para criar a química.", otherOptions: [] } },
+        { level: "Médio", text: "O Cloreto de Sódio (NaCl) tem a proporção em massa de aproximadamente 39% de Sódio e 61% de Cloro. Se minerares sal em Marte, qual seria a proporção encontrada lá, segundo a ciência inorgânica?", options: ["Seria imprevisível devido à gravidade.", "A proporção estaria invertida (61% Sódio, 39% Cloro).", "A proporção seria RIGOROSAMENTE A MESMA (39% Na, 61% Cl), validando a universalidade da Lei de Proust.", "Seria 50% para cada um."], correctIndex: 2, explanation: { correctText: "A Lei das Proporções Constantes não falha no universo (para isótopos padrão). A identidade de uma molécula é a sua proporção mássica cravada na pedra.", otherOptions: [] } },
+        { level: "Médio", text: "Numa balança de pratos, num lado tens um reator de vidro lacrado onde ocorre uma explosão violenta. No outro prato tens um peso de ferro equivalente. O que acontece à balança durante e após a explosão?", options: ["O prato do reator sobe, pois o gás pesa menos.", "O prato do reator desce, pois o calor é pesado.", "A balança PERMANECE ESTÁTICA e equilibrada o tempo todo, comprovando a Lei de Lavoisier de que a massa num sistema fechado não muda independentemente da violência da transformação química.", "A balança parte-se com a ressonância."], correctIndex: 2, explanation: { correctText: "Não importa o espetáculo de luz, fogo ou fumo que ocorra dentro do reator. Se o reator está lacrado (não entra nem sai nenhum átomo), a balança nem sequer pisca, comprovando Lavoisier.", otherOptions: [] } },
+        { level: "Difícil", text: "A Lei de Lavoisier serviu de base para qual processo matemático diário na química escolar, que obriga os alunos a garantir que o número de átomos que entram numa equação tem de ser igual ao que sai?", options: ["A criação de soluções molares.", "O Balanceamento das Equações Químicas (Estequiometria).", "A identificação de cátions e ânions.", "O cálculo do pH."], correctIndex: 1, explanation: { correctText: "O Balanceamento é a tradução de Lavoisier no papel! Se entram 2 átomos de H (reagente), TÊM de sair 2 átomos de H (produtos), para garantir que a massa não se perdeu.", otherOptions: [] } },
+        { level: "Fácil", text: "Na combustão completa do magnésio (2Mg + O2 -> 2MgO). Sabendo que consumiste 48g de Magnésio e 32g de Oxigênio, qual é o reagente limitante se no laboratório tivesses colocado 50g de Magnésio e os mesmos 32g de Oxigênio?", options: ["O Oxigênio, pois ele esgota-se aos 32g, limitando a reação e impedindo que os 2g extra de Magnésio reajam.", "O Magnésio, por ser mais denso.", "Nenhum é limitante, ambos reagem.", "O MgO é o limitante."], correctIndex: 0, explanation: { correctText: "Reagente Limitante é o ingrediente da receita que ACABA PRIMEIRO. Quando o Oxigênio acaba, a reação para, sobrando Magnésio no prato.", otherOptions: [] } },
+        { level: "Médio", text: "A Lei de Dalton (Proporções Múltiplas) foi o pilar para a criação de qual grande teoria revolucionária que moldou a física e a química modernas?", options: ["A Teoria da Relatividade.", "O Modelo Atômico Bola de Bilhar de Dalton. Apenas a existência de átomos indivisíveis, duros e com massas fixas, que se unem como legos em formatos 1:1, 1:2, etc., poderia explicar a perfeição da matemática das suas proporções múltiplas.", "A Tabela Periódica moderna.", "A Lei da Gravidade quântica."], correctIndex: 1, explanation: { correctText: "Foi exatamente para tentar explicar a sua própria lei (porquê os compostos formavam múltiplos perfeitos) que Dalton concebeu a ideia revolucionária de que a matéria era feita de pequenas 'bolas' que se encaixavam.", otherOptions: [] } },
+        { level: "Difícil", text: "Fecho Lógico: Usando Lavoisier e Proust. Receita original: A + B -> C (10g + 5g = 15g). Se tivermos no laboratório 30g de A e 25g de B, quantos gramas do produto C obteremos e quanto de quem irá sobrar (excesso)?", options: ["Obteremos 55g de C e nada sobra.", "Obteremos 30g de C e sobrarão 25g de B.", "Obteremos 45g de C (usando 30g de A e 15g de B). O reagente B estará em excesso e sobrarão 10g no final.", "Obteremos 15g de C, sobrando A e B."], correctIndex: 2, explanation: { correctText: "Para usar as 30g totais de A (que é 3x a receita de 10g), precisaremos de 3x a receita de B (3 x 5 = 15g). Produtos: 30+15 = 45g de C. Como tínhamos 25g de B e só usamos 15g, sobram 10g de B intactos.", otherOptions: [] } }
+    ];
+
+    const STORAGE_KEY = 'promover_quimica_leis_ponderais_progress';
+    let quizState = { currentIndex: 0, userAnswers: new Array(questionsDatabase.length).fill(null), confettiAnimationId: null };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) { lastAnswered = i; break; }
+                    }
+                    quizState.currentIndex = lastAnswered < questionsDatabase.length - 1 ? lastAnswered + 1 : questionsDatabase.length - 1;
+                    if (parsed.filter(a => a !== null).length > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if (btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function saveProgress() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers)); } catch (e) { console.error(e); }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', e => {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let found = 0;
+            contentGroups.forEach(g => {
+                const match = g.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+                g.style.display = match ? 'flex' : 'none';
+                if (match) found++;
+            });
+            noResultsMsg.style.display = found === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(view) {
+        ['viewExplanation', 'viewPractice', 'viewResult'].forEach(v => document.getElementById(v)?.classList.remove('active'));
+        const footer = document.getElementById('quizFooter');
+        if (footer) footer.style.display = view === 'practice' ? 'flex' : 'none';
+        document.getElementById('btnExp')?.classList.toggle('active', view === 'explanation');
+        document.getElementById('btnPrac')?.classList.toggle('active', view === 'practice');
+        
+        const viewId = view === 'explanation' ? 'viewExplanation' : view === 'practice' ? 'viewPractice' : 'viewResult';
+        document.getElementById(viewId)?.classList.add('active');
+        
+        if (view === 'practice') { renderCurrentQuestion(); renderNavigationMap(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        return level === 'Fácil' ? 'dif-facil' : level === 'Médio' ? 'dif-medio' : 'dif-dificil';
+    }
+
+    function buildOptionsHTML(q, sel) {
+        const letters = ['A', 'B', 'C', 'D'];
+        return q.options.map((opt, i) => {
+            let cls = '';
+            if (sel !== null) {
+                cls = i === q.correctIndex ? 'correct' : i === sel ? 'wrong' : 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleOptionSelection(${i})" ${sel !== null ? 'disabled' : ''}>
+                <div class="opt-circle">${letters[i]}</div><div>${opt}</div></button>`;
+        }).join('');
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+        const q = questionsDatabase[quizState.currentIndex];
+        const sel = quizState.userAnswers[quizState.currentIndex];
+        const badge = getDifficultyBadgeClass(q.level);
+        let fb = '';
+        if (sel !== null) {
+            const isC = sel === q.correctIndex;
+            fb = `<div class="feedback-box show"><div class="feedback-title ${isC ? 'success' : 'error'}" style="color: ${isC ? 'var(--correct-border)' : 'var(--wrong-border)'}">${isC ? '✅ Certo!' : '❌ Errado!'}</div>
+            <div class="feedback-item correct-opt"><strong>Correta:</strong> ${q.options[q.correctIndex]}</div>
+            <div style="margin-top:15px; font-weight:600;">${q.explanation.correctText}</div></div>`;
+        }
+        container.innerHTML = `<div class="quiz-question-card"><div class="quiz-question-counter"><span class="difficulty-badge ${badge}" style="margin:0;">${q.level}</span><span>QUESTÃO ${quizState.currentIndex + 1}/${questionsDatabase.length}</span></div>
+        <h2 class="quiz-question-text">${q.text}</h2><div class="options-list">${buildOptionsHTML(q, sel)}</div>${fb}</div>`;
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(idx) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        quizState.userAnswers[quizState.currentIndex] = idx;
+        saveProgress();
+        if (idx === questionsDatabase[quizState.currentIndex].correctIndex) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const c = document.getElementById('quizContainer');
+        if (c) { c.classList.remove('shake-effect'); void c.offsetWidth; c.classList.add('shake-effect'); setTimeout(() => c.classList.remove('shake-effect'), 500); }
+    }
+
+    function startSuccessAnimation() {
+        stopSuccessAnimation();
+        const end = Date.now() + 1500;
+        function frame() {
+            if(window.confetti) {
+                confetti({ particleCount: 5, spread: 55, colors: ['#4338CA', '#10B981', '#F59E0B'], angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ particleCount: 5, spread: 55, colors: ['#4338CA', '#10B981', '#F59E0B'], angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(frame);
+        }
+        frame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && confetti.reset) confetti.reset();
+        if (quizState.confettiAnimationId) { cancelAnimationFrame(quizState.confettiAnimationId); quizState.confettiAnimationId = null; }
+    }
+
+    function renderNavigationMap() {
+        const map = document.getElementById('qMap');
+        if (!map) return;
+        map.innerHTML = questionsDatabase.map((q, i) => {
+            let cls = 'map-dot' + (i === quizState.currentIndex ? ' active' : '');
+            if (quizState.userAnswers[i] !== null) cls += quizState.userAnswers[i] === q.correctIndex ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cls}" onclick="goToQuestion(${i})">${i + 1}</div>`;
+        }).join('');
+        setTimeout(() => { const dot = map.querySelector('.map-dot.active'); if (dot) dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 50);
+    }
+
+    function goToQuestion(idx) { stopSuccessAnimation(); quizState.currentIndex = idx; renderCurrentQuestion(); renderNavigationMap(); }
+    function navigateQuestion(dir) { const next = quizState.currentIndex + dir; if (next >= 0 && next < questionsDatabase.length) goToQuestion(next); }
+
+    function updateNavigationButtons() {
+        const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
+        if (prev) prev.disabled = quizState.currentIndex === 0;
+        if (next) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) {
+                next.textContent = "Finalizar Avaliação";
+                next.onclick = finishQuiz;
+            } else {
+                next.textContent = "Próxima ➡️";
+                next.onclick = () => navigateQuestion(1);
+            }
+        }
+    }
+
+    function finishQuiz() {
+        const unans = quizState.userAnswers.filter(a => a === null).length;
+        if (unans > 0 && !confirm(`Existem ${unans} questões sem resposta. Deseja terminar mesmo assim?`)) return;
+        stopSuccessAnimation();
+        const correct = quizState.userAnswers.filter((a, i) => a === questionsDatabase[i].correctIndex).length;
+        const total = questionsDatabase.length;
+        const pct = Math.round((correct / total) * 100);
+        document.getElementById('finalPercent').textContent = `${pct}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${total}`;
+        document.getElementById('finalStars').textContent = pct === 100 ? "⭐⭐⭐⭐⭐" : pct >= 80 ? "⭐⭐⭐⭐" : pct >= 60 ? "⭐⭐⭐" : pct >= 40 ? "⭐⭐" : pct > 0 ? "⭐" : "🌑";
+        
+        const review = document.getElementById('review-container');
+        review.innerHTML = pct >= 80 
+            ? `<div class="result-summary-box success"><strong>🎉 DOMÍNIO DAS MASSAS!</strong> O seu entendimento estequiométrico e raciocínio de proporções está excelente!</div>`
+            : `<div class="result-summary-box error"><strong>⚠️ CÁLCULO DESBALANCEADO!</strong> Precisa revisar a diferença entre Reagente em Excesso e Proporções Múltiplas.</div>`;
+        
+        if (correct < total) {
+            review.innerHTML += '<h4 style="margin-bottom:15px;">Erros:</h4>';
+            questionsDatabase.forEach((q, i) => {
+                if (quizState.userAnswers[i] !== q.correctIndex) {
+                    review.innerHTML += `<div class="error-log-item"><strong>Q${i+1}: ${q.text}</strong><br>
+                    <span style="color:var(--wrong-border);">Sua resposta: ${quizState.userAnswers[i] === null ? 'Em branco' : q.options[quizState.userAnswers[i]]}</span><br>
+                    <span style="color:var(--correct-border);">Correta: ${q.options[q.correctIndex]}</span></div>`;
+                }
+            });
+        }
+        document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 REFAZER AVALIAÇÃO</button>`;
+        changeApplicationView('result');
+    }
+    
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

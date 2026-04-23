@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Sais e Óxidos - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F0FDFA; 
+            --text-color: #115E59; 
+            --border-color: #0F766E; 
+            --white: #FFFFFF;
+            
+            --theme-light: #CCFBF1; 
+            --theme-medium: #14B8A6; 
+            --theme-dark: #0D9488; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #D97706; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #92400E; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #F0FDF4; border-left-color: #10B981; color: #064E3B; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #FEE2E2; border-color: #BE123C; color: #881337; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧂</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Módulo 5: Funções Inorgânicas - Sais e Óxidos</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Neutralização, Óxido Básico)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🧂 1. Sais (O Fruto da Neutralização)</div>
+                <article class="theory-box search-target">
+                    <h3>A União Eletrostática</h3>
+                    <p>Segundo Arrhenius, um <strong>Sal</strong> é todo composto iônico que, em solução aquosa, sofre dissociação e libera pelo menos um cátion diferente de H⁺ e um ânion diferente de OH⁻.</p>
+                    <p>Eles são o produto direto da <strong>Reação de Neutralização</strong> entre um Ácido e uma Base:</p>
+                    <div class="highlight-box">
+                        <strong>ÁCIDO + BASE ➔ SAL + ÁGUA</strong><br>
+                        Ex: HCl + NaOH ➔ <strong>NaCl</strong> + H₂O<br>
+                        <em>(O cátion Na⁺ vem da base e o ânion Cl⁻ vem do ácido).</em>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📝 2. Nomenclatura dos Sais</div>
+                <article class="theory-box search-target">
+                    <h3>A Regra do Mosquito</h3>
+                    <p>O nome de um sal deriva DIRETAMENTE do ácido que lhe deu origem. A regra de nomenclatura altera o sufixo do ânion do ácido original:</p>
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li>Se o ácido terminava em <strong>-ÍDRICO</strong>, o sal termina em <strong>-ETO</strong>. (Ex: Ácido Clorídrico ➔ Clor<strong>eto</strong> de Sódio).</li>
+                        <li>Se o ácido terminava em <strong>-ICO</strong>, o sal termina em <strong>-ATO</strong>. (Ex: Ácido Sulfúrico ➔ Sulf<strong>ato</strong> de Cálcio).</li>
+                        <li>Se o ácido terminava em <strong>-OSO</strong>, o sal termina em <strong>-ITO</strong>. (Ex: Ácido Nitroso ➔ Nitr<strong>ito</strong> de Potássio).</li>
+                    </ul>
+                    <div class="highlight-box blue" style="margin-top: 10px;">
+                        <strong>Mnemônica:</strong> "Mosqu<strong>ito</strong> teim<strong>oso</strong>, te m<strong>ato</strong> te p<strong>ico</strong>, te m<strong>eto</strong> no v<strong>ídrico</strong>."
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">💨 3. Óxidos (Binários do Oxigênio)</div>
+                <article class="theory-box search-target">
+                    <h3>Compostos de Dois Elementos</h3>
+                    <p>Um <strong>Óxido</strong> é um composto binário (formado por apenas 2 elementos), onde o <strong>Oxigênio é o elemento mais eletronegativo</strong>.</p>
+                    <div class="highlight-box" style="background-color: #FEF2F2; border-left-color: #E11D48; color: #9F1239;">
+                        <strong>A GRANDE EXCEÇÃO:</strong> OF₂ (Fluoreto de Oxigênio) <strong>NÃO</strong> é um óxido! O Flúor é mais eletronegativo que o Oxigênio, quebrando a regra fundamental.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔬 4. Classificação dos Óxidos</div>
+                <article class="theory-box search-target">
+                    <h3>Ácidos, Básicos, Neutros e Anfóteros</h3>
+                    <p>O comportamento de um óxido na água define a sua classe:</p>
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Óxidos Básicos:</strong> Formados por <strong>Metais</strong> (Grupo 1 e 2). Reagem com a água formando Bases. (Ex: CaO, Na₂O).</li>
+                        <li><strong>Óxidos Ácidos (Anidridos):</strong> Formados por <strong>Ametais</strong>. Reagem com a água formando Ácidos. Grandes vilões da Chuva Ácida. (Ex: CO₂, SO₃, NO₂).</li>
+                        <li><strong>Óxidos Neutros:</strong> Não reagem com água, ácido ou base. Decore os três: <strong>CO, NO e N₂O</strong>.</li>
+                        <li><strong>Óxidos Anfóteros:</strong> Têm dupla personalidade. Comportam-se como ácidos perante bases, e como bases perante ácidos. (Ex: ZnO, Al₂O₃).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-contrast);">📌 Resumo Rápido (Macetes)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast); border-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Revise Antes da Prova!</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 15px; text-align: center;">
+                        <div style="background-color: #F8FAFC; border: 2px solid #0D9488; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #0D9488; line-height: 1;">MX</span><br>
+                            <strong style="color: #115E59; font-size: 1.1rem;">Sais</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Cátion + Ânion<br>(Vêm da Neutralização)</span>
+                        </div>
+                        <div style="background-color: #F8FAFC; border: 2px solid #D97706; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #D97706; line-height: 1;">EO</span><br>
+                            <strong style="color: #92400E; font-size: 1.1rem;">Óxidos</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Binários<br>O é o mais eletronegativo</span>
+                        </div>
+                        <div style="background-color: #F8FAFC; border: 2px solid #059669; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); grid-column: 1 / -1;">
+                            <span style="font-size: 1.2rem; font-weight: 900; color: #059669; line-height: 1;">Os 3 Óxidos Neutros</span><br>
+                            <span style="font-size: 0.95rem; font-weight: 600; color: #064E3B;">CO (Monóxido de Carbono), NO (Óxido Nítrico), N₂O (Óxido Nitroso)</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre Sais, Óxidos, Chuva Ácida e Nomenclatura. Acerte <strong>80% (24/30)</strong> para dominar o assunto!
+                </p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    const questionsDatabase = [
+        { level: "Fácil", text: "De acordo com a teoria de Arrhenius, qual é a definição clássica e correta de um Sal?", options: ["Substância molecular que libera H+ na água.", "Composto iônico que, em solução aquosa, sofre dissociação liberando pelo menos um cátion diferente de H+ e um ânion diferente de OH-.", "Composto binário formado por oxigênio e um metal.", "Substância que evapora liberando hidroxilas."], correctIndex: 1, explanation: { correctText: "A marca do Sal é a ausência de exclusividade para H+ ou OH-. Ele libera cátions metálicos (ex: Na+) e ânions de ácidos (ex: Cl-).", otherOptions: [] } },
+        { level: "Fácil", text: "A principal e mais famosa forma de se obter um Sal em laboratório é misturando duas substâncias antagonistas. Qual é essa reação clássica?", options: ["Sublimação de iodo.", "Reação de Combustão.", "Reação de Neutralização (Ácido + Base -> Sal + Água).", "Eletrólise ígnea."], correctIndex: 2, explanation: { correctText: "Todo sal é 'filho' de um ácido com uma base. O cátion do sal vem da base e o ânion vem do ácido.", otherOptions: [] } },
+        { level: "Médio", text: "Se misturarmos Ácido Clorídrico (HCl) e Hidróxido de Sódio (NaOH), os íons H+ e OH- formarão água. Qual será o sal inorgânico resultante desta união?", options: ["Carbonato de Sódio (Na2CO3).", "Cloreto de Sódio (NaCl).", "Sulfato de Sódio (Na2SO4).", "Óxido de Cloro (ClO2)."], correctIndex: 1, explanation: { correctText: "O cátion Na+ da base junta-se ao ânion Cl- do ácido, formando o clássico Cloreto de Sódio (NaCl), o sal de cozinha.", otherOptions: [] } },
+        { level: "Fácil", text: "Na nomenclatura de sais derivados de HIDRÁCIDOS (ácidos sem oxigênio, terminados em -ídrico), qual sufixo deve ser utilizado para o ânion do sal?", options: ["-ato", "-ito", "-eto", "-oso"], correctIndex: 2, explanation: { correctText: "Ácidos em -ídrico formam sais em -eto. Exemplo: Ácido Clorídrico gera Clor-eto.", otherOptions: [] } },
+        { level: "Médio", text: "O Ácido Sulfúrico (H2SO4) reage com Cálcio para formar o sal usado em gessos e construção civil. Aplicando a regra do 'Bico de Pato', como se chama o sal derivado deste ácido terminado em '-ico'?", options: ["Sulfito de Cálcio.", "Sulfeto de Cálcio.", "Sulfato de Cálcio.", "Sulfureto de Cálcio."], correctIndex: 2, explanation: { correctText: "Sufixo '-ico' vira '-ato'. O Ácido Sulfúr-ico gera o sal Sulf-ato de Cálcio (CaSO4).", otherOptions: [] } },
+        { level: "Difícil", text: "O conservante alimentício usado em carnes processadas (salsichas) deriva do Ácido Nitroso (HNO2). Qual é o nome técnico do sal de Sódio derivado deste ácido?", options: ["Nitrato de Sódio.", "Nitrito de Sódio.", "Nitreto de Sódio.", "Nitrogênio de Sódio."], correctIndex: 1, explanation: { correctText: "Regra do mosquito: 'Mosqu-ito teim-oso'. Ácido em '-oso' (Nitroso) gera um sal em '-ito' (Nitrito de Sódio).", otherOptions: [] } },
+        { level: "Médio", text: "O mármore, o calcário e as conchas do mar são compostos primariamente pelo mesmo sal: CaCO3. Qual o seu nome químico?", options: ["Carbureto de Cálcio.", "Cloreto de Cálcio.", "Carbonato de Cálcio.", "Bicarbonato de Cálcio."], correctIndex: 2, explanation: { correctText: "O CaCO3 deriva do Ácido Carbônico (H2CO3). Pela regra '-ico vira -ato', temos o Carbonato de Cálcio.", otherOptions: [] } },
+        { level: "Difícil", text: "Quando um ácido forte poliprótico (ex: H2SO4) é neutralizado PARCIALMENTE por uma base, ele não perde todos os seus hidrogênios, gerando um sal que ainda possui 'H' na fórmula (ex: NaHSO4). Como classificamos esse sal?", options: ["Sal básico (Hidroxissal).", "Sal neutro simples.", "Sal ácido (Hidrogenossal).", "Óxido duplo."], correctIndex: 2, explanation: { correctText: "Se sobrou H+ ionizável preso no ânion do sal, ele é um Sal Ácido ou Hidrogenossal. (NaHSO4 = Hidrogenossulfato de Sódio).", otherOptions: [] } },
+        { level: "Médio", text: "O 'Bicarbonato de Sódio' (NaHCO3), muito usado como fermento em bolos e antiácido, enquadra-se em qual categoria de sais?", options: ["Hidroxissal, pois é uma base.", "Sal neutro binário.", "Sal duplo ou misto.", "Hidrogenossal (Sal Ácido), pois possui um hidrogênio ionizável remanescente na sua estrutura do ânion carbonato."], correctIndex: 3, explanation: { correctText: "O nome oficial é Hidrogenocarbonato de Sódio. A presença do 'H' no meio da fórmula denota a sua natureza de sal ácido (fruto de neutralização parcial).", otherOptions: [] } },
+        { level: "Fácil", text: "Mudando para os Óxidos: Qual é a definição exata de um Óxido na Química Inorgânica?", options: ["Qualquer composto que libere oxigênio no ar.", "Um composto formado por três elementos onde o oxigênio está no meio.", "Um composto binário (formado por apenas dois elementos) onde o Oxigênio é obrigatoriamente o elemento mais eletronegativo.", "Uma base metálica gasosa."], correctIndex: 2, explanation: { correctText: "Binário (2 elementos) e o Oxigênio (O) manda na eletronegatividade (fica à direita na fórmula). Ex: CO2, Fe2O3.", otherOptions: [] } },
+        { level: "Difícil", text: "A química é cheia de pegadinhas no ENEM. O composto OF2 (Fluoreto de Oxigênio) é binário e tem oxigênio. Por que ele NÃO é considerado um Óxido?", options: ["Porque é um gás nobre.", "Porque o Flúor (F) é MAIS eletronegativo que o Oxigênio. No conceito de óxido, o oxigênio tem de ser o elemento mais eletronegativo da dupla.", "Porque o flúor anula a carga neutra do oxigênio.", "Porque só existem óxidos de metais pesados."], correctIndex: 1, explanation: { correctText: "O Flúor é o 'Rei' da Eletronegatividade. Quando o O se liga ao F, o F é quem dita as regras magnéticas, desclassificando o composto do grupo dos óxidos.", otherOptions: [] } },
+        { level: "Médio", text: "Os 'Óxidos Básicos' são compostos sólidos com altos pontos de fusão que, ao reagirem com a água, formam Bases de Arrhenius. Eles são formados primariamente pela ligação do Oxigênio com quais elementos?", options: ["Ametais da família 17.", "Gases Nobres.", "Metais (principalmente alcalinos e alcalinoterrosos, com baixo Nox +1 e +2).", "Apenas pelo Hidrogênio."], correctIndex: 2, explanation: { correctText: "Metal + Oxigênio = Óxido Básico. Exemplo clássico é o Na2O (Óxido de Sódio) ou CaO (Óxido de Cálcio). Ao caírem na água geram NaOH e Ca(OH)2.", otherOptions: [] } },
+        { level: "Fácil", text: "O 'Cal virgem' ou 'Cal viva' é muito usado em construções e para diminuir a acidez de solos rurais. A sua fórmula é CaO. Como ele é classificado e qual o seu nome oficial?", options: ["Óxido Ácido, Dióxido de Carbono.", "Óxido Neutro, Monóxido de Cálcio.", "Óxido Básico, Óxido de Cálcio.", "Sal simples, Cloreto de Cálcio."], correctIndex: 2, explanation: { correctText: "Sendo formado por um Metal do Grupo 2 (Ca) e Oxigênio, é um Óxido Básico (Óxido de Cálcio). Ele neutraliza o solo ácido reagindo com a água e formando a base Ca(OH)2.", otherOptions: [] } },
+        { level: "Médio", text: "Os 'Óxidos Ácidos' (também chamados de Anidridos) são frequentemente gasosos ou líquidos moleculares e reagem com a água formando Ácidos. Eles são formados pela união do oxigênio com:", options: ["Metais de transição pesados.", "Ametais (Não-Metais) com alto Nox.", "Semimetais gelados.", "Gases Nobres inertes."], correctIndex: 1, explanation: { correctText: "Ametal + Oxigênio = Óxido Ácido. O C, S, e N ligados ao O formam gases que, se caírem na chuva, geram desastres ambientais.", otherOptions: [] } },
+        { level: "Fácil", text: "O Dióxido de Carbono (CO2) é o gás liberado na nossa respiração e a principal causa do Efeito Estufa. Como ele é um ametal ligado ao oxigênio, se ele reagir com a água da chuva, formará uma solução fracamente ácida. Como o CO2 é classificado?", options: ["Óxido Básico.", "Óxido Neutro.", "Óxido Ácido (Anidrido Carbônico).", "Sal metálico orgânico."], correctIndex: 2, explanation: { correctText: "CO2 + H2O -> H2CO3 (Ácido Carbônico). Logo, o CO2 atua como um Óxido Ácido.", otherOptions: [] } },
+        { level: "Difícil", text: "A Chuva Ácida destrutiva (pH < 5) é causada pela poluição atmosférica de indústrias e carros. Quais são os principais ÓXIDOS ÁCIDOS despejados no ar que reagem com a chuva para formar os mortais ácidos Sulfúrico e Nítrico?", options: ["CaO e Na2O.", "CO e N2O.", "SO3 (Trióxido de Enxofre) e NO2 (Dióxido de Nitrogênio).", "NaCl e HF."], correctIndex: 2, explanation: { correctText: "O Enxofre (S) e Nitrogênio (N) da queima de carvão/gasolina geram os óxidos ácidos SO3 e NO2, que na nuvem viram H2SO4 e HNO3, caindo como chuva corrosiva.", otherOptions: [] } },
+        { level: "Médio", text: "A Nomenclatura dos Óxidos Ácidos (formados por ametais) utiliza prefixos gregos (mono, di, tri) para indicar as quantidades de átomos. Qual é o nome correto para a molécula SO3?", options: ["Trióxido de Enxofre.", "Óxido de Enxofre (III).", "Monóxido de Trissulfeto.", "Ácido Sulfuroso."], correctIndex: 0, explanation: { correctText: "Regra para ametais: (Prefixo de O) + Óxido de + (Prefixo do elemento) + Elemento. 3 oxigênios = Trióxido. 1 Enxofre = de (mono)Enxofre.", otherOptions: [] } },
+        { level: "Difícil", text: "Para os Óxidos Básicos (metais), não usamos prefixos gregos. Se o metal tiver Nox variável, usamos a numeração romana. A ferrugem é o Fe2O3. Sabendo que o Oxigênio é -2, o ferro aqui tem carga +3. Qual o nome correto?", options: ["Trióxido de Diferro.", "Óxido Férroso.", "Óxido de Ferro (III) ou Óxido Férrico.", "Óxido de Ferro (II)."], correctIndex: 2, explanation: { correctText: "O 3 do oxigênio cruzou do Ferro. Logo, a carga do Ferro é +3. Nome: Óxido de Ferro (III) ou Férrico (maior Nox).", otherOptions: [] } },
+        { level: "Médio", text: "Existe um pequeno e famoso grupo de óxidos que são chamados de 'Óxidos Neutros' (ou Indiferentes), pois eles NÃO reagem com água, nem com ácidos, nem com bases. Quais são esses 3 óxidos fundamentais?", options: ["CO2, SO2, SO3.", "CO, NO e N2O.", "H2O, Na2O, CaO.", "Al2O3, ZnO, PbO."], correctIndex: 1, explanation: { correctText: "Decore: Monóxido de Carbono (CO), Óxido Nítrico (NO) e Óxido Nitroso (N2O). Eles são apáticos quimicamente com a água.", otherOptions: [] } },
+        { level: "Fácil", text: "O Monóxido de Carbono (CO) é um Óxido Neutro gerado na queima incompleta dos motores dos carros. Qual o grande perigo ambiental/biológico direto deste gás invisível e inodoro?", options: ["Ele corrói os pneus dos carros.", "Ele liga-se de forma irreversível à hemoglobina do sangue, impedindo o transporte de oxigênio e causando asfixia e morte silenciosa.", "Ele gera a chuva ácida forte.", "Ele queima a retina sob luz solar."], correctIndex: 1, explanation: { correctText: "O CO é o assassino invisível. O nosso sangue tem muito mais 'afinidade' com o CO do que com o O2. Ao respirar num túnel fechado, o CO entra no sangue e não sai mais.", otherOptions: [] } },
+        { level: "Médio", text: "O Óxido Nitroso (N2O) é outro Óxido Neutro. Historicamente usado na medicina odontológica e em motores de carros de corrida (Nitro). Ele é conhecido popularmente como:", options: ["Gás Mostarda.", "Gás Lacrimogêneo.", "Gás Hilariante (ou gás do riso).", "Gás Nobre."], correctIndex: 2, explanation: { correctText: "O N2O gera efeitos de euforia, leve analgesia e contrações faciais que imitam o riso, sendo muito usado como anestésico leve no dentista.", otherOptions: [] } },
+        { level: "Difícil", text: "Os 'Óxidos Anfóteros' têm dupla personalidade química. O que isso significa na prática de laboratório?", options: ["Eles podem assumir os três estados físicos ao mesmo tempo.", "Eles mudam de cor no escuro.", "Eles comportam-se como Óxidos Básicos na presença de um ácido, e como Óxidos Ácidos na presença de uma base (neutralizando ambos).", "Eles nunca reagem de forma alguma."], correctIndex: 2, explanation: { correctText: "Anfótero significa 'ambos os lados'. O Óxido de Zinco (ZnO) e o de Alumínio (Al2O3) são os camaleões da tabela: combatem com a arma contrária à do seu inimigo reativo.", otherOptions: [] } },
+        { level: "Fácil", text: "O Peróxido de Hidrogênio (H2O2) é um composto onde o oxigênio assume um Nox incomum de -1. No dia a dia das farmácias e hospitais, a solução aquosa deste peróxido é vendida como:", options: ["Álcool etílico.", "Água Oxigenada, usada para limpar feridas.", "Soro fisiológico.", "Cloro de piscina."], correctIndex: 1, explanation: { correctText: "A Água Oxigenada (H2O2) borbulha em ferimentos porque a enzima catalase do sangue destrói o peróxido libertando gás O2, que mata bactérias anaeróbicas (como as do tétano).", otherOptions: [] } },
+        { level: "Médio", text: "Ao observar um frasco no laboratório com o rótulo 'KNO3'. O potássio é um metal (K) e o Nitrato (NO3) é um ânion ametaólico derivado de ácido. A classificação imediata dessa substância é:", options: ["Base forte.", "Óxido básico.", "Ácido oxiácido.", "Sal inorgânico (Nitrato de Potássio)."], correctIndex: 3, explanation: { correctText: "Metal + Ânion de Ácido = Sal clássico de laboratório. Usado intensamente como fertilizante e na pólvora negra.", otherOptions: [] } },
+        { level: "Difícil", text: "Qual destas afirmações sobre Óxidos e Sais está 100% VERDADEIRA?", options: ["Todos os sais contêm oxigênio na sua fórmula obrigatoriamente.", "Óxidos ácidos são sempre formados por metais da família 1 e 2.", "Apenas sais são capazes de neutralizar bases em qualquer contexto molecular neutro vazio.", "Para ser classificado como Óxido, a molécula TEM de ser binária e o Oxigênio TEM de ser o mais eletronegativo."], correctIndex: 3, explanation: { correctText: "Definição cravada! NaOH não é óxido (é ternário). OF2 não é óxido (Flúor ganha na eletronegatividade).", otherOptions: [] } },
+        { level: "Médio", text: "O Cloreto de Sódio (NaCl) pode ser obtido pela evaporação da água do mar. O sal de cozinha vendido nos mercados brasileiros recebe obrigatoriamente a adição de um outro sal para prevenir doenças na tireoide (bócio). Que íon do sal adicionado previne essa doença?", options: ["O Íon Flúor (F-).", "O Íon Iodo (na forma de Iodetos e Iodatos, como o NaI ou KIO3).", "O Íon Cálcio (Ca2+).", "O Íon Lítio (Li+)."], correctIndex: 1, explanation: { correctText: "A lei do 'Sal Iodado' visa erradicar o bócio (papeira) no Brasil, garantindo que toda a população consuma Iodo diário na dieta base.", otherOptions: [] } },
+        { level: "Fácil", text: "A areia da praia e a base do vidro são formadas pelo composto Sílica (SiO2). Sendo o Silício (Si) um semimetal ligado ao oxigênio. O SiO2 é o óxido mais abundante da crosta terrestre. Como ele é classificado?", options: ["Óxido Ácido.", "Óxido Básico.", "Base Neutra.", "Sal metálico."], correctIndex: 0, explanation: { correctText: "O Silício comporta-se como ametal nas ligações do óxido. Portanto, o SiO2 é classificado funcionalmente como Óxido Ácido, que reage com bases para formar silicatos.", otherOptions: [] } },
+        { level: "Médio", text: "Se observares a decomposição térmica do Calcário (CaCO3 -> CaO + CO2). Que duas grandes funções inorgânicas são geradas a partir do sal nos produtos da reação?", options: ["Uma base sólida e um ácido líquido.", "Um óxido básico sólido (CaO, Cal) e um óxido ácido gasoso (CO2).", "Dois sais orgânicos e água.", "Dois metais pesados de transição."], correctIndex: 1, explanation: { correctText: "A calcinação do carbonato liberta o gás carbônico (óxido ácido) e deixa no fundo a cal viva (óxido básico).", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das equações químicas abaixo ilustra perfeitamente o conceito formador de um Sal por NEUTRALIZAÇÃO?", options: ["Ca + 1/2 O2 -> CaO", "HCl + KOH -> KCl + H2O", "H2O -> H2 + 1/2 O2", "C + O2 -> CO2"], correctIndex: 1, explanation: { correctText: "Ácido Clorídrico (HCl) + Hidróxido de Potássio (KOH, base) formam o Sal Cloreto de Potássio (KCl) e a molécula da Água (H2O).", otherOptions: [] } },
+        { level: "Difícil", text: "Fecho final de propriedades! Misturar um Óxido Básico com a Água resulta numa BASE. Misturar um Óxido Ácido com a Água resulta num ÁCIDO. O que acontece se misturarmos um Óxido Neutro (como o CO) com a Água?", options: ["Forma um sal básico espumoso.", "A água entra em ebulição por combustão.", "Fisicamente não acontece NADA. Eles não interagem quimicamente e não geram produtos secundários (são indiferentes).", "Formam um Ácido superforte com liberação de plasma."], correctIndex: 2, explanation: { correctText: "A magia (e o perigo) dos Óxidos Neutros é que eles não se diluem reagindo com a água do ambiente. Eles ficam inertes pairando no ar, não sendo varridos pela chuva.", otherOptions: [] } }
+    ];
+
+    const STORAGE_KEY = 'promover_quimica_sais_oxidos_progress';
+    let quizState = { currentIndex: 0, userAnswers: new Array(questionsDatabase.length).fill(null), confettiAnimationId: null };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) { lastAnswered = i; break; }
+                    }
+                    quizState.currentIndex = lastAnswered < questionsDatabase.length - 1 ? lastAnswered + 1 : questionsDatabase.length - 1;
+                    if (parsed.filter(a => a !== null).length > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if (btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function saveProgress() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers)); } catch (e) { console.error(e); }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', e => {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let found = 0;
+            contentGroups.forEach(g => {
+                const match = g.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+                g.style.display = match ? 'flex' : 'none';
+                if (match) found++;
+            });
+            noResultsMsg.style.display = found === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(view) {
+        ['viewExplanation', 'viewPractice', 'viewResult'].forEach(v => document.getElementById(v)?.classList.remove('active'));
+        const footer = document.getElementById('quizFooter');
+        if (footer) footer.style.display = view === 'practice' ? 'flex' : 'none';
+        document.getElementById('btnExp')?.classList.toggle('active', view === 'explanation');
+        document.getElementById('btnPrac')?.classList.toggle('active', view === 'practice');
+        
+        const viewId = view === 'explanation' ? 'viewExplanation' : view === 'practice' ? 'viewPractice' : 'viewResult';
+        document.getElementById(viewId)?.classList.add('active');
+        
+        if (view === 'practice') { renderCurrentQuestion(); renderNavigationMap(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        return level === 'Fácil' ? 'dif-facil' : level === 'Médio' ? 'dif-medio' : 'dif-dificil';
+    }
+
+    function buildOptionsHTML(q, sel) {
+        const letters = ['A', 'B', 'C', 'D'];
+        return q.options.map((opt, i) => {
+            let cls = '';
+            if (sel !== null) {
+                cls = i === q.correctIndex ? 'correct' : i === sel ? 'wrong' : 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleOptionSelection(${i})" ${sel !== null ? 'disabled' : ''}>
+                <div class="opt-circle">${letters[i]}</div><div>${opt}</div></button>`;
+        }).join('');
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+        const q = questionsDatabase[quizState.currentIndex];
+        const sel = quizState.userAnswers[quizState.currentIndex];
+        const badge = getDifficultyBadgeClass(q.level);
+        let fb = '';
+        if (sel !== null) {
+            const isC = sel === q.correctIndex;
+            fb = `<div class="feedback-box show"><div class="feedback-title ${isC ? 'success' : 'error'}" style="color: ${isC ? 'var(--correct-border)' : 'var(--wrong-border)'}">${isC ? '✅ Certo!' : '❌ Errado!'}</div>
+            <div class="feedback-item correct-opt"><strong>Correta:</strong> ${q.options[q.correctIndex]}</div>
+            <div style="margin-top:15px; font-weight:600;">${q.explanation.correctText}</div></div>`;
+        }
+        container.innerHTML = `<div class="quiz-question-card"><div class="quiz-question-counter"><span class="difficulty-badge ${badge}" style="margin:0;">${q.level}</span><span>QUESTÃO ${quizState.currentIndex + 1}/${questionsDatabase.length}</span></div>
+        <h2 class="quiz-question-text">${q.text}</h2><div class="options-list">${buildOptionsHTML(q, sel)}</div>${fb}</div>`;
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(idx) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        quizState.userAnswers[quizState.currentIndex] = idx;
+        saveProgress();
+        if (idx === questionsDatabase[quizState.currentIndex].correctIndex) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const c = document.getElementById('quizContainer');
+        if (c) { c.classList.remove('shake-effect'); void c.offsetWidth; c.classList.add('shake-effect'); setTimeout(() => c.classList.remove('shake-effect'), 500); }
+    }
+
+    function startSuccessAnimation() {
+        stopSuccessAnimation();
+        const end = Date.now() + 1500;
+        function frame() {
+            if(window.confetti) {
+                confetti({ particleCount: 5, spread: 55, colors: ['#14B8A6', '#0F766E', '#F59E0B'], angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ particleCount: 5, spread: 55, colors: ['#14B8A6', '#0F766E', '#F59E0B'], angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(frame);
+        }
+        frame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && confetti.reset) confetti.reset();
+        if (quizState.confettiAnimationId) { cancelAnimationFrame(quizState.confettiAnimationId); quizState.confettiAnimationId = null; }
+    }
+
+    function renderNavigationMap() {
+        const map = document.getElementById('qMap');
+        if (!map) return;
+        map.innerHTML = questionsDatabase.map((q, i) => {
+            let cls = 'map-dot' + (i === quizState.currentIndex ? ' active' : '');
+            if (quizState.userAnswers[i] !== null) cls += quizState.userAnswers[i] === q.correctIndex ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cls}" onclick="goToQuestion(${i})">${i + 1}</div>`;
+        }).join('');
+        setTimeout(() => { const dot = map.querySelector('.map-dot.active'); if (dot) dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 50);
+    }
+
+    function goToQuestion(idx) { stopSuccessAnimation(); quizState.currentIndex = idx; renderCurrentQuestion(); renderNavigationMap(); }
+    function navigateQuestion(dir) { const next = quizState.currentIndex + dir; if (next >= 0 && next < questionsDatabase.length) goToQuestion(next); }
+
+    function updateNavigationButtons() {
+        const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
+        if (prev) prev.disabled = quizState.currentIndex === 0;
+        if (next) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) {
+                next.textContent = "Finalizar Avaliação";
+                next.onclick = finishQuiz;
+            } else {
+                next.textContent = "Próxima ➡️";
+                next.onclick = () => navigateQuestion(1);
+            }
+        }
+    }
+
+    function finishQuiz() {
+        const unans = quizState.userAnswers.filter(a => a === null).length;
+        if (unans > 0 && !confirm(`Existem ${unans} questões sem resposta. Deseja terminar mesmo assim?`)) return;
+        stopSuccessAnimation();
+        const correct = quizState.userAnswers.filter((a, i) => a === questionsDatabase[i].correctIndex).length;
+        const total = questionsDatabase.length;
+        const pct = Math.round((correct / total) * 100);
+        document.getElementById('finalPercent').textContent = `${pct}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${total}`;
+        document.getElementById('finalStars').textContent = pct === 100 ? "⭐⭐⭐⭐⭐" : pct >= 80 ? "⭐⭐⭐⭐" : pct >= 60 ? "⭐⭐⭐" : pct >= 40 ? "⭐⭐" : pct > 0 ? "⭐" : "🌑";
+        
+        const review = document.getElementById('review-container');
+        review.innerHTML = pct >= 80 
+            ? `<div class="result-summary-box success"><strong>🎉 DOMÍNIO DAS FUNÇÕES!</strong> Conheces perfeitamente a nomenclatura e as características dos Sais e Óxidos.</div>`
+            : `<div class="result-summary-box error"><strong>⚠️ CHUVA ÁCIDA!</strong> Precisas rever a classificação dos Óxidos (Ácidos, Básicos, Neutros).</div>`;
+        
+        if (correct < total) {
+            review.innerHTML += '<h4 style="margin-bottom:15px;">Erros:</h4>';
+            questionsDatabase.forEach((q, i) => {
+                if (quizState.userAnswers[i] !== q.correctIndex) {
+                    review.innerHTML += `<div class="error-log-item"><strong>Q${i+1}: ${q.text}</strong><br>
+                    <span style="color:var(--wrong-border);">Sua resposta: ${quizState.userAnswers[i] === null ? 'Em branco' : q.options[quizState.userAnswers[i]]}</span><br>
+                    <span style="color:var(--correct-border);">Correta: ${q.options[q.correctIndex]}</span></div>`;
+                }
+            });
+        }
+        document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 REFAZER AVALIAÇÃO</button>`;
+        changeApplicationView('result');
+    }
+    
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

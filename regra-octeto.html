@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: A Regra do Octeto - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: REGRA DO OCTETO (Roxo e Ouro) --- */
+        :root {
+            --bg-color: #FAF5FF; 
+            --text-color: #3B0764; 
+            --border-color: #5B21B6; 
+            --white: #FFFFFF;
+            
+            --theme-light: #E9D5FF; 
+            --theme-medium: #8B5CF6; 
+            --theme-dark: #6D28D9; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #10B981; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: #F8FAFC; border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.purple { background-color: #F3E8FF; border-left-color: #7E22CE; color: #4C1D95; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">👑</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">A Regra do Octeto</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Octeto, Dueto, Valência)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">👑 1. A Nobreza Química</div>
+                <article class="theory-box search-target">
+                    <h3>O Clube dos Oito</h3>
+                    <p>Na natureza, os elementos químicos buscam incansavelmente a estabilidade. Os únicos que já nascem estáveis são os <strong>Gases Nobres</strong> (Grupo 18).</p>
+                    <p>Qual o segredo deles? Quase todos os Gases Nobres possuem exatamente <strong>8 elétrons</strong> na sua última camada (Camada de Valência). Esta configuração (ns² np⁶) confere-lhes uma inércia perfeita.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="200" height="200" viewBox="0 0 200 200">
+                            <!-- Núcleo -->
+                            <circle cx="100" cy="100" r="20" fill="#6D28D9" stroke="#3B0764" stroke-width="2"/>
+                            <text x="100" y="105" font-size="14" font-weight="900" fill="#FFF" text-anchor="middle">Ne</text>
+                            
+                            <!-- Camada K (2e-) -->
+                            <circle cx="100" cy="100" r="40" fill="none" stroke="#A78BFA" stroke-width="2" stroke-dasharray="4"/>
+                            <circle cx="100" cy="60" r="6" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/>
+                            <circle cx="100" cy="140" r="6" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/>
+
+                            <!-- Camada L (8e-) - O OCTETO -->
+                            <circle cx="100" cy="100" r="75" fill="none" stroke="#8B5CF6" stroke-width="3"/>
+                            
+                            <!-- 8 Elétrons -->
+                            <circle cx="100" cy="25" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- N -->
+                            <circle cx="100" cy="175" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- S -->
+                            <circle cx="25" cy="100" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- W -->
+                            <circle cx="175" cy="100" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- E -->
+                            
+                            <circle cx="47" cy="47" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- NW -->
+                            <circle cx="153" cy="47" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- NE -->
+                            <circle cx="47" cy="153" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- SW -->
+                            <circle cx="153" cy="153" r="8" fill="#F59E0B" stroke="#3B0764" stroke-width="2"/> <!-- SE -->
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark);">O Neônio (Ne) possui o octeto perfeito.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🎯 2. A Regra do Octeto</div>
+                <article class="theory-box search-target">
+                    <h3>Doar, Receber ou Compartilhar</h3>
+                    <p>A <strong>Regra do Octeto</strong> estabelece que os átomos dos elementos representativos tendem a perder, ganhar ou compartilhar elétrons até ficarem com <strong>8 elétrons na camada de valência</strong>, imitando a configuração de um gás nobre.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Metais (Grupos 1, 2, 13):</strong> Têm poucos elétrons (1 a 3). Para eles, é mais fácil <strong>perder/doar</strong> esses elétrons, esvaziando a última camada e ficando com os 8 da camada interior. (Formam Cátions).</li>
+                        <li><strong>Ametais (Grupos 15, 16, 17):</strong> Têm muitos elétrons (5 a 7). É mais fácil <strong>ganhar ou compartilhar</strong> os elétrons que faltam para chegar a 8. (Formam Ânions ou Ligações Covalentes).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">✌️ 3. A Exceção: Regra do Dueto</div>
+                <article class="theory-box search-target">
+                    <h3>Os "Pequeninos" querem 2</h3>
+                    <p>Nem todos os átomos podem chegar a 8 elétrons, simplesmente porque são demasiado pequenos. O <strong>Hélio (He)</strong> é um gás nobre que só possui 2 elétrons na sua única camada (Camada K).</p>
+                    
+                    <div class="highlight-box purple">
+                        <strong>A Regra do Dueto:</strong> Elementos como o <strong>Hidrogênio (H)</strong>, o <strong>Lítio (Li)</strong> e o <strong>Berílio (Be)</strong> atingem a estabilidade quando ficam com apenas <strong>2 elétrons</strong> na camada de valência, imitando a configuração do Hélio.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚠️ 4. Outras Exceções Famosas</div>
+                <article class="theory-box search-target">
+                    <h3>Contração e Expansão do Octeto</h3>
+                    <p>A Química não seria Química sem exceções. A regra do octeto é um excelente guia, mas falha em alguns compostos clássicos que caem frequentemente no ENEM:</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Contração do Octeto (Menos de 8):</strong> O <strong>Boro (B)</strong> estabiliza frequentemente com apenas <strong>6 elétrons</strong> na sua camada de valência (ex: BF₃). O Berílio estabiliza com 4 (ex: BeCl₂).</li>
+                        <li><strong>Expansão do Octeto (Mais de 8):</strong> Elementos a partir do 3º período (como o Fósforo e o Enxofre) têm acesso aos subníveis 'd' vazios e podem acomodar mais elétrons. O <strong>Fósforo (P)</strong> pode estabilizar com <strong>10 elétrons</strong> (PCl₅) e o <strong>Enxofre (S)</strong> com impressionantes <strong>12 elétrons</strong> (SF₆).</li>
+                        <li><strong>Moléculas de Elétron Ímpar:</strong> O Monóxido de Nitrogênio (NO) possui um número ímpar de elétrons totais, tornando matematicamente impossível que todos os átomos fiquem com 8.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões rigorosas sobre Ligações, Estabilidade, Gases Nobres e as Exceções do Octeto. Acerte <strong>80% (24/30)</strong>!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Regra do Octeto PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Qual é o princípio fundamental da Regra do Octeto na química?", options: ["Os átomos buscam possuir 8 prótons no núcleo para evitar a radioatividade.", "Os átomos buscam alcançar exatamente 8 elétrons na sua camada de valência para atingir a máxima estabilidade.", "Os átomos fundem-se em grupos de 8 para formar cristais perfeitos.", "Apenas os metais precisam de 8 nêutrons para reagir."], correctIndex: 1, explanation: { correctText: "A regra afirma que a estabilidade química dos elementos representativos é atingida quando eles adquirem 8 elétrons na camada exterior (valência), imitando os gases nobres.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual família da Tabela Periódica já possui, de forma natural, a configuração eletrônica que todos os outros elementos procuram imitar?", options: ["Halogênios (Grupo 17).", "Metais Alcalinos (Grupo 1).", "Gases Nobres (Grupo 18).", "Calcogênios (Grupo 16)."], correctIndex: 2, explanation: { correctText: "Os Gases Nobres (ex: Neônio, Argônio, Criptônio) já nascem com 8 elétrons na camada de valência (ns² np⁶), sendo o modelo de estabilidade do universo atômico.", otherOptions: [] } },
+        { level: "Fácil", text: "Atingir o octeto garante uma propriedade muito específica a um átomo isolado. Qual é a principal consequência prática observada nos Gases Nobres por já possuírem 8 elétrons?", options: ["São quimicamente inertes, ou seja, raramente reagem com outros elementos.", "Tornam-se altamente reativos e explosivos.", "Ficam opacos e sólidos à temperatura ambiente.", "Perdem a capacidade de emitir fótons."], correctIndex: 0, explanation: { correctText: "Como já estão estáveis, os gases nobres não têm 'vontade' de doar, receber ou compartilhar elétrons. Por isso, são inertes na natureza.", otherOptions: [] } },
+        { level: "Médio", text: "O Hélio (He) é um gás nobre extremamente estável, mas ele é uma exceção visual à Regra do Octeto clássica. Quantos elétrons o Hélio possui na sua camada de valência?", options: ["8 elétrons.", "4 elétrons.", "Nenhum elétron.", "2 elétrons."], correctIndex: 3, explanation: { correctText: "O Hélio tem apenas a camada K, que só suporta no máximo 2 elétrons (1s²). Por estar com a camada 'cheia', ele é perfeitamente estável com apenas um dueto.", otherOptions: [] } },
+        { level: "Fácil", text: "Para além da 'Regra do Octeto', os átomos mais pequenos da tabela tentam imitar o Hélio. Como é conhecida a regra que dita a estabilidade do Hidrogênio e do Lítio?", options: ["Regra do Dueto (estabilizam com 2 elétrons).", "Regra do Quarteto.", "Octeto Reduzido.", "Nenhuma das anteriores."], correctIndex: 0, explanation: { correctText: "O Hidrogênio (1 elétron) e o Lítio (3 elétrons) buscam estabilizar-se ficando com apenas 2 elétrons na camada de valência, cumprindo a Regra do Dueto.", otherOptions: [] } },
+        { level: "Médio", text: "Um átomo de Sódio (Na) tem 1 elétron na sua camada de valência. De acordo com a Regra do Octeto, qual o mecanismo mais favorável energeticamente para o Sódio estabilizar?", options: ["Ganhar 7 elétrons do meio ambiente.", "Perder esse 1 elétron, esvaziando a última camada e expondo a camada de baixo (que já tem 8 elétrons).", "Compartilhar esse 1 elétron em sete ligações triplas.", "Transformar esse elétron em um próton."], correctIndex: 1, explanation: { correctText: "Para os metais (que têm 1, 2 ou 3 elétrons), o caminho mais fácil é sempre PERDER/DOAR. Ao descartar esse 1 elétron incômodo, ele transforma-se num Cátion estável (Na⁺).", otherOptions: [] } },
+        { level: "Fácil", text: "O Oxigênio (O) pertence ao Grupo 16 (Calcogênios) e possui 6 elétrons na sua camada de valência. O que ele precisa fazer para estabilizar segundo o octeto?", options: ["Perder 6 elétrons.", "Ganhar ou compartilhar exatamente 2 elétrons.", "Perder 2 elétrons e virar O²⁺.", "Compartilhar 8 elétrons com o hidrogênio."], correctIndex: 1, explanation: { correctText: "Tendo 6 elétrons, a matemática diz que faltam 2 para atingir 8. Logo, ele buscará receber (ligação iônica) ou compartilhar (covalente) esses 2 elétrons.", otherOptions: [] } },
+        { level: "Médio", text: "O Carbono (C) pertence ao Grupo 14 e possui 4 elétrons de valência. Sendo ele o elemento base da vida orgânica, qual é a sua estratégia primária para atingir o octeto?", options: ["Perder 4 elétrons para virar C⁴⁺.", "Roubar agressivamente 4 elétrons para virar C⁴⁻.", "Compartilhar os seus 4 elétrons através de ligações covalentes, formando quatro ligações estáveis.", "Formar gases inertes na pressão do mar."], correctIndex: 2, explanation: { correctText: "Como está exatamente no 'meio' do caminho (tem 4, faltam 4), o Carbono é o rei do compartilhamento. Ele forma até quatro ligações covalentes para atingir os 8 elétrons simultaneamente com outros átomos.", otherOptions: [] } },
+        { level: "Fácil", text: "O Flúor (Grupo 17) tem 7 elétrons na valência. Para formar a molécula de gás Flúor (F₂), qual a interação que ocorre entre os dois átomos de flúor para que ambos atinjam o octeto?", options: ["Eles compartilham 1 par de elétrons (ligação covalente simples).", "Um flúor doa 7 elétrons para o outro.", "Ambos perdem 1 elétron para o oxigênio do ar.", "Eles compartilham todos os 14 elétrons no centro."], correctIndex: 0, explanation: { correctText: "Como ambos precisam de apenas 1 elétron, eles decidem compartilhar 1 elétron cada. Esse par de elétrons agora pertence a ambos, e os dois fecham a conta de 8.", otherOptions: [] } },
+        { level: "Médio", text: "Quando o Sódio (Na, 1 elétron na valência) reage com o Cloro (Cl, 7 elétrons na valência), ocorre a formação do sal NaCl. Como a Regra do Octeto é cumprida nesta reação?", options: ["Ambos partilham 1 elétron covalente no centro.", "O Sódio TRANSFERE definitivamente o seu elétron para o Cloro. O Sódio perde a última camada e o Cloro ganha o elétron que faltava para os 8. (Ligação Iônica).", "O Cloro transfere os seus 7 elétrons para o Sódio.", "O núcleo do Sódio estabiliza a nuvem do Cloro."], correctIndex: 1, explanation: { correctText: "Na ligação iônica, ocorre a transferência bruta. O Sódio quer perder o elétron, o Cloro quer ganhar. É um casamento perfeito que gera o Na⁺ e o Cl⁻, ambos com octetos completos.", otherOptions: [] } },
+        { level: "Difícil", text: "Uma das exceções mais cobradas no ENEM: O Boro (B) no composto Trifluoreto de Boro (BF₃) quebra a regra do octeto. Quantos elétrons o Boro possui na camada de valência depois de fazer as 3 ligações?", options: ["8 elétrons perfeitamente.", "10 elétrons (Expansão).", "6 elétrons (Contração do Octeto).", "2 elétrons apenas."], correctIndex: 2, explanation: { correctText: "O Boro é um caso clássico de Contração do Octeto. Ele estabiliza-se e forma compostos sólidos possuindo apenas 6 elétrons na sua valência após o compartilhamento.", otherOptions: [] } },
+        { level: "Difícil", text: "O Fósforo (P), da família 15, reage com o Cloro formando a molécula Pentacloreto de Fósforo (PCl₅). O que ocorre fisicamente na camada de valência do Fósforo nesta molécula?", options: ["Atinge o octeto exato com as 5 ligações iônicas.", "Sofre uma Expansão do Octeto, passando a ficar estabilizado com 10 elétrons na camada de valência.", "Reduz para 4 elétrons (Contração).", "Transmuta-se em gás nobre."], correctIndex: 1, explanation: { correctText: "Sendo do 3º período para baixo, o Fósforo possui subníveis 'd' vazios onde pode guardar elétrons extras. Ao fazer 5 ligações covalentes simples, ele acomoda 10 elétrons na sua valência.", otherOptions: [] } },
+        { level: "Médio", text: "Outro caso notório de Expansão do Octeto é a molécula de Hexafluoreto de Enxofre (SF₆). Quantos elétrons de valência o Enxofre passa a comportar ao redor de si nesta molécula?", options: ["8 elétrons.", "10 elétrons.", "12 elétrons.", "14 elétrons."], correctIndex: 2, explanation: { correctText: "O Enxofre está no centro fazendo 6 ligações simples (uma com cada flúor). Sendo cada ligação um par de elétrons, 6 x 2 = 12 elétrons orbitando o Enxofre central.", otherOptions: [] } },
+        { level: "Médio", text: "Por que razão os elementos do 2º Período da tabela periódica (como o Carbono, Nitrogênio, Oxigênio e Flúor) NUNCA podem sofrer Expansão do Octeto?", options: ["Porque eles são demasiadamente pequenos e não possuem o subnível 'd' na sua eletrosfera para alocar mais de 8 elétrons.", "Porque eles rejeitam a partilha de elétrons covalentes.", "Porque eles só existem no estado gasoso na natureza.", "Porque eles seguem unicamente a regra do Dueto."], correctIndex: 0, explanation: { correctText: "A expansão exige 'espaço'. Os elementos do 2º período só têm as subcamadas '2s' e '2p', que somadas só suportam fisicamente 8 elétrons (2+6). Só a partir do 3º período (que tem o '3d') é que há 'quartos vazios' para expansão.", otherOptions: [] } },
+        { level: "Fácil", text: "O Nitrogênio (N) possui 5 elétrons na valência. Na formação do Gás Nitrogênio (N₂), os dois átomos unem-se. Para que AMBOS completem o octeto, que tipo de ligação precisam realizar?", options: ["Ligação simples (partilhar 1 par).", "Ligação dupla (partilhar 2 pares).", "Ligação tripla (partilhar 3 pares de elétrons).", "Não formam ligação covalente."], correctIndex: 2, explanation: { correctText: "Como ambos têm 5, faltam 3 para chegar a 8. Portanto, os dois átomos de Nitrogênio dão as mãos três vezes (compartilham 3 pares), garantindo que ambos atinjam o octeto.", otherOptions: [] } },
+        { level: "Difícil", text: "Moléculas com número ÍMPAR de elétrons de valência totais são o pior pesadelo da Regra do Octeto, pois a matemática nunca fechará em 8 para todos. Qual das moléculas clássicas abaixo exemplifica essa quebra da regra?", options: ["Água (H₂O).", "Metano (CH₄).", "Monóxido de Nitrogênio (NO).", "Gás Carbônico (CO₂)."], correctIndex: 2, explanation: { correctText: "O N tem 5 elétrons, o O tem 6 elétrons. Total = 11 elétrons de valência. É impossível dividir 11 de forma a que ambos fiquem com 8, resultando sempre num 'elétron ímpar' desemparelhado (radical livre).", otherOptions: ["H2O, CH4 e CO2 seguem o octeto perfeitamente."] } },
+        { level: "Médio", text: "Um átomo de Magnésio (Mg, Grupo 2) e um átomo de Oxigênio (O, Grupo 16) encontram-se. Qual é o balanço de transferência perfeito para que ambos fiquem felizes com o octeto na formação do Óxido de Magnésio (MgO)?", options: ["O Magnésio transfere os seus 2 elétrons de valência inteiramente para o Oxigênio. O Mg vira Mg²⁺ e o O vira O²⁻.", "O Oxigênio transfere 2 elétrons para o Magnésio.", "Eles compartilham 2 elétrons covalentemente, permanecendo neutros.", "Eles estabilizam com a regra do dueto."], correctIndex: 0, explanation: { correctText: "É o encaixe perfeito da ligação Iônica. O Magnésio quer perder 2. O Oxigênio precisa exatamente de 2. A transferência resolve a estabilidade de ambos numa única jogada.", otherOptions: [] } },
+        { level: "Fácil", text: "O Hidrogênio (H) possui 1 elétron e reage com o Cloro (Cl), que possui 7 elétrons, formando o Ácido Clorídrico (HCl). Na partilha (ligação covalente), com quantos elétrons cada átomo estabiliza, respectivamente?", options: ["Hidrogênio com 8, Cloro com 8.", "Hidrogênio com 2 (Dueto), Cloro com 8 (Octeto).", "Hidrogênio com 0, Cloro com 8.", "Ambos com 4 elétrons médios."], correctIndex: 1, explanation: { correctText: "O Hidrogênio partilha o elétron do Cloro, ficando com 2 (imitando a estabilidade do Hélio). O Cloro partilha o elétron do H, ficando com 8. Uma molécula, duas regras aplicadas em harmonia.", otherOptions: [] } },
+        { level: "Difícil", text: "Os Íons dos Metais de Transição (como o Ferro Fe²⁺ ou Fe³⁺) muitas vezes não possuem 8 elétrons na última camada final após perderem as suas cargas. Porque é que eles ainda assim são considerados estáveis?", options: ["Porque os metais não ligam à termodinâmica.", "Porque eles perdem elétrons dos subníveis 's' e 'd', atingindo configurações pseudo-nobres (ex: subnível d meio cheio ou d completamente cheio), que lhes garantem uma estabilidade alternativa ao octeto simples.", "Porque o núcleo magnético anula os elétrons restantes.", "Porque eles são sempre instáveis na natureza e evaporam."], correctIndex: 1, explanation: { correctText: "A regra do octeto funciona muito bem para os grupos principais (elementos representativos). Os metais de transição operam com a física fina dos subníveis 'd' (a estabilidade d⁵ ou d¹⁰ substitui muitas vezes o octeto de 8).", otherOptions: [] } },
+        { level: "Médio", text: "Na molécula de Água (H₂O), o átomo central de Oxigênio estabiliza o seu octeto fazendo 2 ligações simples com os Hidrogênios. Quantos elétrons LIVRES (pares não-ligantes) restam ao redor do Oxigênio após a ligação?", options: ["Zero pares livres.", "1 par livre (2 elétrons).", "2 pares livres (4 elétrons no total que não participam nas ligações).", "6 elétrons dispersos."], correctIndex: 2, explanation: { correctText: "O Oxigênio tem 6 de valência. Ele usa 2 para partilhar com os dois Hidrogênios (formando 2 pontes). Sobram 4 elétrons na sua posse que não foram tocados, agrupando-se em 2 pares não-ligantes.", otherOptions: [] } },
+        { level: "Fácil", text: "Um aluno descobre um novo elemento sintético num exercício e a prova diz: 'Ele precisa ganhar 3 elétrons para atingir o octeto'. Com esta informação crucial, o aluno conclui que o elemento pertence obrigatoriamente a qual Grupo da tabela?", options: ["Grupo 13.", "Grupo 1.", "Grupo 15 (ex: Nitrogênio, Fósforo).", "Grupo 18."], correctIndex: 2, explanation: { correctText: "A matemática do octeto: Se precisa ganhar 3 para chegar a 8, é porque ele já tem 5 elétrons. Quem tem 5 elétrons de valência mora no Grupo 15 da tabela.", otherOptions: [] } },
+        { level: "Fácil", text: "Da mesma forma, se o exercício afirmar que 'O átomo X atinge a estabilidade ao perder 2 elétrons', deves procurar o átomo X em qual coluna?", options: ["Grupo 16 (Calcogênios).", "Grupo 17 (Halogênios).", "Grupo 2 (Metais Alcalinoterrosos).", "Grupo 1 (Metais Alcalinos)."], correctIndex: 2, explanation: { correctText: "Quem perde 2 elétrons quer livrar-se dos únicos 2 que tem na valência. Elementos com 2 na valência são os Metais Alcalinoterrosos (Grupo 2).", otherOptions: [] } },
+        { level: "Difícil", text: "Existe um avanço laboratorial recente muito curioso sobre a Regra do Octeto. Durante décadas ensinou-se que Gases Nobres NÃO formavam ligações. No entanto, hoje existem moléculas como XeF₄ (Tetrafluoreto de Xenônio). O que acontece ao octeto do Xenônio nestas moléculas sintéticas?", options: ["O Xenônio abandona os elétrons, virando cátion Xe⁴⁺.", "O Xenônio sofre Expansão do Octeto, acomodando mais de 8 elétrons na sua valência graças a condições extremas e reagentes hiper-eletronegativos (Flúor).", "O Flúor anula a massa do Xenônio, invisibilizando a ligação.", "O Xenônio reduz para 4 elétrons."], correctIndex: 1, explanation: { correctText: "Gases nobres pesados (como Kr, Xe, Rn) têm subníveis 'd' vazios acessíveis e elétrons muito distantes do núcleo. Sob a 'chantagem' violenta de elétrons do Flúor, eles cedem à pressão e expandem o seu octeto, formando os chamados compostos de gases nobres.", otherOptions: [] } },
+        { level: "Médio", text: "O Berílio (Be) é um metal do Grupo 2, mas tem um comportamento muito anômalo nas suas ligações covalentes com halogênios (ex: Cloreto de Berílio, BeCl₂). Com quantos elétrons o Berílio estabiliza nesta molécula específica?", options: ["Com 8 elétrons de octeto perfeito.", "Com 2 elétrons (Dueto pleno).", "Com apenas 4 elétrons na camada de valência (Contração severa do Octeto).", "Com 10 elétrons de Expansão alcalina."], correctIndex: 2, explanation: { correctText: "O Berílio (Be) tem apenas 2 elétrons de valência. Em vez de perdê-los (o que custaria muita energia pelo seu tamanho minúsculo), ele partilha-os. Faz 2 ligações simples, ficando com um total de 4 elétrons na valência, sendo uma exceção fatal de prova.", otherOptions: [] } },
+        { level: "Fácil", text: "Na representação em 'Fórmula de Lewis' (com os pontinhos ao redor do elemento), quantos 'pontinhos' totais desenhamos ao redor de um átomo de Alumínio (Al) no seu estado fundamental, neutro e isolado?", options: ["8 pontos.", "13 pontos (o Z total).", "3 pontos, correspondentes aos elétrons da sua camada de valência (Grupo 13).", "0 pontos."], correctIndex: 2, explanation: { correctText: "A Estrutura de Lewis foca-se APENAS na camada de valência (pois são esses elétrons que reagem para tentar atingir o octeto). O Alumínio, do grupo 13, tem 3 elétrons de valência, desenhando-se com 3 pontos.", otherOptions: [] } },
+        { level: "Médio", text: "Numa ligação metálica, como num fio de Cobre (Cu), os átomos também procuram estabilidade atômica, mas não de forma iônica ou covalente tradicional. Como se baseia a mecânica da ligação para estabilizar todos os metais na rede?", options: ["Os metais partilham prótons do núcleo em dupla rede covalente.", "Os metais formam um 'Mar de Elétrons' (nuvem deslocalizada), onde os cátions metálicos nadam num fluido de elétrons de valência libertos e partilhados por todos os átomos do fio simultaneamente.", "Eles transferem todos os elétrons para a atmosfera fria de oxigênio.", "O metal anula as suas cargas criando um buraco nulo denso no centro."], correctIndex: 1, explanation: { correctText: "Como todos os metais querem 'perder' elétrons, eles libertam os elétrons de valência numa piscina coletiva. O 'Mar de Elétrons' confere estabilidade eletrostática aos núcleos residuais, garantindo o octeto nas camadas debaixo e a alta condutividade térmica do fio.", otherOptions: [] } },
+        { level: "Difícil", text: "A relação entre a Configuração Eletrônica (subníveis s, p, d, f) e a Regra do Octeto revela que o preenchimento de 8 elétrons na valência corresponde sempre a qual terminação exata nos orbitais?", options: ["nd⁸ puro.", "ns² np⁶ completos na última camada energética.", "ns² np⁴ e dois buracos vagos.", "nd¹⁰ ns² np⁶ completos na transição franca."], correctIndex: 1, explanation: { correctText: "A matemática da tabela não falha: O subnível 's' guarda 2 elétrons no máximo. O subnível 'p' guarda 6 no máximo. Logo, s² + p⁶ = 8 elétrons! Essa é a assinatura quântica dos Gases Nobres (exceto o Hélio que é só 1s²).", otherOptions: [] } },
+        { level: "Médio", text: "Um elemento da tabela periódica tem Z=20. Para atingir o octeto e estabilizar numa reação clínica de laboratório, qual deverá ser a sua carga iônica resultante?", options: ["+1, doando 1 elétron para limpar a camada s.", "+2, originando um Cátion bivalente após ceder 2 elétrons e expor o octeto do 3º nível.", "-2, engolindo 2 elétrons de uma massa anódica letal.", "Ele já é estável pois 20 é par."], correctIndex: 1, explanation: { correctText: "Z=20 é o Cálcio (Ca). Distribuição K=2, L=8, M=8, N=2. Ele tem 2 elétrons na última ponta. Para ficar feliz, ele atira esses 2 ao lixo (doa-os), a camada N desaparece e ele fica com a camada M (com 8) como nova ponta orgulhosa. Ele forma o Cátion Ca²⁺.", otherOptions: [] } },
+        { level: "Fácil", text: "Um dos princípios essenciais que a Regra do Octeto ilustra é que, na natureza, sistemas e átomos isolados de alta energia procuram sempre caminhar num sentido fatal. Qual o sentido da evolução termodinâmica destas reações?", options: ["Do estado de menor estabilidade e MAIOR energia para um estado de MAIOR estabilidade e MENOR energia residual química no final da ligação.", "Procuram maximizar a dor atômica com repulsão livre rica viva e densa de núcleos falsos soltos.", "Absorver a energia nula do vácuo para explodirem em fótons brancos finos vagos murchos.", "Aumentar sempre o volume atômico falso duro claro doce mudo limpo raso e vago da nuvem fria."], correctIndex: 0, explanation: { correctText: "A química é preguiçosa. Tudo o que é reativo tem muita energia contida ('ansiedade atômica'). Ao partilhar ou ceder elétrons (cumprir o octeto), os átomos acalmam-se, libertando energia e atingindo um estado pacato e altamente estável (de baixa energia).", otherOptions: [] } },
+        { level: "Médio", text: "Em suma, qual a classificação científica de consenso mundial dada à Regra do Octeto pelos químicos contemporâneos face a tantas moléculas como PCl₅, SF₆, BF₃ e NO?", options: ["É uma Lei Física Universal e Inquebrável da Matéria Orgânica, Aplicável sem Rasteiras.", "É um modelo totalmente falso e obsoleto não ensinado mais no século XXI.", "É um Modelo Orientador Heurístico muito prático e excelente para prever a maioria dos comportamentos dos elementos representativos e da base biológica orgânica, MAS possui dezenas de exceções comprovadas laboratorialmente.", "É válida apenas para os metais densos falsos limpos ricos moles fofos lúgubres vagos e mornos livres."], correctIndex: 2, explanation: { correctText: "A Ciência não tem dogmas cegos! A regra do octeto funciona maravilhosamente bem para quase tudo o que nos mantém vivos (Carbono, Oxigênio, Nitrogênio formam octetos quase sempre). Mas não é uma lei universal absoluta, dada a existência das moléculas de expansão e íons metálicos pesados.", otherOptions: [] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_octeto_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Perfeito!' : '❌ Falha de Estabilidade!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#8B5CF6', '#6D28D9', '#F59E0B', '#10B981'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 DOMÍNIO DAS LIGAÇÕES!</strong> O seu entendimento sobre os Gases Nobres e o objetivo de estabilidade dos átomos está fantástico!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ INSTABILIDADE DETECTADA!</strong> Você foi avaliado abaixo da meta (80%). Lembre-se que Metais perdem elétrons e Ametais ganham/compartilham!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

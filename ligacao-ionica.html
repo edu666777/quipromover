@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Ligação Iônica - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: LIGAÇÃO IÔNICA (Azul Profundo e Laranja) --- */
+        :root {
+            --bg-color: #EFF6FF; 
+            --text-color: #1E3A8A; 
+            --border-color: #1E40AF; 
+            --white: #FFFFFF;
+            
+            --theme-light: #DBEAFE; 
+            --theme-medium: #3B82F6; 
+            --theme-dark: #1D4ED8; 
+            --theme-contrast: #EA580C; 
+            --theme-accent: #10B981; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: #F8FAFC; border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FFF7ED; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #9A3412; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #2563EB; color: #1E3A8A; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧲</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Ligações Químicas: Iônica</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Transferência, Sódio, Retículo)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">⚖️ 1. O Que é a Ligação Iônica?</div>
+                <article class="theory-box search-target">
+                    <h3>A Transferência Definitiva</h3>
+                    <p>A Ligação Iônica (ou Eletrovalente) ocorre quando há uma <strong>transferência definitiva de elétrons</strong> de um átomo para outro. Alguém doa, alguém recebe.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Quem doa?</strong> Os <strong>Metais</strong> (Grupos 1, 2, 13). Eles têm poucos elétrons na valência e preferem perdê-los, formando <strong>Cátions (+)</strong>.</li>
+                        <li><strong>Quem recebe?</strong> Os <strong>Ametais</strong> (Grupos 15, 16, 17) ou o Hidrogênio. Eles têm muitos elétrons e adoram roubá-los para fechar o octeto, formando <strong>Ânions (-)</strong>.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🤝 2. O Casamento Perfeito (Ex: NaCl)</div>
+                <article class="theory-box search-target">
+                    <h3>Atração Eletrostática</h3>
+                    <p>O exemplo clássico é o sal de cozinha (Cloreto de Sódio - NaCl). O Sódio (Na) tem 1 elétron sobrando. O Cloro (Cl) precisa exatamente de 1 elétron.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="280" height="120" viewBox="0 0 280 120">
+                            <!-- Sódio (Na) -->
+                            <circle cx="50" cy="60" r="25" fill="none" stroke="#3B82F6" stroke-width="2" stroke-dasharray="4"/>
+                            <text x="50" y="65" font-size="16" font-weight="900" fill="#1D4ED8" text-anchor="middle">Na</text>
+                            <circle cx="75" cy="60" r="5" fill="#F59E0B"/> <!-- 1 elétron -->
+                            
+                            <!-- Transferência (Seta) -->
+                            <path d="M 85 60 Q 140 20 190 55" fill="none" stroke="#F59E0B" stroke-width="3" marker-end="url(#arrow-orange)"/>
+                            <text x="140" y="30" font-size="12" font-weight="800" fill="#EA580C" text-anchor="middle">Transfere 1 e⁻</text>
+                            
+                            <!-- Cloro (Cl) -->
+                            <circle cx="230" cy="60" r="25" fill="none" stroke="#10B981" stroke-width="2" stroke-dasharray="4"/>
+                            <text x="230" y="65" font-size="16" font-weight="900" fill="#059669" text-anchor="middle">Cl</text>
+                            
+                            <!-- 7 elétrons do Cl -->
+                            <circle cx="205" cy="60" r="5" fill="#10B981" opacity="0.3"/> <!-- Vaga para o elétron do Na -->
+                            <circle cx="230" cy="35" r="5" fill="#10B981"/>
+                            <circle cx="255" cy="60" r="5" fill="#10B981"/>
+                            <circle cx="230" cy="85" r="5" fill="#10B981"/>
+                            <circle cx="215" cy="40" r="5" fill="#10B981"/>
+                            <circle cx="245" cy="40" r="5" fill="#10B981"/>
+                            <circle cx="215" cy="80" r="5" fill="#10B981"/>
+                            <circle cx="245" cy="80" r="5" fill="#10B981"/>
+
+                            <defs>
+                                <marker id="arrow-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F59E0B"/></marker>
+                            </defs>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); text-align: center;">Na⁺ e Cl⁻ atraem-se como super-ímãs após a transferência!</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📉 3. A Regra do Escorregador (Cruzamento)</div>
+                <article class="theory-box search-target">
+                    <h3>Como montar a Fórmula?</h3>
+                    <p>A fórmula de um composto iônico mostra a proporção exata de átomos para que o composto final seja <strong>eletricamente neutro</strong>. O metal (Cátion) é escrito sempre primeiro.</p>
+                    
+                    <div class="highlight-box blue">
+                        <strong>Macete:</strong> A carga de um escorrega e vira o índice (quantidade) do outro!
+                        <br><br>
+                        <strong>Exemplo:</strong> Alumínio (Al³⁺) + Oxigênio (O²⁻)<br>
+                        O 3 do Al escorrega para o O. O 2 do O escorrega para o Al.<br>
+                        Fórmula Final: <strong>Al₂O₃</strong>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">💎 4. O Retículo Cristalino e as Propriedades</div>
+                <article class="theory-box search-target">
+                    <h3>Por que o Sal é duro e salgado?</h3>
+                    <p>Os íons positivos e negativos não formam moléculas isoladas. Eles aglomeram-se em estruturas 3D gigantes chamadas <strong>Retículos Cristalinos</strong>.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Estado Físico:</strong> Como a atração elétrica é fortíssima, todos os compostos iônicos são <strong>SÓLIDOS</strong> à temperatura ambiente.</li>
+                        <li><strong>Ponto de Fusão e Ebulição:</strong> Altíssimos! Derreter sal (separar os íons) exige temperaturas superiores a 800 ºC.</li>
+                        <li><strong>Dureza:</strong> São muito duros, mas <strong>Quebradiços</strong>. Se você bater com um martelo num cristal de sal, as camadas deslizam, íons iguais ficam frente a frente (+ com +) e a repulsão quebra o cristal na hora!</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚡ 5. Condutividade Elétrica</div>
+                <article class="theory-box search-target">
+                    <h3>A Dança dos Íons</h3>
+                    <p>Para conduzir eletricidade, é necessário haver cargas livres que se possam mover.</p>
+                    
+                    <div class="highlight-box" style="background-color: #FEF2F2; border-left-color: #EF4444; color: #9F1239;">
+                        <strong>No estado SÓLIDO:</strong> NÃO conduzem eletricidade! Os íons estão presos como estátuas na grade do cristal.
+                    </div>
+
+                    <div class="highlight-box" style="background-color: #ECFDF5; border-left-color: #10B981; color: #065F46; margin-top: 10px;">
+                        <strong>No estado LÍQUIDO (fundido) ou em SOLUÇÃO AQUOSA (dissolvido na água):</strong> Conduzem excelentemente! A grade quebra-se e os íons (Na⁺ e Cl⁻) ficam livres para nadar e transportar a corrente elétrica.
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre Ligação Iônica, Retículos e Condutividade. Acerte <strong>80% (24/30)</strong> para dominar!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Ligação Iônica PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "A ligação iônica (ou eletrovalente) é baseada na interação eletrostática entre íons de cargas opostas. Como ocorre fundamentalmente a formação destes íons?", options: ["Pela atração nuclear entre os prótons.", "Pelo compartilhamento igualitário de pares de elétrons.", "Pela transferência DEFINITIVA de elétrons de um átomo para outro.", "Pela fusão dos nêutrons no núcleo."], correctIndex: 2, explanation: { correctText: "Na ligação iônica não há meias-medidas: um átomo dá o elétron (doa) e o outro pega (recebe) definitivamente. A transferência gera os íons positivo e negativo que se atraem.", otherOptions: [] } },
+        { level: "Fácil", text: "Para que ocorra uma ligação iônica clássica, é necessário haver um encontro entre dois tipos específicos de elementos da Tabela Periódica. Quais são eles?", options: ["Dois Metais pesados.", "Dois Ametais gasosos.", "Gases Nobres entre si.", "Um Metal e um Ametal (ou Hidrogênio)."], correctIndex: 3, explanation: { correctText: "O casamento iônico precisa de alguém que queira dar elétrons (O Metal) e alguém que queira receber desesperadamente (O Ametal ou o Hidrogênio).", otherOptions: [] } },
+        { level: "Médio", text: "O Cloreto de Sódio (NaCl) é o exemplo mais comum de ligação iônica. O Sódio (Na) pertence ao Grupo 1 e o Cloro (Cl) ao Grupo 17. Qual é o fluxo exato dos elétrons nesta reação?", options: ["O Cloro cede 7 elétrons para o Sódio.", "Eles compartilham 1 elétron no centro.", "O Sódio cede o seu único elétron de valência para o Cloro, formando Na⁺ e Cl⁻.", "O Cloro cede 1 elétron ao Sódio."], correctIndex: 2, explanation: { correctText: "Sódio tem 1 elétron na última camada e quer perdê-lo. O Cloro tem 7 e quer ganhar 1. O Sódio transfere o seu elétron para o Cloro, ambos atingindo o Octeto.", otherOptions: [] } },
+        { level: "Fácil", text: "Na representação da fórmula de um composto iônico (ex: NaCl ou MgF₂), qual elemento deve ser escrito SEMPRE em primeiro lugar (à esquerda)?", options: ["O Ametal, por ser mais eletronegativo.", "O elemento no estado gasoso.", "O Cátion (o Metal, eletropositivo).", "O elemento com maior massa molar."], correctIndex: 2, explanation: { correctText: "Por convenção mundial da IUPAC, o Cátion (quem doa o elétron, geralmente o metal) é sempre escrito primeiro. Na⁺ vem antes do Cl⁻ -> NaCl.", otherOptions: [] } },
+        { level: "Médio", text: "Um átomo de Cálcio (Ca, Grupo 2) e um átomo de Flúor (F, Grupo 17) encontram-se. Sabendo que o Cálcio tem 2 elétrons de valência e cada Flúor precisa apenas de 1 elétron, qual será a fórmula química do composto resultante?", options: ["CaF", "Ca₂F", "CaF₂", "CaF₃"], correctIndex: 2, explanation: { correctText: "Pela 'regra do escorregador': O Ca vira Ca²⁺. O F vira F⁻. Cruzando as cargas, o 2 do Cálcio desce para o Flúor, e o 1 do Flúor desce para o Cálcio. Fórmula: CaF₂.", otherOptions: [] } },
+        { level: "Difícil", text: "Vamos aplicar a 'Regra do Escorregador' para cruzar as cargas: O Alumínio forma o cátion Al³⁺. O Oxigênio forma o ânion O²⁻. Qual será a proporção final e a fórmula correta do Óxido de Alumínio?", options: ["AlO", "Al₃O₂", "Al₂O₃", "AlO₃"], correctIndex: 2, explanation: { correctText: "Cruze as cargas para os índices! O 3 do Al³⁺ escorrega para o índice do Oxigênio. O 2 do O²⁻ escorrega para o índice do Alumínio. Resultado final: Al₂O₃.", otherOptions: [] } },
+        { level: "Médio", text: "Um elemento X do Grupo 1 (Metais Alcalinos) reage com um elemento Y do Grupo 16 (Calcogênios). Qual será a fórmula molecular mais provável do composto formado?", options: ["XY", "X₂Y", "XY₂", "X₂Y₃"], correctIndex: 1, explanation: { correctText: "Grupo 1 vira Cátion X⁺ (precisa doar 1). Grupo 16 vira Ânion Y²⁻ (precisa ganhar 2). Cruzando as cargas (X⁺ e Y²⁻), a fórmula resultante é X₂Y (precisamos de 2 átomos de X para saciar 1 átomo de Y).", otherOptions: [] } },
+        { level: "Difícil", text: "Magnésio (Mg) forma Mg²⁺ e Enxofre (S) forma S²⁻. Se cruzarmos as cargas pela regra do escorregador, teríamos Mg₂S₂. No entanto, qual a regra final de simplificação na química iônica para escrever a fórmula correta deste Sulfeto de Magnésio?", options: ["A fórmula permanece Mg₂S₂.", "Sempre que os índices numéricos podem ser simplificados (divididos pelo mesmo número), a fórmula empírica deve ser reduzida. A fórmula correta é MgS.", "A fórmula vira MgS₄.", "Soma-se os índices virando MgS₂."], correctIndex: 1, explanation: { correctText: "A fórmula de um composto iônico indica a PROPORÇÃO mínima. Como a proporção de Mg²⁺ para S²⁻ é de 1 para 1 (2:2 simplifica para 1:1), a fórmula correta e final é MgS.", otherOptions: [] } },
+        { level: "Fácil", text: "Os compostos iônicos não formam moléculas individuais como a água (H₂O). Em vez disso, formam aglomerados gigantes de cátions e ânions organizados simetricamente. Como se chama esta estrutura tridimensional sólida?", options: ["Cadeia Polimérica.", "Retículo Cristalino (ou Grade Cristalina).", "Gás Monoatômico.", "Nuvem Eletrosférica."], correctIndex: 1, explanation: { correctText: "A atração positiva/negativa ocorre em todas as direções, formando uma estrutura gigante 3D muito organizada, sólida e repetitiva, conhecida como Retículo Cristalino.", otherOptions: [] } },
+        { level: "Fácil", text: "Devido às fortíssimas forças de atração eletrostática que mantêm os íons presos no retículo cristalino, todos os compostos iônicos (sem exceção) encontram-se em qual estado físico à temperatura ambiente (25ºC)?", options: ["Sólido.", "Líquido.", "Gasoso.", "Plasma."], correctIndex: 0, explanation: { correctText: "A cola elétrica (+ atraindo -) é tão brutal que é impossível os átomos movimentarem-se livremente à temperatura ambiente. Por isso, são todos sólidos (como o sal).", otherOptions: [] } },
+        { level: "Médio", text: "Considerando que as ligações iônicas são extremamente fortes, o que podemos afirmar sobre os Pontos de Fusão (P.F.) e de Ebulição (P.E.) dos compostos iônicos?", options: ["São muito baixos, derretem facilmente no sol.", "São altos, necessitando de temperaturas elevadíssimas (centenas ou milhares de graus Celsius) para romper a atração do retículo cristalino e derreter o composto.", "São idênticos aos da água pura.", "Possuem Ponto de Fusão negativo."], correctIndex: 1, explanation: { correctText: "Para derreter o sal de cozinha (NaCl), você precisaria de um forno a cerca de 800ºC! A atração + / - é tão forte que a agitação térmica precisa ser gigantesca para separá-los.", otherOptions: [] } },
+        { level: "Médio", text: "Os cristais iônicos (como o sal grosso) são notoriamente DUROS (resistentes a riscos), mas possuem uma fraqueza mecânica. Se você bater com um martelo num cristal de sal, ele quebra-se facilmente em vários pedaços. Como se chama esta propriedade e por que ocorre?", options: ["Maleabilidade; o cristal dobra-se sob a pressão.", "Tenacidade; a energia é absorvida pelo vácuo.", "Quebradiço (Friabilidade). Ao sofrer o impacto, as camadas de íons deslizam, colocando cargas iguais frente a frente (+ com + e - com -). A repulsão imediata quebra e despedaça o cristal.", "Ductilidade; o cristal estilhaça por falta de elétrons."], correctIndex: 2, explanation: { correctText: "Duro, mas quebradiço! O impacto do martelo empurra uma fileira de átomos ligeiramente para o lado. Quando o 'positivo' fica de frente com outro 'positivo', eles repelem-se com fúria, e o bloco de sal quebra (clivagem perfeita).", otherOptions: [] } },
+        { level: "Fácil", text: "Uma das propriedades que mais cai em provas do ENEM: Compostos iônicos no estado SÓLIDO (o sal no saleiro) conseguem conduzir corrente elétrica?", options: ["Sim, são excelentes condutores no estado sólido.", "Sim, conduzem, mas com resistência térmica.", "Não! No estado sólido, os íons estão rígidos e presos no retículo cristalino. Sem cargas livres e móveis, não há condução de eletricidade.", "Não conduzem em nenhum estado físico."], correctIndex: 2, explanation: { correctText: "A corrente elétrica precisa de uma 'pista livre' para viajar (cargas soltas e móveis). No sal sólido, os cátions e ânions estão engessados e paralisados na grade do cristal. Logo, é um material isolante.", otherOptions: [] } },
+        { level: "Médio", text: "Em contrapartida, os compostos iônicos TORNAM-SE excelentes condutores de eletricidade se passarem por duas situações específicas. Quais são?", options: ["Congelamento absoluto ou cristalização.", "Fundidos (derretidos no estado Líquido) ou Dissolvidos em Água (solução aquosa).", "Sublimados em gás ou cortados em fatias.", "Expostos à luz solar ou ao vácuo."], correctIndex: 1, explanation: { correctText: "Ao derreter o sal (líquido) ou jogá-lo na água (dissolução), o retículo cristalino é destruído. Os íons Na⁺ e Cl⁻ soltam-se das correntes e ficam livres para nadar, permitindo o fluxo da eletricidade.", otherOptions: [] } },
+        { level: "Médio", text: "O processo em que a água (um solvente polar) 'ataca' um cristal de sal, puxando os cátions e os ânions para longe uns dos outros e soltando-os no líquido, recebe o nome técnico de:", options: ["Dissociação Iônica.", "Ionização Molecular.", "Precipitação Química.", "Sublimação Salina."], correctIndex: 0, explanation: { correctText: "Atenção ao termo! Como os íons já existem dentro do cristal de sal, a água apenas os SEPARA (Dissociação). Diferente da ionização, onde moléculas neutras precisam primeiro 'criar' íons.", otherOptions: [] } },
+        { level: "Difícil", text: "Qualitativamente, porque a molécula de água consegue destruir um retículo de sal tão forte durante a dissolução?", options: ["Porque a água é ácida e derrete metais pesados.", "A água é uma molécula polar (tem um lado negativo e um lado positivo). Os lados negativos da água abraçam e arrancam os Cátions (+), enquanto os lados positivos da água abraçam e arrancam os Ânions (-). Esse processo chama-se Solvatação.", "Porque a água realiza uma ligação metálica com o Sódio.", "A água neutraliza as cargas do sal com nêutrons livres."], correctIndex: 1, explanation: { correctText: "É um cabo de guerra elétrico! Milhões de moléculas de água juntam-se ao redor de um íon de sódio e arrancam-no da pedra de sal. A água isola o íon para ele não voltar a colar-se (Solvatação).", otherOptions: [] } },
+        { level: "Fácil", text: "Observe a lista de compostos: NaCl, H₂O, CO₂, CH₄, CaCl₂. Quais deles são, inquestionavelmente, COMPOSTOS IÔNICOS?", options: ["H₂O e CO₂.", "CH₄ e NaCl.", "NaCl e CaCl₂.", "Todos são iônicos."], correctIndex: 2, explanation: { correctText: "O macete é procurar o METAL! Na (Sódio) e Ca (Cálcio) são metais ligados a ametais (Cloro). Logo, NaCl e CaCl₂ são ligações iônicas puras. A água, o CO₂ e o CH₄ só possuem ametais (ligações covalentes).", otherOptions: [] } },
+        { level: "Médio", text: "A energia envolvida na formação de um cristal de cloreto de sódio a partir dos seus íons gasosos (Na⁺ e Cl⁻ colidindo para formar o retículo sólido) liberta uma quantidade colossal de calor. Como se denomina essa energia de formação do cristal?", options: ["Energia de Ionização Mútua.", "Energia Reticular (ou de Rede).", "Afinidade Térmica.", "Eletronegatividade Cristalina."], correctIndex: 1, explanation: { correctText: "A 'Energia de Rede' ou Reticular é a energia que estabiliza o cristal. Quanto maior a energia de rede, mais forte e difícil de derreter será o composto iônico.", otherOptions: [] } },
+        { level: "Difícil", text: "A força da Ligação Iônica (e da Energia de Rede) depende principalmente de dois fatores eletrostáticos (Lei de Coulomb). Entre o Cloreto de Sódio (Na⁺ e Cl⁻) e o Óxido de Magnésio (Mg²⁺ e O²⁻), o Óxido de Magnésio tem um Ponto de Fusão quase três vezes maior (2800ºC vs 800ºC). Qual é o motivo principal dessa força muito maior no MgO?", options: ["O Magnésio é mais pesado que o Sódio.", "A ligação iônica é MAIS FORTE quando as CARGAS dos íons são maiores. A atração entre (+2) e (-2) no MgO é monstruosamente superior à atração entre (+1) e (-1) do NaCl.", "O Oxigênio tem um raio atômico gigantesco.", "O Magnésio forma ligações covalentes mistas com o Oxigênio."], correctIndex: 1, explanation: { correctText: "Lei de Coulomb pura! Cargas maiores atraem-se com muito mais força. Um ímã de força 2 (+2 e -2) cola-se com muito mais resistência do que um ímã de força 1 (+1 e -1).", otherOptions: [] } },
+        { level: "Médio", text: "Um metal M da família dos alcalinoterrosos reage com um halogênio X. A fórmula matemática mínima do composto iônico formado será:", options: ["MX", "M₂X", "MX₂", "M₂X₃"], correctIndex: 2, explanation: { correctText: "Alcalinoterroso (Grupo 2) doa 2 elétrons -> M²⁺. Halogênio (Grupo 17) precisa de 1 elétron -> X⁻. Cruzando o 2 para baixo do X e o 1 para baixo do M, obtemos a fórmula: MX₂.", otherOptions: [] } },
+        { level: "Fácil", text: "Verdadeiro ou Falso em exames: 'Existem moléculas de Cloreto de Sódio'. Esta afirmação química é conceitualmente correta?", options: ["Verdadeiro, o sal marinho é formado por bilhões de moléculas isoladas de NaCl.", "Falso! Compostos iônicos não formam 'moléculas' (unidades finitas e isoladas). Eles formam redes infinitas (retículos cristalinos). A fórmula 'NaCl' indica apenas a proporção mínima (unidade fórmula) na rede.", "Falso, porque o NaCl é um gás orgânico.", "Verdadeiro, desde que a água evapore primeiro."], correctIndex: 1, explanation: { correctText: "Atenção ao vocabulário! Só quem faz Ligação Covalente pode usar o termo 'Molécula' (ex: molécula de água). Ligação Iônica forma um 'Retículo', e NaCl é apenas a 'Unidade Fórmula'.", otherOptions: [] } },
+        { level: "Difícil", text: "O Hidrogênio (H) e o Sódio (Na) pertencem ao mesmo Grupo (1) da tabela periódica. Porém, ao reagirem com o Cloro (Cl), formam compostos muito diferentes (HCl e NaCl). Em relação ao tipo de ligação química envolvida nesses dois compostos, é correto afirmar:", options: ["Ambos são compostos puramente iônicos.", "O NaCl é iônico (metal + ametal), enquanto o HCl é covalente molecular (ametal + hidrogênio), pois o hidrogênio não quer ceder definitivamente o seu único elétron.", "O HCl é iônico e o NaCl é covalente.", "Ambos partilham o núcleo atômico."], correctIndex: 1, explanation: { correctText: "O Hidrogênio é a exceção do Grupo 1. Sendo praticamente um ametal gasoso, ele prefere compartilhar (ligação covalente) o seu único elétron com o cloro (HCl), enquanto o Sódio atira o dele embora para formar o iônico (NaCl).", otherOptions: [] } },
+        { level: "Médio", text: "Na ligação iônica, o metal geralmente doa elétrons até assumir a configuração de qual grupo da tabela periódica?", options: ["Dos Halogênios.", "Dos Metais de Transição.", "Dos Calcogênios.", "Dos Gases Nobres."], correctIndex: 3, explanation: { correctText: "Todo o sacrifício atômico (doar ou receber elétrons) é feito com uma única meta em mente: ficar com a valência lotada e estável (ns² np⁶), assumindo a idêntica e nobre 'roupagem' (configuração isoeletrônica) do Gás Nobre mais próximo.", otherOptions: [] } },
+        { level: "Fácil", text: "Dentre os compostos abaixo, aquele que apresenta APENAS ligação iônica em sua essência principal é:", options: ["Dióxido de carbono (CO₂).", "Fluoreto de Potássio (KF).", "Gás amônia (NH₃).", "Ácido sulfúrico (H₂SO₄)."], correctIndex: 1, explanation: { correctText: "Sempre busque o metal! O Potássio (K) é um metal alcalino (Grupo 1) reagindo com o Flúor (F), um forte ametal. Portanto, KF é a resposta. Os demais são formados inteiramente por ametais e hidrogênio (covalentes).", otherOptions: [] } },
+        { level: "Médio", text: "Os Elementos de Transição (como o Ferro, Cobre, Zinco) costumam formar ligações iônicas peculiares, pois eles podem doar quantidades variáveis de elétrons. O Ferro, por exemplo, pode originar compostos como FeCl₂ e FeCl₃. Por que isso ocorre?", options: ["Porque o Cloro altera a sua eletronegatividade dependendo do dia.", "Porque os metais de transição possuem elétrons em subníveis energéticos 'd' incompletos, podendo ceder diferentes quantidades de elétrons para atingir níveis alternativos de estabilidade (ex: Fe²⁺ e Fe³⁺).", "Porque os elementos de transição não formam retículos cristalinos sólidos.", "Porque sofrem de contração quântica do núcleo radioativo."], correctIndex: 1, explanation: { correctText: "Diferente dos elementos representativos (que têm a carga quase cravada pela família), os metais do meio da tabela (bloco d) têm mais flexibilidade energética e podem assumir diferentes cargas (valências variáveis) para estabilizar.", otherOptions: [] } },
+        { level: "Difícil", text: "Uma exceção sutil aos íons monoatômicos: Existem ligações iônicas que ocorrem sem a presença de um metal clássico, usando um CÁTION POLIATÔMICO (um grupo de ametais que agem juntos como um cátion positivo). Qual das substâncias abaixo exemplifica isso perfeitamente?", options: ["O Cloreto de Sódio (NaCl).", "O Cloreto de Amônio (NH₄Cl).", "O Gás Cloro (Cl₂).", "O Ácido Clorídrico (HCl)."], correctIndex: 1, explanation: { correctText: "Rasteira avançada! O íon Amônio (NH₄⁺) é um aglomerado de ametais que, juntos, possuem uma carga residual +1. Ele atua como se fosse um metal alcalino, colando-se eletrostaticamente ao Cl⁻ num retículo iônico (NH₄Cl).", otherOptions: [] } },
+        { level: "Fácil", text: "Resumo Mnemônico Prático: Se um professor desenhar um X no quadro e lhe disser que ele tem uma Baixa Energia de Ionização e uma Baixa Eletronegatividade, e depois desenhar um Y com Alta Afinidade Eletrônica e Alta Eletronegatividade, qual será a união mais lógica entre X e Y?", options: ["Uma ligação iônica poderosa, pois X é claramente um Metal que quer doar, e Y é um Ametal esfomeado que quer ganhar.", "Uma ligação metálica, pois ambos são gases brilhantes.", "Uma ligação covalente dupla nula e livre.", "A repulsão mútua por isótopos térmicos cínicos."], correctIndex: 0, explanation: { correctText: "O casamento iônico exige polaridades e 'vontades' extremas! Um não tem força para segurar os elétrons (baixa ionização = Metal), o outro atrai tudo como um buraco negro (alta eletronegatividade = Ametal).", otherOptions: [] } },
+        { level: "Médio", text: "Se um cristal iônico de sal cai na água do mar, ele dissolve-se. No entanto, se o mesmo cristal de sal cair num copo com óleo mineral ou gasolina (solventes apolares), ele não dissolve e fica intocado no fundo. Por que?", options: ["O sal reage quimicamente com o óleo, endurecendo o cristal.", "Os compostos iônicos são polares por natureza (têm polos + e - fortes). O óleo é apolar e não possui 'ganchos' elétricos ou magnéticos para puxar e arrancar os íons do retículo de sal.", "O óleo tem elétrons a mais que repelem o Sódio da ligação.", "O sal sublima-se dentro do hidrocarboneto denso."], correctIndex: 1, explanation: { correctText: "A velha regra da química: 'Semelhante dissolve semelhante'. O sal é uma bomba de cargas (íons polares). Precisa de um solvente carregado/polar (como a água) para o quebrar. O óleo é apolar (liso, sem polos) e não interage com cargas elétricas.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das opções a seguir NÃO descreve uma propriedade clássica de um composto iônico padrão (como o sal grosso)?", options: ["Elevado Ponto de Ebulição térmico.", "Solúvel em solventes polares na sua maioria.", "Elevada flexibilidade e maleabilidade a marteladas (pode ser dobrado sem partir).", "É um sólido cristalino em dias normais."], correctIndex: 2, explanation: { correctText: "Dobra um cristal de sal ao meio e o que acontece? Ele esmigalha-se! Compostos iônicos NÃO SÃO maleáveis (isso é exclusividade dos metais). Eles são altamente quebradiços perante a pressão mecânica.", otherOptions: [] } },
+        { level: "Difícil", text: "Fecho Lógico: O Alumínio (Al, Z=13) e o Nitrogênio (N, Z=7) reagem. Usando o cruzamento de valências com raciocínio puro, qual a fórmula mínima empírica final para o Nitreto de Alumínio e porquê?", options: ["Al₃N₃, pois ambos precisam de três elétrons e cruzam a massa e sobram três para cada na base crua do átomo livre.", "AlN. O Alumínio perde 3 (Al³⁺). O Nitrogênio (Grupo 15) precisa de 3 para o octeto (N³⁻). Cruzando +3 e -3, os índices ficam Al₃N₃, que é obrigatoriamente SIMPLIFICADO pela matemática para a proporção mínima AlN.", "Al₂N, pois o nitrogênio é mais eletronegativo e retira dois prótons do alvo longo solto.", "AlN₂, pois os gases do ar compensam o metal pesado alcalino."], correctIndex: 1, explanation: { correctText: "Para os Mestres do Octeto! O Al quer dar 3 elétrons. O N quer receber exatamente 3 elétrons. É um par 'tampa e panela' 1 para 1 perfeito, sem sobras. Logo, a fórmula final é AlN, sem necessidade de multiplicar nada.", otherOptions: [] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_ionica_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Perfeito!' : '❌ Deslizou no Retículo!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#1D4ED8', '#EA580C', '#10B981', '#3B82F6'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 ELETROSTÁTICA DOMINADA!</strong> Você destruiu a prova de Ligação Iônica! Sabe tudo sobre cruzamento de cargas e retículos de sal.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CRISTAL QUEBRADIÇO!</strong> Você foi avaliado abaixo da meta (80%). Revise a Regra do Escorregador e a condutividade elétrica!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

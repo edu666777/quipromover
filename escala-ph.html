@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Escala de pH - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F8FAFC; 
+            --text-color: #0F172A; 
+            --border-color: #334155; 
+            --white: #FFFFFF;
+            
+            --theme-light: #F1F5F9; 
+            --theme-medium: #10B981; 
+            --theme-dark: #4F46E5; 
+            --theme-contrast: #E11D48; 
+            --theme-accent: #F59E0B; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF2F2; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #9F1239; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EEF2FF; border-left-color: #4F46E5; color: #312E81; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #FFE4E6; border-color: #BE123C; color: #881337; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧪</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Módulo 5: Escala de pH e Indicadores</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Neutro, Básico, Logaritmo)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">💧 1. O que é o pH?</div>
+                <article class="theory-box search-target">
+                    <h3>O Potencial Hidrogeniônico</h3>
+                    <p>O <strong>pH</strong> é uma medida matemática que usamos para determinar a acidez, a neutralidade ou a alcalinidade (basicidade) de uma solução aquosa.</p>
+                    <p>Ele mede a concentração de íons <strong>H⁺</strong> (Hidrogênio) livres na água. Quantos mais íons H⁺ estiverem soltos, mais forte é o ácido e <strong>MENOR</strong> será o número do pH.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📏 2. A Escala de 0 a 14</div>
+                <article class="theory-box search-target">
+                    <h3>O Termômetro da Acidez</h3>
+                    <p>À temperatura ambiente (25ºC), a escala de pH varia de 0 a 14.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="300" height="80" viewBox="0 0 300 80">
+                            <defs>
+                                <linearGradient id="phGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#EF4444" />
+                                    <stop offset="25%" stop-color="#F59E0B" />
+                                    <stop offset="50%" stop-color="#10B981" />
+                                    <stop offset="75%" stop-color="#3B82F6" />
+                                    <stop offset="100%" stop-color="#4F46E5" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="10" y="30" width="280" height="20" rx="10" fill="url(#phGradient)" stroke="#1E293B" stroke-width="2"/>
+                            
+                            <text x="10" y="20" font-size="12" font-weight="900" fill="#EF4444" text-anchor="middle">0</text>
+                            <text x="150" y="20" font-size="12" font-weight="900" fill="#10B981" text-anchor="middle">7</text>
+                            <text x="290" y="20" font-size="12" font-weight="900" fill="#4F46E5" text-anchor="middle">14</text>
+                            
+                            <text x="50" y="65" font-size="12" font-weight="900" fill="#EF4444" text-anchor="middle">ÁCIDO</text>
+                            <text x="150" y="65" font-size="12" font-weight="900" fill="#10B981" text-anchor="middle">NEUTRO</text>
+                            <text x="250" y="65" font-size="12" font-weight="900" fill="#4F46E5" text-anchor="middle">BÁSICO</text>
+
+                            <line x1="150" y1="25" x2="150" y2="55" stroke="#1E293B" stroke-width="2"/>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>pH < 7:</strong> Solução <strong>Ácida</strong> (Há mais H⁺ do que OH⁻).</li>
+                        <li><strong>pH = 7:</strong> Solução <strong>Neutra</strong> (H⁺ e OH⁻ estão em quantidades exatas iguais). Ex: Água pura.</li>
+                        <li><strong>pH > 7:</strong> Solução <strong>Básica ou Alcalina</strong> (Há mais OH⁻ do que H⁺).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🧮 3. A Matemática Logarítmica</div>
+                <article class="theory-box search-target">
+                    <h3>Saltos de 10 em 10</h3>
+                    <p>A escala de pH é <strong>Logarítmica</strong> (base 10). O que isso significa na prática?</p>
+                    <div class="highlight-box">
+                        Cada vez que o pH desce 1 unidade, a acidez multiplica-se por 10!<br><br>
+                        Um refrigerante de pH 3 é <strong>10 vezes</strong> mais ácido que um suco de tomate de pH 4.<br>
+                        O mesmo refrigerante (pH 3) é <strong>100 vezes</strong> mais ácido que um café de pH 5 (10 x 10).
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔄 4. O pOH (O Irmão Inverso)</div>
+                <article class="theory-box search-target">
+                    <h3>O Oposto do pH</h3>
+                    <p>O <strong>pOH</strong> mede a concentração de hidroxilas (OH⁻). A matemática entre eles é uma gangorra perfeita que totaliza 14.</p>
+                    <span class="inline-example">pH + pOH = 14</span>
+                    <p>Se o pH de um xampu for 9, o seu pOH será 5 (pois 9 + 5 = 14). Se o pH cair, o pOH sobe obrigatoriamente para manter o equilíbrio a 25ºC.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🧪 5. Indicadores Ácido-Base</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Mudando de Cor</h3>
+                    <p>São substâncias que mudam visualmente de cor dependendo do pH da solução em que estão imersas. Os vestibulares amam cobrar três indicadores clássicos:</p>
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Fenolftaleína:</strong> Fica <strong>Incolor</strong> no Ácido e Neutro. Fica <strong>Rosa Intenso / Carmim</strong> no Básico.</li>
+                        <li><strong>Papel de Tornassol:</strong> Fica <strong>Vermelho</strong> no Ácido. Fica <strong>Azul</strong> no Básico.</li>
+                        <li><strong>Repolho Roxo (Natural):</strong> O suco do repolho roxo é um indicador caseiro. Fica Vermelho/Rosa no ácido, e Verde/Amarelo em bases fortes.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre Cálculos, Escala, Indicadores e pOH. Acerte <strong>80% (24/30)</strong> para dominar a matéria!
+                </p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    const questionsDatabase = [
+        { level: "Fácil", text: "O que a sigla 'pH' significa literalmente na química?", options: ["Poder de Hidratação.", "Potencial Hidrogeniônico.", "Peso do Hidrogênio.", "Potência Hidráulica."], correctIndex: 1, explanation: { correctText: "A sigla pH significa Potencial Hidrogeniônico, e refere-se à medida da concentração de íons de hidrogênio (H+) numa solução.", otherOptions: [] } },
+        { level: "Fácil", text: "A escala padrão de pH, considerando uma temperatura ambiente de 25ºC, varia numericamente entre quais valores?", options: ["1 a 10.", "-14 a 14.", "0 a 14.", "0 a 100."], correctIndex: 2, explanation: { correctText: "A escala padrão oscila de 0 (máxima acidez) a 14 (máxima basicidade).", otherOptions: [] } },
+        { level: "Fácil", text: "A água destilada, sendo quimicamente pura, possui uma quantidade exata e idêntica de íons H+ e OH-. Por isso, qual é o valor exato do seu pH?", options: ["0", "14", "10", "7"], correctIndex: 3, explanation: { correctText: "O pH 7 fica exatamente no meio da escala (0 a 14), representando a neutralidade absoluta.", otherOptions: [] } },
+        { level: "Fácil", text: "Se realizares o teste de pH do suco de limão, verificarás que o valor encontrado é de aproximadamente 2,5. Como classificamos uma solução com pH menor do que 7?", options: ["Solução Básica.", "Solução Ácida.", "Solução Neutra.", "Solução Alcalina."], correctIndex: 1, explanation: { correctText: "Qualquer valor de pH abaixo de 7 indica que a solução é Ácida (há mais íons H+ do que OH-).", otherOptions: [] } },
+        { level: "Fácil", text: "Os produtos de limpeza pesada, como a lixívia (água sanitária) ou os limpa-fornos, costumam ter um pH ao redor de 12 ou 13. Como são classificadas as soluções com pH maior do que 7?", options: ["Ácidas.", "Neutras.", "Isotônicas.", "Básicas (ou Alcalinas)."], correctIndex: 3, explanation: { correctText: "Valores entre 7 e 14 indicam que a substância tem excesso de hidroxilas (OH-), sendo portanto Básica.", otherOptions: [] } },
+        { level: "Médio", text: "Qual das opções abaixo explica matematicamente a relação entre os íons numa solução com pH igual a 7?", options: ["A concentração de íons H+ é zero.", "A concentração de H+ é igual à concentração de OH-.", "A concentração de OH- é superior à de H+.", "Não existem íons na solução."], correctIndex: 1, explanation: { correctText: "No pH 7, os íons de ácido (H+) e base (OH-) empatam no 'cabo de guerra'. A anulação mútua dita a neutralidade.", otherOptions: [] } },
+        { level: "Médio", text: "A escala de pH não é uma escala linear como uma régua, mas sim uma escala logarítmica (de base 10). Isso significa que se o pH cair do número 4 para o número 3, a acidez da solução irá:", options: ["Aumentar 1 vez.", "Diminuir 10 vezes.", "Aumentar 10 vezes.", "Dobrar de valor."], correctIndex: 2, explanation: { correctText: "Cada degrau da escala de pH representa um salto multiplicado por 10. Cair de 4 para 3 significa ficar 10 vezes mais ácido.", otherOptions: [] } },
+        { level: "Difícil", text: "Aplicando a regra da escala logarítmica: O pH de um refrigerante é 3, e o pH do café negro é 5. Quantas vezes o refrigerante é mais ácido que o café?", options: ["2 vezes.", "20 vezes.", "100 vezes.", "1000 vezes."], correctIndex: 2, explanation: { correctText: "O salto é de duas unidades (do 5 para o 4, e do 4 para o 3). 10 elevado à potência 2 é 100. O refrigerante é 100x mais agressivo.", otherOptions: [] } },
+        { level: "Fácil", text: "Enquanto o pH mede a acidez (H+), o pOH mede a basicidade (OH-). Existe uma regra de soma inviolável a 25ºC que une estes dois valores. Qual é essa fórmula?", options: ["pH + pOH = 7", "pH + pOH = 100", "pH + pOH = 0", "pH + pOH = 14"], correctIndex: 3, explanation: { correctText: "Eles são uma gangorra constante que sempre totaliza 14. Se um aumenta, o outro tem de descer na mesma proporção.", otherOptions: [] } },
+        { level: "Médio", text: "Se uma solução aquosa de shampoo tem um pH aferido de 8, qual será obrigatoriamente o valor do seu pOH?", options: ["8", "6", "14", "7"], correctIndex: 1, explanation: { correctText: "Se pH + pOH = 14, então 8 + pOH = 14. O pOH será 6.", otherOptions: [] } },
+        { level: "Médio", text: "Sabendo que a escala de pH é inversa (quanto menor o número, maior a acidez), como se comporta a concentração do íon H+ quando o pH aumenta?", options: ["Aumenta proporcionalmente.", "A concentração de H+ diminui (a solução fica menos ácida).", "Permanece estática.", "Atinge o zero absoluto."], correctIndex: 1, explanation: { correctText: "O pH é calculado através do logaritmo negativo (-log). Por isso o comportamento é invertido: muito H+ solto significa um número de pH muito baixinho.", otherOptions: [] } },
+        { level: "Médio", text: "Qualitativamente, o sangue humano é uma solução ligeiramente básica. Qual é o pH aceitável e normal do sangue saudável no corpo humano?", options: ["Em torno de 7.4.", "Exatamente 7.0.", "Em torno de 5.5.", "Em torno de 12.0."], correctIndex: 0, explanation: { correctText: "O sangue saudável é levissimamente alcalino, mantendo-se estritamente entre 7.35 e 7.45 graças aos sistemas tampão.", otherOptions: [] } },
+        { level: "Fácil", text: "O suco gástrico dentro do teu estômago ajuda a digerir as proteínas da carne graças à presença do Ácido Clorídrico. Qual é o pH aproximado deste ambiente estomacal em jejum?", options: ["Entre 1.5 e 2.0 (fortemente ácido).", "7.0 (neutro).", "8.5 (basicamente leve).", "13.0 (fortemente básico)."], correctIndex: 0, explanation: { correctText: "O estômago é um banho de ácido corrosivo (pH ~2), capaz de derreter até pequenos pedaços de metal que sejam engolidos acidentalmente.", otherOptions: [] } },
+        { level: "Difícil", text: "Para que uma solução atinja o pH exato de 3, a concentração em mol/L de íons H+ (Hidrogênio) deverá ser de:", options: ["10³ mol/L", "3 mol/L", "10⁻³ mol/L", "0,3 mol/L"], correctIndex: 2, explanation: { correctText: "O pH é o valor positivo do expoente negativo da base 10. Se a concentração de H+ for 10⁻³, o pH corta o sinal e fica 3.", otherOptions: [] } },
+        { level: "Difícil", text: "Se prepararmos uma solução aquosa concentrada de NaOH (Soda Cáustica), que é uma base fortíssima. Qual deverá ser a medição correta dos seus potenciais na escala?", options: ["pH = 1 e pOH = 13.", "pH = 7 e pOH = 7.", "pH = 13 e pOH = 1.", "pH = 0 e pOH = 0."], correctIndex: 2, explanation: { correctText: "A soda cáustica é ultra básica. O seu pH estará no topo da escala (próximo a 13 ou 14). Se o pH é 13, o pOH (o oposto) é 1.", otherOptions: [] } },
+        { level: "Fácil", text: "O uso de 'Indicadores Ácido-Base' é diário nos laboratórios. O que caracteriza de forma prática a ação destes indicadores ao serem pingados numa solução?", options: ["Fazem a solução ferver.", "Eles alteram visualmente a sua cor dependendo do pH da solução em que se encontram.", "Eles neutralizam os ácidos instantaneamente.", "Eles cristalizam as bases no fundo do recipiente."], correctIndex: 1, explanation: { correctText: "Indicadores são os 'olhos' do químico. Eles têm uma cor estrutural numa zona ácida e mudam abruptamente de cor quando o ambiente fica básico.", otherOptions: [] } },
+        { level: "Médio", text: "A Fenolftaleína é o indicador mais cobrado no ENEM. Ela é frequentemente usada na titulação de bases. Qual é a cor da fenolftaleína quando adicionada a uma solução fortemente BÁSICA (pH > 9)?", options: ["Amarelo ouro.", "Verde musgo.", "Rosa carmim intenso (ou Fúcsia).", "Permanece incolor."], correctIndex: 2, explanation: { correctText: "É o clássico de laboratório! A fenolftaleína denuncia a presença de uma base ao ganhar uma coloração rosa escuro maravilhosa.", otherOptions: [] } },
+        { level: "Médio", text: "E qual é o comportamento visual (a cor) da mesma Fenolftaleína quando é pingada dentro de uma solução ÁCIDA ou NEUTRA?", options: ["Fica Vermelha.", "Permanece Incolor.", "Fica Azul.", "Fica Preta."], correctIndex: 1, explanation: { correctText: "Em meio ácido ou em água pura (neutra), a molécula da fenolftaleína não sofre alteração que refrate a luz, permanecendo como água transparente (incolor).", otherOptions: [] } },
+        { level: "Fácil", text: "Outro indicador super famoso é o Papel de Tornassol. Qual é a cor que uma fita de Papel de Tornassol Azul ganha imediatamente ao ser mergulhada no suco de limão (ácido)?", options: ["Continua Azul.", "Fica Vermelha.", "Fica Verde.", "Fica Branca."], correctIndex: 1, explanation: { correctText: "Regra do Tornassol: O Ácido deixa o papel Vermelho. A Base deixa o papel Azul. Suco de limão = Vermelho.", otherOptions: [] } },
+        { level: "Médio", text: "Se colocares Papel de Tornassol Vermelho num copo com solução de Amoníaco (produto de limpeza básico), o papel ficará:", options: ["Vermelho, pois queima a fibra.", "Amarelo pálido.", "Azul, indicando o pH básico da amônia.", "Transparente."], correctIndex: 2, explanation: { correctText: "Tornassol + Base = Azul. A amônia tem um pH em torno de 11.", otherOptions: [] } },
+        { level: "Difícil", text: "O suco do Repolho Roxo atua como um excelente indicador natural caseiro, graças às antocianinas. Se pingares o suco roxo num copo de vinagre (ácido), ele ficará de que cor? E se pingares num copo com sabão em pó (base forte)?", options: ["Vinagre: Rosa/Vermelho. Sabão: Verde/Amarelo.", "Vinagre: Verde. Sabão: Roxo profundo.", "Ambos ficarão laranjas.", "Vinagre: Incolor. Sabão: Azul."], correctIndex: 0, explanation: { correctText: "O repolho roxo é um espetáculo de cores. Fica avermelhado/rosado se houver acidez, e passa para o verde (ou amarelo se for muito cáustico) na presença de bases.", otherOptions: [] } },
+        { level: "Fácil", text: "A chuva normal que cai nas cidades já é levemente ácida devido à reação com o gás carbônico do ar, formando o ácido carbônico. Qual é o pH médio da chuva limpa natural?", options: ["pH exato de 7.0.", "pH em torno de 5.6.", "pH acima de 8.0.", "pH próximo a 1.0."], correctIndex: 1, explanation: { correctText: "Mesmo sem poluição industrial, a chuva dissolve o CO2 da atmosfera e nunca desce perfeitamente neutra, estabilizando num pH de 5.6 (ácida e inofensiva).", otherOptions: [] } },
+        { level: "Médio", text: "Quando as indústrias emitem SO2 e NO2, gera-se o grave problema ambiental da Chuva Ácida (que contém ácido sulfúrico e nítrico). Consideramos uma chuva como sendo perigosamente 'Chuva Ácida' quando o seu pH desce para qual faixa de valores?", options: ["Abaixo de 5.5, podendo chegar a pH 3 em zonas industriais.", "Abaixo de 7.0 apenas.", "Quando o pH atinge o número negativo.", "Quando o pH sobe para 9."], correctIndex: 0, explanation: { correctText: "Quando o pH da água da chuva cai dos 5.5 e entra na casa do 4 ou 3, ela torna-se corrosiva o suficiente para matar peixes em lagos e derreter estátuas de mármore.", otherOptions: [] } },
+        { level: "Difícil", text: "Qual a melhor forma de intervir (remediar) um solo rural que se encontra ácido demais (pH 4) para permitir o plantio correto da safra?", options: ["Aplicar mais chuva ácida para habituar o solo.", "Realizar o processo de 'Calagem', espalhando compostos alcalinos (como o Calcário CaCO3 ou Cal CaO) sobre o solo, para neutralizar os íons H+ e subir o pH para perto de 7.", "Adicionar cloreto de sódio (sal de cozinha) em abundância.", "Não intervir, pois o sol equilibra o pH."], correctIndex: 1, explanation: { correctText: "A calagem é a aplicação de pedras moídas de calcário ou cal. Elas reagem com a água e com o ácido do solo, neutralizando a acidez e corrigindo o pH.", otherOptions: [] } },
+        { level: "Médio", text: "Se você tem um copo com suco de laranja (pH 3) e decide adicionar-lhe 2 copos de água pura (pH 7). O que vai acontecer à acidez e ao valor numérico do pH do suco resultante?", options: ["O pH continuará 3, pois a água não altera ácidos.", "A acidez diminui por diluição, o que faz o valor do pH SUBIR em direção ao número 7.", "A acidez aumenta, baixando o pH para 1.", "A água transforma o suco numa base forte."], correctIndex: 1, explanation: { correctText: "A diluição atalha a concentração do ácido! Ao espalhar os íons H+ por mais volume de água, a concentração cai. E quando a acidez cai, o número do pH sobe.", otherOptions: [] } },
+        { level: "Médio", text: "Numa reação de Neutralização Total (ácido forte + base forte), como na mistura de HCl com NaOH. Qual será o pH exato da solução que sobrará no copo (contendo apenas sal e água)?", options: ["pH = 0.", "pH = 14.", "pH = 7, pois a solução ficará rigorosamente neutra.", "O pH não é mensurável num sal."], correctIndex: 2, explanation: { correctText: "Se a neutralização for total, todos os H+ mataram todos os OH-. Só resta água neutra e sal sem características ácido-base. A escala regressa ao equilíbrio do pH 7.", otherOptions: [] } },
+        { level: "Fácil", text: "Dentre as opções de alimentos e produtos caseiros abaixo, assinale o grupo que é formado predominantemente por soluções BÁSICAS (alcalinas):", options: ["Café, Coca-Cola, Vinagre.", "Suco gástrico, Ácido cítrico.", "Sabão em pó, Amoníaco, Desengordurante de fornos.", "Lágrima e chuva."], correctIndex: 2, explanation: { correctText: "Produtos de limpeza pesada (desengordurantes, lixívia, sabão) utilizam o poder das bases (hidroxilas) para transformar e derreter gorduras corporais e de comida.", otherOptions: ["Os grupos alimentares tendem a ser muito mais ácidos."] } },
+        { level: "Difícil", text: "O que diz a Constante de Ionização da Água (Produto iônico da água - Kw) a 25ºC, que justifica a fórmula pH+pOH=14?", options: ["Que o hidrogênio pesa mais que a água.", "Que o produto das concentrações molares de [H+] e [OH-] na água gera o valor fixo astronômico de 10⁻¹⁴. Aplicando o logaritmo, os 14 zeros transformam-se no topo da nossa escala.", "Que a água é indestrutível no vácuo termodinâmico.", "Que a água só tem 14 átomos."], correctIndex: 1, explanation: { correctText: "A matemática da escala 14 não caiu do céu! A constante de equilíbrio da auto-ionização da água é sempre [H+] x [OH-] = 1.0 x 10⁻¹⁴. Ao aplicar -log a isto, nasce a escala de 0 a 14.", otherOptions: [] } },
+        { level: "Fácil", text: "Entre duas soluções, A e B. A solução A tem pH 2. A solução B tem pH 5. Qual delas é a MAIS ÁCIDA?", options: ["A solução B, porque o número 5 é maior.", "A solução A, porque na escala de pH, quanto menor o número em direção ao 0, maior é a força e a agressividade do ácido.", "Ambas têm igual força química.", "Não podemos saber sem provar."], correctIndex: 1, explanation: { correctText: "A escala inverte a perceção comum do cérebro. Número baixo = Altíssima acidez. O ácido da bateria (pH 1) queima muito mais a pele do que um refrigerante (pH 4).", otherOptions: [] } },
+        { level: "Médio", text: "O que aconteceria à medição de um pH de um copo de água pura (neutra) a 25ºC se lhe atirasses uma pequena pastilha de Soda Cáustica (NaOH)?", options: ["O pH de 7 desceria para 2.", "O pH sofreria um salto, subindo do 7 para a zona alcalina (ex: pH 12), pois adicionaste uma base forte repleta de hidroxilas (OH-).", "A água entraria em combustão radioativa.", "O pOH subiria para 14."], correctIndex: 1, explanation: { correctText: "A água estava descansada no 7. A introdução do NaOH polui a água com um banho de OH-, quebrando a neutralidade. A solução vira básica, e o ponteiro do pH sobe aceleradamente.", otherOptions: [] } }
+    ];
+
+    const STORAGE_KEY = 'promover_quimica_escalaph_progress';
+    let quizState = { currentIndex: 0, userAnswers: new Array(questionsDatabase.length).fill(null), confettiAnimationId: null };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) { lastAnswered = i; break; }
+                    }
+                    quizState.currentIndex = lastAnswered < questionsDatabase.length - 1 ? lastAnswered + 1 : questionsDatabase.length - 1;
+                    if (parsed.filter(a => a !== null).length > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if (btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function saveProgress() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers)); } catch (e) { console.error(e); }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', e => {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let found = 0;
+            contentGroups.forEach(g => {
+                const match = g.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+                g.style.display = match ? 'flex' : 'none';
+                if (match) found++;
+            });
+            noResultsMsg.style.display = found === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(view) {
+        ['viewExplanation', 'viewPractice', 'viewResult'].forEach(v => document.getElementById(v)?.classList.remove('active'));
+        const footer = document.getElementById('quizFooter');
+        if (footer) footer.style.display = view === 'practice' ? 'flex' : 'none';
+        document.getElementById('btnExp')?.classList.toggle('active', view === 'explanation');
+        document.getElementById('btnPrac')?.classList.toggle('active', view === 'practice');
+        
+        const viewId = view === 'explanation' ? 'viewExplanation' : view === 'practice' ? 'viewPractice' : 'viewResult';
+        document.getElementById(viewId)?.classList.add('active');
+        
+        if (view === 'practice') { renderCurrentQuestion(); renderNavigationMap(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        return level === 'Fácil' ? 'dif-facil' : level === 'Médio' ? 'dif-medio' : 'dif-dificil';
+    }
+
+    function buildOptionsHTML(q, sel) {
+        const letters = ['A', 'B', 'C', 'D'];
+        return q.options.map((opt, i) => {
+            let cls = '';
+            if (sel !== null) {
+                cls = i === q.correctIndex ? 'correct' : i === sel ? 'wrong' : 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleOptionSelection(${i})" ${sel !== null ? 'disabled' : ''}>
+                <div class="opt-circle">${letters[i]}</div><div>${opt}</div></button>`;
+        }).join('');
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+        const q = questionsDatabase[quizState.currentIndex];
+        const sel = quizState.userAnswers[quizState.currentIndex];
+        const badge = getDifficultyBadgeClass(q.level);
+        let fb = '';
+        if (sel !== null) {
+            const isC = sel === q.correctIndex;
+            fb = `<div class="feedback-box show"><div class="feedback-title ${isC ? 'success' : 'error'}" style="color: ${isC ? 'var(--correct-border)' : 'var(--wrong-border)'}">${isC ? '✅ Certo!' : '❌ Errado!'}</div>
+            <div class="feedback-item correct-opt"><strong>Correta:</strong> ${q.options[q.correctIndex]}</div>
+            <div style="margin-top:15px; font-weight:600;">${q.explanation.correctText}</div></div>`;
+        }
+        container.innerHTML = `<div class="quiz-question-card"><div class="quiz-question-counter"><span class="difficulty-badge ${badge}" style="margin:0;">${q.level}</span><span>QUESTÃO ${quizState.currentIndex + 1}/${questionsDatabase.length}</span></div>
+        <h2 class="quiz-question-text">${q.text}</h2><div class="options-list">${buildOptionsHTML(q, sel)}</div>${fb}</div>`;
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(idx) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        quizState.userAnswers[quizState.currentIndex] = idx;
+        saveProgress();
+        if (idx === questionsDatabase[quizState.currentIndex].correctIndex) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const c = document.getElementById('quizContainer');
+        if (c) { c.classList.remove('shake-effect'); void c.offsetWidth; c.classList.add('shake-effect'); setTimeout(() => c.classList.remove('shake-effect'), 500); }
+    }
+
+    function startSuccessAnimation() {
+        stopSuccessAnimation();
+        const end = Date.now() + 1500;
+        function frame() {
+            if(window.confetti) {
+                confetti({ particleCount: 5, spread: 55, colors: ['#4F46E5', '#10B981', '#E11D48'], angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ particleCount: 5, spread: 55, colors: ['#4F46E5', '#10B981', '#E11D48'], angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(frame);
+        }
+        frame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && confetti.reset) confetti.reset();
+        if (quizState.confettiAnimationId) { cancelAnimationFrame(quizState.confettiAnimationId); quizState.confettiAnimationId = null; }
+    }
+
+    function renderNavigationMap() {
+        const map = document.getElementById('qMap');
+        if (!map) return;
+        map.innerHTML = questionsDatabase.map((q, i) => {
+            let cls = 'map-dot' + (i === quizState.currentIndex ? ' active' : '');
+            if (quizState.userAnswers[i] !== null) cls += quizState.userAnswers[i] === q.correctIndex ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cls}" onclick="goToQuestion(${i})">${i + 1}</div>`;
+        }).join('');
+        setTimeout(() => { const dot = map.querySelector('.map-dot.active'); if (dot) dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 50);
+    }
+
+    function goToQuestion(idx) { stopSuccessAnimation(); quizState.currentIndex = idx; renderCurrentQuestion(); renderNavigationMap(); }
+    function navigateQuestion(dir) { const next = quizState.currentIndex + dir; if (next >= 0 && next < questionsDatabase.length) goToQuestion(next); }
+
+    function updateNavigationButtons() {
+        const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
+        if (prev) prev.disabled = quizState.currentIndex === 0;
+        if (next) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) {
+                next.textContent = "Finalizar Avaliação";
+                next.onclick = finishQuiz;
+            } else {
+                next.textContent = "Próxima ➡️";
+                next.onclick = () => navigateQuestion(1);
+            }
+        }
+    }
+
+    function finishQuiz() {
+        const unans = quizState.userAnswers.filter(a => a === null).length;
+        if (unans > 0 && !confirm(`Existem ${unans} questões sem resposta. Deseja terminar mesmo assim?`)) return;
+        stopSuccessAnimation();
+        const correct = quizState.userAnswers.filter((a, i) => a === questionsDatabase[i].correctIndex).length;
+        const total = questionsDatabase.length;
+        const pct = Math.round((correct / total) * 100);
+        document.getElementById('finalPercent').textContent = `${pct}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${total}`;
+        document.getElementById('finalStars').textContent = pct === 100 ? "⭐⭐⭐⭐⭐" : pct >= 80 ? "⭐⭐⭐⭐" : pct >= 60 ? "⭐⭐⭐" : pct >= 40 ? "⭐⭐" : pct > 0 ? "⭐" : "🌑";
+        
+        const review = document.getElementById('review-container');
+        review.innerHTML = pct >= 80 
+            ? `<div class="result-summary-box success"><strong>🎉 DOMÍNIO DO PH!</strong> Calculas perfeitamente os saltos logarítmicos e sabes usar os indicadores coloridos.</div>`
+            : `<div class="result-summary-box error"><strong>⚠️ SOLUÇÃO CONFUSA!</strong> Precisas rever a escala. Lembre-se: O pH é invertido (números baixos = muito ácido).</div>`;
+        
+        if (correct < total) {
+            review.innerHTML += '<h4 style="margin-bottom:15px;">Erros:</h4>';
+            questionsDatabase.forEach((q, i) => {
+                if (quizState.userAnswers[i] !== q.correctIndex) {
+                    review.innerHTML += `<div class="error-log-item"><strong>Q${i+1}: ${q.text}</strong><br>
+                    <span style="color:var(--wrong-border);">Sua resposta: ${quizState.userAnswers[i] === null ? 'Em branco' : q.options[quizState.userAnswers[i]]}</span><br>
+                    <span style="color:var(--correct-border);">Correta: ${q.options[q.correctIndex]}</span></div>`;
+                }
+            });
+        }
+        document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 REFAZER AVALIAÇÃO</button>`;
+        changeApplicationView('result');
+    }
+    
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

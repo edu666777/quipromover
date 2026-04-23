@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Teoria de Arrhenius - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: ARRHENIUS (Ciano/Água e Vermelho/Ácido) --- */
+        :root {
+            --bg-color: #ECFEFF; 
+            --text-color: #164E63; 
+            --border-color: #0891B2; 
+            --white: #FFFFFF;
+            
+            --theme-light: #CFFAFE; 
+            --theme-medium: #06B6D4; 
+            --theme-dark: #0E7490; 
+            --theme-contrast: #E11D48; 
+            --theme-accent: #8B5CF6; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: #F8FAFC; border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FFF1F2; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #9F1239; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #ECFEFF; border-left-color: #06B6D4; color: #164E63; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">💧</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Módulo 5: Funções Inorgânicas - Arrhenius</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Ácido, Base, Ionização)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">⚡ 1. O Teste da Lâmpada (Eletrólitos)</div>
+                <article class="theory-box search-target">
+                    <h3>O que conduz eletricidade na água?</h3>
+                    <p>O químico Svante Arrhenius, em 1887, fez uma descoberta fantástica. Ele testou se a água misturada com diferentes substâncias conseguia acender uma lâmpada num circuito.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="260" height="150" viewBox="0 0 260 150">
+                            <!-- Béquer 1: Não Eletrólito -->
+                            <rect x="20" y="50" width="80" height="90" fill="#CFFAFE" stroke="#0891B2" stroke-width="2"/>
+                            <text x="60" y="130" font-size="10" font-weight="900" fill="#0E7490" text-anchor="middle">Água + Açúcar</text>
+                            <circle cx="60" cy="90" r="10" fill="#FFF" stroke="#0891B2"/>
+                            <text x="60" y="94" font-size="10" font-weight="bold" fill="#0891B2" text-anchor="middle">Mol.</text>
+                            <!-- Lâmpada apagada -->
+                            <circle cx="60" cy="20" r="15" fill="#E2E8F0" stroke="#64748B" stroke-width="2"/>
+                            <line x1="60" y1="35" x2="60" y2="50" stroke="#64748B" stroke-width="2"/>
+                            <text x="60" y="10" font-size="10" font-weight="bold" fill="#64748B" text-anchor="middle">Apagada</text>
+
+                            <!-- Béquer 2: Eletrólito -->
+                            <rect x="160" y="50" width="80" height="90" fill="#CFFAFE" stroke="#0891B2" stroke-width="2"/>
+                            <text x="200" y="130" font-size="10" font-weight="900" fill="#0E7490" text-anchor="middle">Água + Sal</text>
+                            <circle cx="185" cy="80" r="8" fill="#E11D48"/>
+                            <text x="185" y="84" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">+</text>
+                            <circle cx="215" cy="100" r="8" fill="#0891B2"/>
+                            <text x="215" y="104" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">-</text>
+                            <!-- Lâmpada acesa -->
+                            <circle cx="200" cy="20" r="15" fill="#FDE047" stroke="#D97706" stroke-width="2"/>
+                            <path d="M 180 5 Q 200 -5 220 5" fill="none" stroke="#F59E0B" stroke-width="2"/>
+                            <line x1="200" y1="35" x2="200" y2="50" stroke="#D97706" stroke-width="2"/>
+                            <text x="200" y="10" font-size="10" font-weight="bold" fill="#D97706" text-anchor="middle">Acesa!</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Soluções Eletrolíticas:</strong> Conduzem eletricidade porque possuem <strong>Íons Livres</strong> na água (cátions e ânions móveis). Ex: Sal (NaCl), Ácidos.</li>
+                        <li><strong>Soluções NÃO Eletrolíticas:</strong> Não conduzem eletricidade. A substância dissolve-se, mas continua na forma de <strong>moléculas inteiras neutras</strong>, sem gerar íons. Ex: Açúcar (Sacarose), Álcool.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">✂️ 2. Dissociação vs. Ionização</div>
+                <article class="theory-box search-target">
+                    <h3>Como surgem os íons na água?</h3>
+                    <p>Existem dois caminhos distintos para que a água fique cheia de íons livres:</p>
+                    
+                    <div class="highlight-box blue">
+                        <strong>1. DISSOCIAÇÃO IÔNICA (Para Sais e Bases):</strong><br>
+                        Ocorre em Compostos Iônicos (ex: NaCl). Eles <strong>já possuem íons</strong> no seu cristal sólido. A água apenas atua como um "separador", afastando o Na⁺ do Cl⁻. Apenas DISSOCIA (separa) o que já existia.
+                    </div>
+                    
+                    <div class="highlight-box" style="background-color: #FEF2F2; border-left-color: #E11D48; color: #9F1239; margin-top: 10px;">
+                        <strong>2. IONIZAÇÃO (Para Ácidos):</strong><br>
+                        Ocorre em Compostos Covalentes (Moleculares) puros (ex: gás HCl). Eles <strong>NÃO possuem íons</strong> originalmente. A água ataca a molécula covalente com tanta força que rompe a ligação, <strong>CRIANDO</strong> (fabricando) íons que antes não existiam.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔴 3. Os Ácidos de Arrhenius</div>
+                <article class="theory-box search-target">
+                    <h3>A Força do Hidrogênio</h3>
+                    <p>Segundo Arrhenius, <strong>Ácido</strong> é toda a substância covalente que, em solução aquosa, sofre ionização e libera como ÚNICO cátion o íon <strong>H⁺</strong> (que se junta à água formando o Hidroxônio, H₃O⁺).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="60" viewBox="0 0 250 60">
+                            <!-- HCl -->
+                            <text x="40" y="40" font-size="18" font-weight="900" fill="#0E7490">HCl</text>
+                            <text x="65" y="45" font-size="12" font-weight="600" fill="#64748B">(g)</text>
+                            
+                            <!-- Seta + H2O -->
+                            <line x1="90" y1="35" x2="140" y2="35" stroke="#0F172A" stroke-width="2" marker-end="url(#arrow-arr)"/>
+                            <text x="115" y="25" font-size="12" font-weight="bold" fill="#0891B2" text-anchor="middle">H₂O</text>
+                            
+                            <!-- Produtos -->
+                            <text x="160" y="40" font-size="18" font-weight="900" fill="#E11D48">H⁺</text>
+                            <text x="180" y="45" font-size="12" font-weight="600" fill="#64748B">(aq)</text>
+                            <text x="200" y="40" font-size="18" font-weight="900" fill="#0E7490">+</text>
+                            <text x="220" y="40" font-size="18" font-weight="900" fill="#0891B2">Cl⁻</text>
+
+                            <defs>
+                                <marker id="arrow-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0F172A"/></marker>
+                            </defs>
+                        </svg>
+                    </div>
+                    
+                    <p><strong>Dica Visual:</strong> As fórmulas dos ácidos inorgânicos clássicos <strong>começam sempre pela letra H</strong>. Ex: HCl, H₂SO₄, HNO₃.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔵 4. As Bases de Arrhenius</div>
+                <article class="theory-box search-target">
+                    <h3>O Poder da Hidroxila</h3>
+                    <p>Segundo Arrhenius, <strong>Base</strong> é toda a substância iônica que, em solução aquosa, sofre dissociação e libera como ÚNICO ânion o íon <strong>OH⁻</strong> (chamado de Hidroxila ou Oxidrila).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="60" viewBox="0 0 250 60">
+                            <!-- NaOH -->
+                            <text x="30" y="40" font-size="18" font-weight="900" fill="#0E7490">NaOH</text>
+                            <text x="75" y="45" font-size="12" font-weight="600" fill="#64748B">(s)</text>
+                            
+                            <!-- Seta + H2O -->
+                            <line x1="100" y1="35" x2="150" y2="35" stroke="#0F172A" stroke-width="2" marker-end="url(#arrow-arr)"/>
+                            <text x="125" y="25" font-size="12" font-weight="bold" fill="#0891B2" text-anchor="middle">H₂O</text>
+                            
+                            <!-- Produtos -->
+                            <text x="170" y="40" font-size="18" font-weight="900" fill="#0891B2">Na⁺</text>
+                            <text x="195" y="45" font-size="12" font-weight="600" fill="#64748B">(aq)</text>
+                            <text x="210" y="40" font-size="18" font-weight="900" fill="#0E7490">+</text>
+                            <text x="230" y="40" font-size="18" font-weight="900" fill="#0E7490">OH⁻</text>
+                        </svg>
+                    </div>
+
+                    <p><strong>Dica Visual:</strong> As fórmulas das bases inorgânicas clássicas <strong>terminam sempre em OH</strong>. Ex: NaOH, Ca(OH)₂, Al(OH)₃.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">⚖️ 5. Reação de Neutralização</div>
+                <article class="theory-box search-target">
+                    <h3>O Encontro Perfeito</h3>
+                    <p>Quando misturamos um Ácido com uma Base, o cátion letal do ácido (H⁺) encontra o ânion característico da base (OH⁻). Eles unem-se instantaneamente, anulando a periculosidade um do outro.</p>
+                    
+                    <div class="highlight-box" style="text-align: center; font-size: 1.15rem; color: var(--text-color);">
+                        <strong>ÁCIDO + BASE ➔ SAL + ÁGUA</strong><br>
+                        <span style="color: #E11D48; font-weight: 800;">H⁺</span> + <span style="color: #0E7490; font-weight: 800;">OH⁻</span> ➔ <span style="color: #059669; font-weight: 800;">H₂O</span>
+                    </div>
+
+                    <p style="margin-top: 10px;"><em>Atenção ao limite da Teoria:</em> Arrhenius foi brilhante, mas o seu modelo tinha um defeito estrutural. A sua teoria só funcionava se houvesse <strong>ÁGUA</strong> no meio (soluções aquosas). Para explicar ácidos em gases ou sem água, surgiram mais tarde as teorias de Brønsted-Lowry e Lewis.</p>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões rigorosas sobre Ácidos, Bases, Ionização e Neutralização. Acerte <strong>80% (24/30)</strong> para dominar a Teoria de Arrhenius!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Teoria de Arrhenius PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "O químico sueco Svante Arrhenius foi laureado com o Nobel pela sua teoria revolucionária. O que fundamentava essencialmente o estudo inicial que o levou a criar o conceito de ácidos e bases?", options: ["A fusão térmica de metais pesados.", "A capacidade de certas soluções aquosas conduzirem corrente elétrica.", "A expansão de gases nobres no vácuo.", "A radiação emitida por isótopos de urânio."], correctIndex: 1, explanation: { correctText: "Arrhenius investigava por que razão a água salgada conduzia eletricidade e a água com açúcar não. Isso levou-o à descoberta dos íons livres em solução.", otherOptions: [] } },
+        { level: "Fácil", text: "Segundo a teoria original de Arrhenius, qual é a definição clássica e estrita de um Ácido?", options: ["Toda a substância que em solução aquosa liberta como único cátion o íon Hidrogênio (H⁺).", "Qualquer substância que conduz eletricidade no estado sólido.", "Qualquer molécula que possua oxigênio na sua estrutura.", "Substância que liberta o ânion hidroxila (OH⁻)."], correctIndex: 0, explanation: { correctText: "A marca registada do ácido de Arrhenius é libertar H⁺ na água (que logo se agarra a uma molécula de água virando H₃O⁺).", otherOptions: [] } },
+        { level: "Fácil", text: "Da mesma forma, qual é a definição clássica e exata de uma Base para Arrhenius?", options: ["Substância que, quando dissolvida em água, sofre dissociação e liberta exclusivamente como ânion o íon Hidroxila (OH⁻).", "Composto molecular que doa elétrons ao ar.", "Qualquer metal alcalino no estado puro.", "Substância que liberta gás hidrogênio (H₂)."], correctIndex: 0, explanation: { correctText: "A base joga o ânion Hidroxila (OH⁻) na água. Exemplos clássicos são o NaOH e o Ca(OH)₂.", otherOptions: [] } },
+        { level: "Médio", text: "Uma das grandes diferenças ensinadas na química inorgânica é entre 'Dissociação' e 'Ionização'. O que caracteriza a Ionização, processo que ocorre com os ácidos (como o HCl)?", options: ["A água separa íons que já existiam previamente no retículo cristalino sólido.", "A água ataca uma molécula covalente neutra (que não tinha íons), quebra as suas ligações e 'fabrica' íons novos no líquido.", "Os elétrons são totalmente perdidos para o vácuo.", "É um processo que ocorre apenas com bases e sais."], correctIndex: 1, explanation: { correctText: "Ácidos são compostos moleculares (covalentes). Não têm íons de fábrica. Quando caem na água, a água polar atua como um machado, quebra a ligação H-Cl e CRIA o H⁺ e o Cl⁻. A isso chama-se Ionização.", otherOptions: [] } },
+        { level: "Médio", text: "Em contrapartida, o que caracteriza a Dissociação Iônica, que ocorre tipicamente quando dissolvemos sais (como o NaCl) ou bases fortes em água?", options: ["O composto cria íons novos através da fricção com a água.", "A molécula absorve os prótons da água virando um ácido.", "O composto JÁ ERA iônico (já possuía cátions e ânions no cristal sólido). A água apenas os separa e espalha pelo recipiente.", "É um processo onde a molécula permanece intacta sem liberar carga."], correctIndex: 2, explanation: { correctText: "Dissociar significa 'separar uma sociedade'. Os íons Na⁺ e Cl⁻ já existiam agarrados na pedrinha de sal. A água apenas se mete no meio deles e afasta-os.", otherOptions: [] } },
+        { level: "Fácil", text: "As soluções aquosas podem ser classificadas quanto à sua condutividade. Uma solução aquosa que conduz brilhantemente a corrente elétrica (acendendo o circuito da lâmpada de Arrhenius) é chamada de:", options: ["Solução Eletrolítica.", "Solução Neutra Saturada.", "Solução Não-Eletrolítica.", "Mistura Isomérica."], correctIndex: 0, explanation: { correctText: "Eletrólitos são substâncias que, em água, geram íons livres e permitem o fluxo da eletricidade (Solução Eletrolítica).", otherOptions: [] } },
+        { level: "Fácil", text: "Se você dissolver uma colher de açúcar de mesa (sacarose) num copo de água destilada pura, a lâmpada do circuito de Arrhenius NÃO irá acender. Por que isso acontece?", options: ["Porque o açúcar reage e forma um ácido.", "Porque a sacarose é um composto molecular que não se dissolve na água.", "Porque o açúcar é um Não-Eletrólito. Ele dissolve-se na água, mas as suas moléculas separam-se inteiras e neutras, não gerando íons móveis.", "Porque os íons do açúcar são pesados demais para mover elétrons."], correctIndex: 2, explanation: { correctText: "Para conduzir eletricidade, precisas de cargas elétricas livres (íons). O açúcar dissolve (some na água), mas as moléculas de sacarose flutuam inteiras e neutras (carga zero). Sem carga, sem choque.", otherOptions: [] } },
+        { level: "Médio", text: "Ao observar as fórmulas químicas das seguintes substâncias: HCl, NaOH, H₂SO₄ e Ca(OH)₂. Podemos classificar, segundo Arrhenius, que os Ácidos desta lista são:", options: ["NaOH e Ca(OH)₂, pois possuem o grupo hidroxila.", "Apenas o HCl.", "HCl e H₂SO₄, pois a fórmula inicia-se pelo hidrogênio ionizável (H).", "Todos são ácidos em meio aquoso."], correctIndex: 2, explanation: { correctText: "O macete visual de Arrhenius: Ácido começa com H (ex: HCl, Ácido Sulfúrico H₂SO₄). Base termina com OH (Hidróxido de Sódio NaOH, Hidróxido de Cálcio Ca(OH)₂).", otherOptions: [] } },
+        { level: "Médio", text: "O Ácido Clorídrico (HCl) é um gás à temperatura ambiente. Se o testarmos no estado gasoso puro (seco, sem água), ele NÃO conduz eletricidade. Contudo, ao ser injetado em água, torna-se um excelente condutor elétrico. Qual é a explicação de Arrhenius?", options: ["A água atua como catalisador térmico, derretendo o gás.", "Sem água, o HCl é uma molécula covalente neutra. Apenas em meio aquoso (com a água) ele sofre ionização, libertando os íons H⁺ e Cl⁻ necessários para a condução.", "O cloro evapora, deixando apenas os íons de hidrogênio metálicos.", "A água pura é a verdadeira responsável por conduzir a eletricidade, não o ácido."], correctIndex: 1, explanation: { correctText: "A teoria de Arrhenius é escrava da água! Sem água, não há quebra da molécula. Sem quebra, não há íons. Sem íons, não há eletricidade.", otherOptions: [] } },
+        { level: "Fácil", text: "O que ocorre quimicamente na famosa 'Reação de Neutralização' de Arrhenius?", options: ["Um ácido reage com um metal, formando gás hidrogênio.", "Uma base reage com um sal, precipitando no fundo.", "Um Ácido reage com uma Base para formar Sal e Água.", "A água decompõe-se nos seus gases base."], correctIndex: 2, explanation: { correctText: "É o feijão com arroz da química inorgânica: Ácido + Base ➔ Sal + Água.", otherOptions: [] } },
+        { level: "Difícil", text: "Do ponto de vista iônico estrito, qual é a reação principal e universal que ocorre nos bastidores de toda e qualquer Neutralização de Arrhenius?", options: ["A união do metal com o ametal para formar um gás.", "O cátion H⁺ (do ácido) encontra o ânion OH⁻ (da base) e unem-se imediatamente para formar a molécula neutra de Água (H₂O).", "A destruição dos prótons da água.", "A precipitação do sal no fundo do recipiente."], correctIndex: 1, explanation: { correctText: "Esta é a magia da neutralização! O perigo do ácido é o H⁺. O perigo da base é o OH⁻. Quando se cruzam, anulam-se, formando a inofensiva e neutra molécula de H₂O.", otherOptions: [] } },
+        { level: "Médio", text: "Na teoria de Arrhenius original, qual era a grande limitação (o calcanhar de Aquiles) deste modelo conceitual?", options: ["Ele não conseguia explicar por que o sal era salgado.", "A teoria funcionava muito bem, MAS estava totalmente limitada a soluções aquosas. Se a reação ocorresse num gás ou noutro solvente que não fosse a água, o conceito dele falhava.", "Ele não reconhecia a existência de elétrons.", "Ele afirmava que as bases libertavam H⁺ em vez de OH⁻."], correctIndex: 1, explanation: { correctText: "Arrhenius exigia água! Se não houvesse água, ele não conseguia classificar quem era o ácido ou a base. Por isso, mais tarde, surgiram teorias mais abrangentes (Brønsted-Lowry e Lewis).", otherOptions: [] } },
+        { level: "Médio", text: "A Amônia (gás NH₃), quando injetada na água, gera uma solução básica (básica/alcalina), pois reage com a água formando íons OH⁻ (NH₄⁺ + OH⁻). Por que é que a Amônia foi uma grande dor de cabeça para a definição clássica de Arrhenius?", options: ["Porque a Amônia é um ácido disfarçado.", "Porque a molécula de Amônia (NH₃) NÃO possui nenhuma hidroxila (OH) na sua estrutura original para libertar, o que contrariava a regra de Arrhenius de que a base 'tem que ter OH para doar'.", "Porque o NH₃ não se dissolve em água.", "Porque evapora antes de reagir."], correctIndex: 1, explanation: { correctText: "Arrhenius dizia: Base TEM de ter OH na fórmula (ex: NaOH). A Amônia (NH₃) quebrava essa regra, pois gerava meio básico sem ter a hidroxila no seu próprio corpo (ela arranca o H da água para que a água liberte o OH⁻).", otherOptions: [] } },
+        { level: "Fácil", text: "Uma garrafa possui um líquido misterioso e incolor. O aluno introduz o sistema da lâmpada de Arrhenius (dois eletrodos ligados a uma pilha) na solução, e a lâmpada brilha com grande intensidade. A conclusão inegável é:", options: ["A substância é açúcar puro derretido.", "O líquido é água destilada (100% pura).", "A solução contém uma elevada concentração de íons livres (é um forte eletrólito).", "O circuito entrou em curto-circuito térmico."], correctIndex: 2, explanation: { correctText: "Luz forte = muitos íons livres nadando na água para fechar o circuito elétrico. É a prova clara de um eletrólito forte (ácido, base ou sal dissolvido).", otherOptions: [] } },
+        { level: "Difícil", text: "Ao estudarmos o cátion H⁺ liberado pelos ácidos de Arrhenius, a física moderna revela que o H⁺ isolado é, na verdade, uma partícula subatômica solitária. Que partícula é essa?", options: ["Um Elétron puro.", "Um Nêutron puro.", "Um Próton nu e solitário.", "Um isótopo radioativo."], correctIndex: 2, explanation: { correctText: "O átomo de Hidrogênio só tem 1 Próton no núcleo e 1 Elétron na nuvem. Se ele perde o elétron para virar o cátion H⁺, o que sobra? Literalmente apenas um Próton voando solto!", otherOptions: [] } },
+        { level: "Médio", text: "Devido à enorme densidade de carga do H⁺ (um próton nu), ele não consegue existir isolado e livre na água líquida. O que acontece imediatamente a este H⁺ assim que o ácido se ioniza?", options: ["Ele evapora como gás H₂.", "Ele une-se instantaneamente a uma molécula de água neutra (H₂O) formando o íon Hidroxônio ou Hidrônio (H₃O⁺).", "Ele ataca o vidro do béquer.", "Ele choca com outro H⁺ para realizar fusão nuclear."], correctIndex: 1, explanation: { correctText: "É o detalhe mais rigoroso de Arrhenius moderno: o H⁺ não flutua sozinho. Ele cola-se numa molécula de água através de uma ligação dativa, formando o famoso H₃O⁺.", otherOptions: [] } },
+        { level: "Fácil", text: "Observe a reação de ionização do Ácido Nítrico: HNO₃ + H₂O ➔ H₃O⁺ + NO₃⁻. Segundo os conceitos de Arrhenius, o íon NO₃⁻ (Nitrato) representa:", options: ["A hidroxila neutra do ácido.", "O cátion base da água.", "O Ânion que sobra do ácido após ele libertar o seu hidrogênio.", "O metal de transição do processo."], correctIndex: 2, explanation: { correctText: "O ácido é como uma moeda de duas caras: o H⁺ e o Ânion. Quando o H⁺ sai e vai para a água, o que sobra (NO₃⁻, SO₄²⁻, Cl⁻) é o ânion característico desse ácido.", otherOptions: [] } },
+        { level: "Fácil", text: "Identifique qual das substâncias abaixo se enquadra perfeitamente no conceito de BASE de Arrhenius:", options: ["CH₄ (Metano).", "H₂CO₃ (Ácido Carbônico).", "KCl (Cloreto de Potássio).", "Mg(OH)₂ (Hidróxido de Magnésio)."], correctIndex: 3, explanation: { correctText: "A marca registrada da base é terminar com o grupo OH (Hidroxila). O Hidróxido de Magnésio possui o grupo OH e vai libertá-lo em água por dissociação.", otherOptions: ["H₂CO₃ é ácido. KCl é sal. CH₄ é um hidrocarboneto."] } },
+        { level: "Médio", text: "Um sal comum, como o Cloreto de Cálcio (CaCl₂), é dissolvido em água. Que partículas estarão livres nadando na solução após a DISSOCIAÇÃO iônica completa?", options: ["Moléculas inteiras neutras de CaCl₂.", "Gás cloro livre e metal cálcio sólido.", "Cátions Ca²⁺ e Ânions Cl⁻ dispersos e rodeados por água.", "Íons H⁺ e OH⁻ libertados do sal."], correctIndex: 2, explanation: { correctText: "A água quebra o retículo cristalino e separa os parceiros. O metal vira o seu cátion (Ca²⁺) e o ametal vira o seu ânion (Cl⁻), ambos nadando independentes na solução aquosa.", otherOptions: [] } },
+        { level: "Difícil", text: "Se misturarmos volumes iguais e concentrações exatas (1 mol/L) de Ácido Clorídrico (HCl) e Hidróxido de Sódio (NaOH), a solução final resultante irá conduzir eletricidade?", options: ["Não, porque a neutralização anula todos os íons, restando apenas água pura (isolante).", "Sim! Porque a reação produz Água e SAL (NaCl). O NaCl na água estará na forma de íons Na⁺ e Cl⁻ livres, o que torna a solução resultante uma excelente condutora.", "Não, porque a água e o sal reagem virando gás.", "Sim, porque o calor da neutralização queima a água formando elétrons."], correctIndex: 1, explanation: { correctText: "Atenção a esta pegadinha de ENEM! A neutralização destrói o H⁺ e o OH⁻, mas deixa para trás o Sal dissolvido. Água com sal dissolvido conduz perfeitamente a eletricidade (é eletrolítica).", otherOptions: [] } },
+        { level: "Fácil", text: "Em relação ao grau de condução elétrica, dizemos que um 'Ácido Forte' (como o H₂SO₄) diferencia-se de um 'Ácido Fraco' (como o vinagre/ácido acético) porque o forte:", options: ["Não se dissolve na água.", "Evapora mais rápido do copo.", "Sofre uma taxa de ionização altíssima, libertando quase 100% das suas moléculas na forma de íons H⁺, tornando-se num forte eletrólito.", "Tem uma cor mais vibrante no laboratório."], correctIndex: 2, explanation: { correctText: "Força do ácido = Capacidade de quebrar e libertar o H⁺ na água. Os fortes 'explodem' em íons quase totalmente, os fracos têm preguiça e poucas moléculas se quebram (gerando poucos íons e pouca condução).", otherOptions: [] } },
+        { level: "Médio", text: "O que diz rigorosamente a equação genérica de ionização de Arrhenius para um ácido monoprótico (HA)?", options: ["HA(aq) ➔ H⁺(aq) + A⁻(aq)", "HA + OH⁻ ➔ H₂O + A⁺", "HA(s) ➔ HA(g) no vácuo.", "H⁺ + A⁻ ➔ HA(s) precipitado."], correctIndex: 0, explanation: { correctText: "É a quebra básica: O Ácido (HA) em meio aquoso (aq) separa-se libertando o cátion H⁺ e o seu ânion genérico A⁻.", otherOptions: [] } },
+        { level: "Médio", text: "Toda a solução aquosa ácida de Arrhenius tem um sabor característico e um efeito destrutivo sobre certos materiais. O sabor e o efeito químico principal são:", options: ["Sabor doce e conservação de metais.", "Sabor amargo e criação de gordura.", "Sabor azedo (como o limão) e reação com metais básicos libertando gás hidrogênio.", "Sabor adstringente (amarra a boca) e proteção do alumínio."], correctIndex: 2, explanation: { correctText: "O sabor clássico dos ácidos é o azedo (ácido cítrico no limão, ácido acético no vinagre). Eles têm forte poder corrosivo sobre a maioria dos metais.", otherOptions: ["Bases têm sabor adstringente/amargo e sensação escorregadia ao toque (como sabão)."] } },
+        { level: "Fácil", text: "Ao tocar numa solução aquosa diluída de uma Base (como água de sabão ou soda cáustica extremamente diluída), os dedos sentem uma textura 'escorregadia' ou saponácea. A que classe de função inorgânica de Arrhenius se deve este efeito prático?", options: ["Aos Ácidos.", "Aos Sais Metálicos.", "Aos Óxidos Neutros.", "Às Bases (Hidróxidos)."], correctIndex: 3, explanation: { correctText: "A textura escorregadia é a marca registada das bases. Elas reagem com a gordura da nossa pele num micro-processo de saponificação, criando uma camada de sabão na ponta dos dedos.", otherOptions: [] } },
+        { level: "Difícil", text: "A dissociação de bases pode gerar um ou múltiplos íons OH⁻. Qual será a equação de dissociação completa da base Hidróxido de Bário, Ba(OH)₂?", options: ["Ba(OH)₂ ➔ Ba⁺ + 2OH⁻", "Ba(OH)₂ ➔ Ba²⁺ + 2OH⁻", "Ba(OH)₂ ➔ Ba + H₂O", "Ba(OH)₂ ➔ BaOH + OH⁻"], correctIndex: 1, explanation: { correctText: "O Bário (Ba) é do Grupo 2, logo forma o cátion bivalente Ba²⁺. Para equilibrar essa carga +2, ele liberta exatamente 2 íons OH⁻ (que têm carga -1 cada).", otherOptions: [] } },
+        { level: "Fácil", text: "Para saber se um líquido é ácido ou básico sem o tocar ou provar (o que seria mortal num laboratório), os químicos utilizam substâncias mágicas que mudam de cor perante a presença de H⁺ ou OH⁻. Como se chamam estas substâncias vitais?", options: ["Catalisadores isotópicos.", "Indicadores Ácido-Base (ex: Tornassol, Fenolftaleína).", "Neutralizadores quânticos.", "Inibidores salinos metálicos."], correctIndex: 1, explanation: { correctText: "Os Indicadores são moléculas orgânicas que alteram a sua estrutura (e por consequência a cor que refletem) dependendo da concentração de íons de Arrhenius na água.", otherOptions: [] } },
+        { level: "Médio", text: "Se colocares papel de Tornassol Azul numa solução e ele ficar instantaneamente Vermelho, a teoria de Arrhenius prevê que na solução existe excesso de qual íon?", options: ["OH⁻, logo é uma Base.", "H⁺ (ou H₃O⁺), confirmando que a solução é um Ácido.", "Na⁺, confirmando que é um sal neutro.", "O₂⁻ livre dissolvido no meio."], correctIndex: 1, explanation: { correctText: "Vermelho é a cor universal de alerta de ÁCIDO em quase todos os indicadores clássicos europeus, ditado pela alta concentração dos prótons H⁺ soltos na solução atacando o papel.", otherOptions: [] } },
+        { level: "Médio", text: "Um aluno descobre a fórmula do Ácido Fosfórico: H₃PO₄. Com base apenas na fórmula visual de Arrhenius, quantos hidrogênios ele é capaz de ionizar (teoricamente) se atirado para a água?", options: ["Zero, ele é inerte.", "Apenas 1.", "Três (é um ácido triprótico).", "Quatro, devido ao oxigênio."], correctIndex: 2, explanation: { correctText: "A fórmula H₃... avisa-nos que há 3 átomos de hidrogênio que podem ser potencialmente 'arrancados' pela água na forma de íons H⁺, classificando-o como um triácido ou ácido triprótico.", otherOptions: [] } },
+        { level: "Difícil", text: "Limitação final de Arrhenius! Uma reação ocorre sem uma única gota de água presente. O Gás Amônia (NH₃) e o Gás Cloreto de Hidrogênio (HCl) misturam-se no ar e formam uma nuvem sólida branca de sal (NH₄Cl). O HCl agiu como ácido doando o H⁺ para a Amônia. Como Arrhenius avaliaria isto?", options: ["Ele diria que foi uma neutralização perfeita de Arrhenius.", "O modelo dele entraria em 'tilt' e não poderia classificar a reação como ácido-base, pois Arrhenius exige obrigatoriamente que a reação aconteça em MEIO AQUOSO (água líquida solvente).", "Ele chamaria de dissociação a frio do gás nobre.", "Ele chamaria à Amônia de ácido reverso."], correctIndex: 1, explanation: { correctText: "Este é o clássico exemplo (Fumaça Branca) que quebrou as pernas a Arrhenius e forçou a química a inventar a teoria de Brønsted-Lowry, pois a reação é uma óbvia doação de próton que acontece no AR, sem água.", otherOptions: [] } },
+        { level: "Fácil", text: "Resumo Mestre! Complete a frase com o balanço de Arrhenius: 'Na água pura e neutra, existe uma quantidade microscópica, mas perfeitamente IGUAL, de íons...'", options: ["Na⁺ e Cl⁻ de sal marinho invisível.", "H⁺ (Ácidos) e OH⁻ (Básicos). A água quebra-se a si mesma raramente, mas como liberta 1 de cada, o balanço de empate elétrico mantém a água NEUTRA.", "O₂ e H₂ dissolvidos na estrutura nula.", "Cátions e Nêutrons em fusão branda."], correctIndex: 1, explanation: { correctText: "A Auto-ionização da água: H₂O ➔ H⁺ + OH⁻. Como há exatamente 1 H⁺ para cada 1 OH⁻ gerado, os efeitos anulam-se e a água fica maravilhosamente neutra.", otherOptions: [] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_arrhenius_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Solúvel Perfeito!' : '❌ Eletrólito Fraco!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#06B6D4', '#0E7490', '#E11D48', '#8B5CF6'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 NEUTRALIZAÇÃO PERFEITA!</strong> Você compreende perfeitamente a base da química inorgânica aquosa. Os íons H⁺ e OH⁻ não têm segredos para ti!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ SOLUÇÃO MUITO ÁCIDA!</strong> Você foi avaliado abaixo da meta (80%). Lembre-se: Arrhenius é refém da água! Ácido liberta H⁺ e Base liberta OH⁻.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

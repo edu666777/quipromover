@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Ácidos e Bases - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F8FAFC; 
+            --text-color: #0F172A; 
+            --border-color: #1E293B; 
+            --white: #FFFFFF;
+            
+            --theme-light: #FEE2E2; 
+            --theme-medium: #E11D48; 
+            --theme-dark: #BE123C; 
+            --theme-contrast: #0369A1; 
+            --theme-accent: #8B5CF6; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF2F2; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #9F1239; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #E0F2FE; border-left-color: #0284C7; color: #164E63; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧪</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Ácidos, Bases e Nomenclatura</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Hidrácido, Oxiácido, Força)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🔴 1. Classificação dos Ácidos</div>
+                <article class="theory-box search-target">
+                    <h3>Hidrácidos vs. Oxiácidos</h3>
+                    <p>Podemos classificar os ácidos pela presença ou ausência de Oxigênio na sua molécula:</p>
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Hidrácidos:</strong> NÃO possuem oxigênio. Ex: HCl, HCN, H₂S.</li>
+                        <li><strong>Oxiácidos:</strong> POSSUEM oxigênio na fórmula. Ex: H₂SO₄, HNO₃, H₃PO₄.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">💪 2. Força dos Ácidos</div>
+                <article class="theory-box search-target">
+                    <h3>Quem ioniza mais?</h3>
+                    <p>A força de um ácido mede a sua capacidade de liberar H⁺ em água. As regras variam:</p>
+                    <div class="highlight-box">
+                        <strong>Hidrácidos Fortes:</strong> Apenas três! HCl, HBr e HI.<br>
+                        <strong>Moderado:</strong> HF.<br>
+                        <strong>Fracos:</strong> Todos os outros (ex: H₂S, HCN).
+                    </div>
+                    <div class="highlight-box" style="margin-top: 10px;">
+                        <strong>Oxiácidos (Regra de Pauling):</strong> Subtraia o nº de Hidrogênios do nº de Oxigênios (O - H).<br>
+                        Se der <strong>2 ou 3</strong> = Forte (ex: H₂SO₄ ➔ 4-2 = 2).<br>
+                        Se der <strong>1</strong> = Moderado (ex: H₃PO₄ ➔ 4-3 = 1).<br>
+                        Se der <strong>0</strong> = Fraco (ex: HClO).<br>
+                        <em>Exceção importante: H₂CO₃ (Ácido Carbônico) é FRACO e instável!</em>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📝 3. Nomenclatura de Ácidos</div>
+                <article class="theory-box search-target">
+                    <h3>Dar Nome aos Bois</h3>
+                    <p>O nome do ácido depende do ânion que sobra quando ele perde o H⁺.</p>
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Hidrácidos:</strong> Sempre terminam em <strong>-ÍDRICO</strong>. Ex: Ácido Clorídrico (HCl), Ácido Sulfídrico (H₂S).</li>
+                        <li><strong>Oxiácidos:</strong> Dependem do sufixo do ânion. Regra do Mosquito: "Mosqu<strong>ito</strong> teim<strong>oso</strong>, te m<strong>ato</strong> te p<strong>ico</strong>, te m<strong>eto</strong> no v<strong>ídrico</strong>."<br>
+                        Ânion em <em>-ato</em> ➔ Ácido <strong>-ico</strong> (ex: Sulfato ➔ Ácido Sulfúrico).<br>
+                        Ânion em <em>-ito</em> ➔ Ácido <strong>-oso</strong> (ex: Nitrito ➔ Ácido Nitroso).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔵 4. Classificação das Bases</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Força e Solubilidade</h3>
+                    <p>As bases liberam OH⁻. A sua classificação foca-se na solubilidade e força:</p>
+                    <div class="highlight-box blue">
+                        <strong>Força:</strong> As bases dos metais Alcalinos (Grupo 1) e Alcalinoterrosos (Grupo 2) são FORTES. <em>Exceção: Mg(OH)₂ e Be(OH)₂ são FRACAS!</em> As restantes bases (ex: ferro, cobre, amônio) são FRACAS.
+                    </div>
+                    <div class="highlight-box blue" style="margin-top: 10px;">
+                        <strong>Solubilidade:</strong> <br>Solúveis = Grupo 1 e NH₄OH.<br>
+                        Pouco Solúveis = Grupo 2.<br>
+                        Insolúveis = Todas as outras.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🏷️ 5. Nomenclatura das Bases</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Hidróxido de...</h3>
+                    <p>Nomear bases é muito simples: <strong>Hidróxido de [Nome do Metal]</strong>.</p>
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li>Ex: NaOH = Hidróxido de Sódio. Ca(OH)₂ = Hidróxido de Cálcio.</li>
+                        <li><strong>Metais com Nox variável:</strong> Adiciona-se o algarismo romano ou sufixo. Ex: Fe(OH)₂ = Hidróxido de ferro (II) ou ferroso. Fe(OH)₃ = Hidróxido de ferro (III) ou férrico.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- BLOCO: RESUMO RÁPIDO -->
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-contrast);">📌 Resumo Rápido (Macetes)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast); border-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">Revise Antes da Prova!</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 15px; text-align: center;">
+                        <div style="background-color: #F8FAFC; border: 2px solid #E11D48; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #E11D48; line-height: 1;">H⁺</span><br>
+                            <strong style="color: #BE123C; font-size: 1.1rem;">Ácidos</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Começam com H<br>Ionizam em Água</span>
+                        </div>
+                        <div style="background-color: #F8FAFC; border: 2px solid #0369A1; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">
+                            <span style="font-size: 1.8rem; font-weight: 900; color: #0369A1; line-height: 1;">OH⁻</span><br>
+                            <strong style="color: #075985; font-size: 1.1rem;">Bases</strong><br>
+                            <span style="font-size: 0.85rem; font-weight: 600;">Terminam com OH<br>Dissociam em Água</span>
+                        </div>
+                        <div style="background-color: #F8FAFC; border: 2px solid #8B5CF6; border-radius: 8px; padding: 12px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); grid-column: 1 / -1;">
+                            <span style="font-size: 1.2rem; font-weight: 900; color: #8B5CF6; line-height: 1;">Macete dos Sufixos</span><br>
+                            <span style="font-size: 0.95rem; font-weight: 600; color: #4C1D95;">Mosqu<strong>ito</strong> teim<strong>oso</strong>, te m<strong>ato</strong> te p<strong>ico</strong>, te m<strong>eto</strong> no v<strong>ídrico</strong>.</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre Classificação, Nomenclatura e Força. Acerte <strong>80% (24/30)</strong> para dominar os Ácidos e Bases!
+                </p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    const questionsDatabase = [
+        { level: "Fácil", text: "Os ácidos são classificados quanto à presença ou ausência de oxigênio em suas fórmulas. Como é chamado um ácido que NÃO possui oxigênio?", options: ["Oxiácido.", "Diácido.", "Hidrácido.", "Ácido binário."], correctIndex: 2, explanation: { correctText: "Hidrácidos são ácidos compostos apenas por hidrogênio e ametais, sem qualquer oxigênio (ex: HCl, H2S).", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das opções abaixo apresenta exclusivamente HIDRÁCIDOS?", options: ["HCl, H2SO4, HNO3", "HCN, H2S, HF", "H3PO4, HClO, H2CO3", "H2O, NH3, CH4"], correctIndex: 1, explanation: { correctText: "HCN, H2S e HF não possuem oxigênio na fórmula, enquadrando-se perfeitamente na classe dos hidrácidos.", otherOptions: [] } },
+        { level: "Fácil", text: "Para nomear hidrácidos, a química utiliza uma terminação (sufixo) padrão. Qual é esse sufixo?", options: ["-ico", "-oso", "-ato", "-ídrico"], correctIndex: 3, explanation: { correctText: "Todos os hidrácidos terminam em 'ídrico'. Exemplo: HCl = Ácido Clorídrico; HF = Ácido Fluorídrico.", otherOptions: [] } },
+        { level: "Médio", text: "Aplicando a regra de nomenclatura dos hidrácidos, qual o nome correto do composto H2S?", options: ["Ácido sulfúrico.", "Ácido sulfuroso.", "Ácido sulfídrico.", "Ácido sulfato."], correctIndex: 2, explanation: { correctText: "Como não tem oxigênio, é um hidrácido. O nome do elemento (enxofre/sulfur) + sufixo 'ídrico' = Ácido sulfídrico.", otherOptions: [] } },
+        { level: "Médio", text: "O Ácido Clorídrico (HCl) é um gás quando puro, mas muito solúvel em água. Onde este poderoso hidrácido pode ser encontrado naturalmente no corpo humano?", options: ["No sangue, ajudando no transporte de oxigênio.", "No suco gástrico do estômago, auxiliando na digestão.", "Nos pulmões, facilitando a troca de gases.", "No cérebro, servindo como neurotransmissor."], correctIndex: 1, explanation: { correctText: "O suco gástrico é composto primariamente por ácido clorídrico (HCl), sendo responsável pela acidez estomacal.", otherOptions: [] } },
+        { level: "Médio", text: "Qual dos hidrácidos abaixo é classificado como um ácido MODERADO, possuindo ainda a capacidade ímpar de corroer o vidro?", options: ["HCl", "HBr", "HF", "HCN"], correctIndex: 2, explanation: { correctText: "O Ácido Fluorídrico (HF) é moderado, mas incrivelmente reativo. Ele não pode ser guardado em frascos de vidro pois corrói o silício (é usado para gravar em vidros).", otherOptions: [] } },
+        { level: "Difícil", text: "No grupo dos Hidrácidos, a força é memorizada através de exceções. Quais são os ÚNICOS três hidrácidos classificados como FORTES?", options: ["HF, HCl, HBr", "HCl, HBr, HI", "HCN, H2S, HF", "HCl, HNO3, H2SO4"], correctIndex: 1, explanation: { correctText: "Decorar: HCl (Clorídrico), HBr (Bromídrico) e HI (Iodídrico) são os únicos hidrácidos fortes. HF é moderado, os restantes são fracos.", otherOptions: [] } },
+        { level: "Fácil", text: "Ácidos que possuem oxigênio em suas fórmulas (como H2SO4) são classificados como:", options: ["Hidrácidos.", "Ácidos ternários.", "Oxiácidos.", "Ácidos carboxílicos."], correctIndex: 2, explanation: { correctText: "Oxiácidos = Ácidos com Oxigênio.", otherOptions: [] } },
+        { level: "Médio", text: "Para calcular a FORÇA de um Oxiácido, usamos a Regra de Pauling: diminui-se o número de hidrogênios do número de oxigênios (O - H). Aplicando a regra, como classificamos o Ácido Sulfúrico (H2SO4)?", options: ["Fraco (resultado 0).", "Moderado (resultado 1).", "Forte (resultado 2).", "Superforte (resultado 4)."], correctIndex: 2, explanation: { correctText: "H2SO4 -> 4 Oxigênios - 2 Hidrogênios = 2. Resultados 2 ou 3 indicam Oxiácidos FORTES.", otherOptions: [] } },
+        { level: "Médio", text: "Aplicando a mesma regra (O - H) para o Ácido Carbônico (H2CO3): 3 - 2 = 1. A matemática diria que ele é moderado. Porém, ele é uma famosa EXCEÇÃO cobrada em provas. Qual a verdadeira classificação do H2CO3?", options: ["Ácido Forte.", "Ácido Fraco, pois é altamente instável e decompõe-se em H2O e CO2.", "Ácido Superforte.", "Ele não é um ácido."], correctIndex: 1, explanation: { correctText: "O Ácido Carbônico (dos refrigerantes) é uma exceção à regra. É um ácido FRACO e decompõe-se logo em água e gás carbônico.", otherOptions: [] } },
+        { level: "Fácil", text: "Como se escreve o nome de um ácido cuja molécula formadora contém o ânion Sulfato (SO4²⁻)? (Lembre do macete: 'te mato te pico').", options: ["Ácido Sulfídrico.", "Ácido Sulfuroso.", "Ácido Sulfúrico.", "Ácido Sulfato."], correctIndex: 2, explanation: { correctText: "Macete: Bico de Pato (Ato -> Ico). O ânion Sulfato gera o Ácido Sulfúrico.", otherOptions: [] } },
+        { level: "Difícil", text: "A nomenclatura dos oxiácidos do Cloro muda com o Nox. Sabendo que o HClO3 é o ácido Clórico. O que será o HClO4 (que tem um oxigênio a mais)?", options: ["Ácido Cloroso.", "Ácido Perclórico.", "Ácido Hipocloroso.", "Ácido Clorídrico."], correctIndex: 1, explanation: { correctText: "Quando tem o maior número de oxigênios possível, ganha o prefixo 'Per' e o sufixo 'ico'. Logo, HClO4 = Ácido Perclórico.", otherOptions: [] } },
+        { level: "Fácil", text: "Classifique o ácido H3PO4 quanto ao número de hidrogênios ionizáveis presentes na fórmula estrutural normal:", options: ["Monoácido.", "Diácido.", "Triácido.", "Tetrácido."], correctIndex: 2, explanation: { correctText: "Possui 3 hidrogênios que podem ser liberados na água como H+, sendo classificado como Triácido.", otherOptions: [] } },
+        { level: "Difícil", text: "Rasteira do ENEM! O Ácido Fosforoso tem a fórmula H3PO3. Analisando a sua estrutura (apenas os hidrogênios ligados ao oxigênio se ionizam), quantos hidrogênios ele efetivamente libera, e como ele é classificado?", options: ["Três, Triácido.", "Dois, Diácido (um hidrogênio está ligado direto ao fósforo e não ioniza).", "Um, Monoácido.", "Nenhum, não é ácido."], correctIndex: 1, explanation: { correctText: "Exceção clássica! Embora tenha H3 na fórmula, apenas 2 hidrogênios estão ligados a oxigênios (podem sair). O terceiro H está grudado no Fósforo e não ioniza. É um Diácido.", otherOptions: [] } },
+        { level: "Fácil", text: "A base mais importante da indústria química é o NaOH, conhecido popularmente como Soda Cáustica. Qual o nome oficial desta substância?", options: ["Hidróxido de Sódio.", "Óxido de Sódio.", "Ácido Sódico.", "Sódio Hidroxilado."], correctIndex: 0, explanation: { correctText: "O nome das bases segue a regra: 'Hidróxido de' + 'Nome do metal'. NaOH = Hidróxido de Sódio.", otherOptions: [] } },
+        { level: "Médio", text: "O ferro forma duas bases distintas dependendo de sua valência (Nox): Fe(OH)2 e Fe(OH)3. Qual é o nome correto do Fe(OH)3?", options: ["Hidróxido de Ferro (II).", "Hidróxido de Ferro (III) ou Férrico.", "Hidróxido Ferroso.", "Hidróxido de Ferro tri-hidratado."], correctIndex: 1, explanation: { correctText: "O número 3 indica a carga do ferro (+3). Usa-se a nomenclatura romana 'Ferro (III)' ou o sufixo 'ico' para a maior carga (Férrico).", otherOptions: [] } },
+        { level: "Fácil", text: "Na classificação das Bases quanto à solubilidade em água, quais são as bases mais solúveis e que se dissolvem quase completamente?", options: ["As bases de Metais de Transição (ex: Ferro).", "As bases de Metais Alcalinos (Grupo 1) e o NH4OH.", "As bases de Metais Alcalinoterrosos.", "Nenhuma base é solúvel."], correctIndex: 1, explanation: { correctText: "As bases do Grupo 1 (LiOH, NaOH, KOH) e o Hidróxido de Amônio são as únicas 100% solúveis. As do Grupo 2 são pouco solúveis, o resto é insolúvel.", otherOptions: [] } },
+        { level: "Médio", text: "Quanto à FORÇA, as bases formadas por Metais Alcalinos e Alcalinoterrosos são consideradas FORTES. No entanto, existem duas exceções importantes no Grupo 2 que são bases FRACAS. Quais são?", options: ["Cálcio e Bário.", "Estrôncio e Rádio.", "Magnésio (Mg) e Berílio (Be).", "Sódio e Potássio."], correctIndex: 2, explanation: { correctText: "Apesar de estarem no Grupo 2, o Hidróxido de Magnésio (Mg(OH)2) e o Hidróxido de Berílio são bases fracas (não liberam muito OH-).", otherOptions: [] } },
+        { level: "Médio", text: "O 'Leite de Magnésia' é muito utilizado como antiácido estomacal. Ele é uma suspensão aquosa de qual base química?", options: ["NaOH (Hidróxido de Sódio).", "Ca(OH)2 (Hidróxido de Cálcio).", "Mg(OH)2 (Hidróxido de Magnésio).", "Al(OH)3 (Hidróxido de Alumínio)."], correctIndex: 2, explanation: { correctText: "O Leite de Magnésia é uma base fraca (Mg(OH)2) perfeita para neutralizar o excesso de HCl no estômago sem queimar os tecidos.", otherOptions: [] } },
+        { level: "Fácil", text: "A Fenolftaleína é um famoso indicador ácido-base. Qual é a cor que esta substância adquire quando pingada numa solução BÁSICA (alcalina)?", options: ["Incolor.", "Vermelho.", "Rosa carmim / Fúcsia.", "Amarelo."], correctIndex: 2, explanation: { correctText: "A fenolftaleína é incolor em meio ácido, mas quando encontra uma base (OH-), ela muda bruscamente para um rosa muito intenso (fúcsia).", otherOptions: [] } },
+        { level: "Médio", text: "Ao observar a fórmula molecular NH4OH, sabemos que se trata do Hidróxido de Amônio. Esta base tem duas características peculiares que a diferenciam da soda cáustica. Quais são?", options: ["É uma base forte e insolúvel.", "É uma base formada por um não-metal, é FRACA e VOLÁTIL (evapora na forma de gás amônia).", "É uma base sólida e resistente ao fogo.", "É um ácido disfarçado de base."], correctIndex: 1, explanation: { correctText: "O NH4OH só existe em solução. É uma base fraca, solúvel e muito volátil (vira gás NH3 facilmente, o cheiro de produtos de limpeza).", otherOptions: [] } },
+        { level: "Médio", text: "A chuva ácida natural é levemente ácida (pH ~ 5,6) devido à reação do gás carbônico (CO2) com a água. Que ácido FRACO é formado nessa mistura natural?", options: ["Ácido Sulfúrico (H2SO4).", "Ácido Nítrico (HNO3).", "Ácido Carbônico (H2CO3).", "Ácido Clorídrico (HCl)."], correctIndex: 2, explanation: { correctText: "CO2 + H2O -> H2CO3. O ácido carbônico é fraco e inofensivo em pequenas quantidades (presente nos refrigerantes e na chuva limpa).", otherOptions: [] } },
+        { level: "Difícil", text: "Por outro lado, a chuva ácida POLUÍDA (pH muito baixo) causa a destruição de estátuas de mármore e morte de florestas. Quais são os ácidos FORTES formados pela queima de combustíveis fósseis (enxofre e nitrogênio) no ar?", options: ["Ácido Cítrico e Ácido Acético.", "Ácido Sulfúrico (H2SO4) e Ácido Nítrico (HNO3).", "Ácido Fluorídrico (HF) e Ácido Carbônico (H2CO3).", "Ácido Cianídrico (HCN)."], correctIndex: 1, explanation: { correctText: "As indústrias soltam SO2 e NO2, que reagem com a chuva formando Ácido Sulfúrico e Ácido Nítrico, ácidos extremamente corrosivos que descem como chuva.", otherOptions: [] } },
+        { level: "Médio", text: "Qual das equações abaixo representa corretamente uma reação de NEUTRALIZAÇÃO TOTAL entre um ácido forte e uma base forte de Arrhenius?", options: ["HCl + NaOH -> NaCl + H2O", "H2SO4 + Ca -> CaSO4 + H2", "CO2 + H2O -> H2CO3", "NaCl + H2O -> NaOH + HCl"], correctIndex: 0, explanation: { correctText: "Ácido (HCl) + Base (NaOH) -> Sal (NaCl) + Água (H2O). É o exemplo clássico de neutralização total.", otherOptions: [] } },
+        { level: "Difícil", text: "Se misturarmos H2SO4 (um diácido, libera 2 H+) com apenas 1 molécula de NaOH (que libera 1 OH-), nem todos os íons H+ serão neutralizados. O que ocorrerá como resultado prático?", options: ["Formação de um gás nobre.", "Ocorrerá uma Neutralização PARCIAL, formando um Sal Ácido (Hidrogenossal, ex: NaHSO4).", "O ácido destruirá a base sem formar sal.", "Ocorrerá a formação de uma nova base."], correctIndex: 1, explanation: { correctText: "Como há mais 'ácido' que 'base' na panela, sobra um H+ na molécula do sal resultante, caracterizando um sal ácido (NaHSO4).", otherOptions: [] } },
+        { level: "Fácil", text: "Qual é o nome comercial e aplicação clássica do ácido H2SO4 (Ácido Sulfúrico) na indústria?", options: ["Vinagre de cozinha.", "Ácido de bateria de carros, fortemente desidratante e corrosivo.", "Gás de refrigerante.", "Componente do limão."], correctIndex: 1, explanation: { correctText: "O ácido sulfúrico é o termômetro industrial do mundo. É altamente corrosivo, ferve a água e é o principal eletrólito das baterias de chumbo.", otherOptions: [] } },
+        { level: "Fácil", text: "O Ácido Acético (CH3COOH) é um ácido orgânico e, como quase todos os orgânicos, é considerado FRACO pela química. Onde o consumimos diariamente?", options: ["Nas baterias.", "No sal de cozinha.", "No vinagre usado em saladas.", "Nos sabonetes de banho."], correctIndex: 2, explanation: { correctText: "O vinagre é uma solução aquosa contendo cerca de 5% de ácido acético. Sendo fraco, dá o sabor azedo característico sem causar danos.", otherOptions: [] } },
+        { level: "Médio", text: "O HCN (Ácido Cianídrico) é tristemente famoso na história, sendo utilizado nas câmaras de gás. Do ponto de vista químico, como ele é classificado quanto à força e presença de oxigênio?", options: ["Oxiácido forte.", "Hidrácido forte.", "Hidrácido fraco e altamente tóxico.", "Oxiácido fraco."], correctIndex: 2, explanation: { correctText: "Apesar de letal pela sua toxicidade biológica (bloqueia o oxigênio nas células), na teoria de Arrhenius o HCN é apenas um hidrácido FRACO (ioniza muito pouco em água).", otherOptions: [] } },
+        { level: "Difícil", text: "Ao reagir Hidróxido de Alumínio, Al(OH)3, com Ácido Clorídrico (HCl) para obter uma neutralização total, qual será a proporção (balanceamento) de ácido necessária para neutralizar 1 molécula da base?", options: ["1 molécula de HCl.", "2 moléculas de HCl.", "3 moléculas de HCl.", "4 moléculas de HCl."], correctIndex: 2, explanation: { correctText: "O Al(OH)3 libera 3 íons OH-. O HCl libera apenas 1 íon H+. Portanto, precisaremos de 3 moléculas de HCl (3 H+) para neutralizar os 3 OH- da base, gerando 3 H2O.", otherOptions: [] } },
+        { level: "Médio", text: "Bases fortes (como a Soda Cáustica, NaOH) são frequentemente usadas em desentupidores de pia e produtos de limpeza pesada. Qual é o motivo químico para a sua eficácia em desentupir encanamentos cheios de restos orgânicos?", options: ["Elas evaporam a água do cano.", "Congelam os resíduos formando blocos de gelo.", "Elas reagem violentamente com as gorduras e proteínas, quebrando as suas moléculas (saponificação e hidrólise).", "Elas criam gás hidrogênio que empurra a sujeira."], correctIndex: 2, explanation: { correctText: "Bases fortes são excelentes para atacar matéria orgânica (cabelos, gordura da cozinha). O NaOH transforma a gordura num tipo de sabão, dissolvendo o bloqueio no cano.", otherOptions: [] } }
+    ];
+
+    const STORAGE_KEY = 'promover_quimica_acidosbases_progress';
+    let quizState = { currentIndex: 0, userAnswers: new Array(questionsDatabase.length).fill(null), confettiAnimationId: null };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) { lastAnswered = i; break; }
+                    }
+                    quizState.currentIndex = lastAnswered < questionsDatabase.length - 1 ? lastAnswered + 1 : questionsDatabase.length - 1;
+                    if (parsed.filter(a => a !== null).length > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if (btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) { console.error("Erro progresso:", e); }
+    }
+
+    function saveProgress() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers)); } catch (e) { console.error("Erro salvar:", e); }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', e => {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let found = 0;
+            contentGroups.forEach(g => {
+                const match = g.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+                g.style.display = match ? 'flex' : 'none';
+                if (match) found++;
+            });
+            noResultsMsg.style.display = found === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(view) {
+        ['viewExplanation', 'viewPractice', 'viewResult'].forEach(v => document.getElementById(v)?.classList.remove('active'));
+        const footer = document.getElementById('quizFooter');
+        if (footer) footer.style.display = view === 'practice' ? 'flex' : 'none';
+        document.getElementById('btnExp')?.classList.toggle('active', view === 'explanation');
+        document.getElementById('btnPrac')?.classList.toggle('active', view === 'practice');
+        
+        const viewId = view === 'explanation' ? 'viewExplanation' : view === 'practice' ? 'viewPractice' : 'viewResult';
+        document.getElementById(viewId)?.classList.add('active');
+        
+        if (view === 'practice') { renderCurrentQuestion(); renderNavigationMap(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        return level === 'Fácil' ? 'dif-facil' : level === 'Médio' ? 'dif-medio' : 'dif-dificil';
+    }
+
+    function buildOptionsHTML(q, sel) {
+        const letters = ['A', 'B', 'C', 'D'];
+        return q.options.map((opt, i) => {
+            let cls = '';
+            if (sel !== null) {
+                cls = i === q.correctIndex ? 'correct' : i === sel ? 'wrong' : 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleOptionSelection(${i})" ${sel !== null ? 'disabled' : ''}>
+                <div class="opt-circle">${letters[i]}</div><div>${opt}</div></button>`;
+        }).join('');
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+        const q = questionsDatabase[quizState.currentIndex];
+        const sel = quizState.userAnswers[quizState.currentIndex];
+        const badge = getDifficultyBadgeClass(q.level);
+        let fb = '';
+        if (sel !== null) {
+            const isC = sel === q.correctIndex;
+            fb = `<div class="feedback-box show"><div class="feedback-title ${isC ? 'success' : 'error'}" style="color: ${isC ? 'var(--correct-border)' : 'var(--wrong-border)'}">${isC ? '✅ Certo!' : '❌ Errado!'}</div>
+            <div class="feedback-item correct-opt"><strong>Correta:</strong> ${q.options[q.correctIndex]}</div>
+            <div style="margin-top:15px; font-weight:600;">${q.explanation.correctText}</div></div>`;
+        }
+        container.innerHTML = `<div class="quiz-question-card"><div class="quiz-question-counter"><span class="difficulty-badge ${badge}" style="margin:0;">${q.level}</span><span>QUESTÃO ${quizState.currentIndex + 1}/${questionsDatabase.length}</span></div>
+        <h2 class="quiz-question-text">${q.text}</h2><div class="options-list">${buildOptionsHTML(q, sel)}</div>${fb}</div>`;
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(idx) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        quizState.userAnswers[quizState.currentIndex] = idx;
+        saveProgress();
+        if (idx === questionsDatabase[quizState.currentIndex].correctIndex) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const c = document.getElementById('quizContainer');
+        if (c) { c.classList.remove('shake-effect'); void c.offsetWidth; c.classList.add('shake-effect'); setTimeout(() => c.classList.remove('shake-effect'), 500); }
+    }
+
+    function startSuccessAnimation() {
+        stopSuccessAnimation();
+        const end = Date.now() + 1500;
+        function frame() {
+            if(window.confetti) {
+                confetti({ particleCount: 5, spread: 55, colors: ['#BE123C', '#0369A1', '#8B5CF6'], angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ particleCount: 5, spread: 55, colors: ['#BE123C', '#0369A1', '#8B5CF6'], angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(frame);
+        }
+        frame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && confetti.reset) confetti.reset();
+        if (quizState.confettiAnimationId) { cancelAnimationFrame(quizState.confettiAnimationId); quizState.confettiAnimationId = null; }
+    }
+
+    function renderNavigationMap() {
+        const map = document.getElementById('qMap');
+        if (!map) return;
+        map.innerHTML = questionsDatabase.map((q, i) => {
+            let cls = 'map-dot' + (i === quizState.currentIndex ? ' active' : '');
+            if (quizState.userAnswers[i] !== null) cls += quizState.userAnswers[i] === q.correctIndex ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cls}" onclick="goToQuestion(${i})">${i + 1}</div>`;
+        }).join('');
+        setTimeout(() => { const dot = map.querySelector('.map-dot.active'); if (dot) dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 50);
+    }
+
+    function goToQuestion(idx) { stopSuccessAnimation(); quizState.currentIndex = idx; renderCurrentQuestion(); renderNavigationMap(); }
+    function navigateQuestion(dir) { const next = quizState.currentIndex + dir; if (next >= 0 && next < questionsDatabase.length) goToQuestion(next); }
+
+    function updateNavigationButtons() {
+        const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
+        if (prev) prev.disabled = quizState.currentIndex === 0;
+        if (next) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) {
+                next.textContent = "Finalizar Avaliação";
+                next.onclick = finishQuiz;
+            } else {
+                next.textContent = "Próxima ➡️";
+                next.onclick = () => navigateQuestion(1);
+            }
+        }
+    }
+
+    function finishQuiz() {
+        const unans = quizState.userAnswers.filter(a => a === null).length;
+        if (unans > 0 && !confirm(`Existem ${unans} questões sem resposta. Deseja terminar mesmo assim?`)) return;
+        stopSuccessAnimation();
+        const correct = quizState.userAnswers.filter((a, i) => a === questionsDatabase[i].correctIndex).length;
+        const total = questionsDatabase.length;
+        const pct = Math.round((correct / total) * 100);
+        document.getElementById('finalPercent').textContent = `${pct}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${total}`;
+        document.getElementById('finalStars').textContent = pct === 100 ? "⭐⭐⭐⭐⭐" : pct >= 80 ? "⭐⭐⭐⭐" : pct >= 60 ? "⭐⭐⭐" : pct >= 40 ? "⭐⭐" : pct > 0 ? "⭐" : "🌑";
+        
+        const review = document.getElementById('review-container');
+        review.innerHTML = pct >= 80 
+            ? `<div class="result-summary-box success"><strong>🎉 NEUTRALIZAÇÃO PERFEITA!</strong> Ótimo trabalho.</div>`
+            : `<div class="result-summary-box error"><strong>⚠️ SOLUÇÃO ÁCIDA!</strong> Precisas rever o conteúdo.</div>`;
+        
+        if (correct < total) {
+            review.innerHTML += '<h4 style="margin-bottom:15px;">Erros:</h4>';
+            questionsDatabase.forEach((q, i) => {
+                if (quizState.userAnswers[i] !== q.correctIndex) {
+                    review.innerHTML += `<div class="error-log-item"><strong>Q${i+1}: ${q.text}</strong><br>
+                    <span style="color:var(--wrong-border);">Sua resposta: ${quizState.userAnswers[i] === null ? 'Em branco' : q.options[quizState.userAnswers[i]]}</span><br>
+                    <span style="color:var(--correct-border);">Correta: ${q.options[q.correctIndex]}</span></div>`;
+                }
+            });
+        }
+        document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 REFAZER AVALIAÇÃO</button>`;
+        changeApplicationView('result');
+    }
+    
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

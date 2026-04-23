@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Tipos de Reações - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F5F3FF; 
+            --text-color: #2E1065; 
+            --border-color: #4C1D95; 
+            --white: #FFFFFF;
+            
+            --theme-light: #EDE9FE; 
+            --theme-medium: #8B5CF6; 
+            --theme-dark: #6D28D9; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #10B981; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #92400E; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #3B82F6; color: #1E3A8A; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #FFE4E6; border-color: #E11D48; color: #9F1239; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🔄</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Tipos de Reações Químicas</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Síntese, Análise, Troca)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">➕ 1. Reação de Síntese ou Adição</div>
+                <article class="theory-box search-target">
+                    <h3>Juntando as Peças</h3>
+                    <p>Ocorre quando duas ou mais substâncias se unem para formar <strong>apenas uma</strong> substância nova e mais complexa.</p>
+                    <span class="inline-example">A + B ➔ AB</span>
+                    
+                    <div class="visual-area">
+                        <svg width="200" height="60" viewBox="0 0 200 60">
+                            <circle cx="30" cy="30" r="20" fill="#3B82F6"/>
+                            <text x="65" y="38" font-size="24" font-weight="bold" fill="#0F172A">+</text>
+                            <circle cx="100" cy="30" r="20" fill="#F59E0B"/>
+                            <path d="M 130 30 L 150 30" fill="none" stroke="#0F172A" stroke-width="3" marker-end="url(#arrow)"/>
+                            <rect x="165" y="10" width="30" height="40" rx="10" fill="#10B981"/>
+                        </svg>
+                    </div>
+                    <p><strong>Exemplo:</strong> C + O₂ ➔ CO₂</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">✂️ 2. Reação de Análise ou Decomposição</div>
+                <article class="theory-box search-target">
+                    <h3>Separando as Partes</h3>
+                    <p>É o exato oposto da Síntese. Uma única substância divide-se em duas ou mais substâncias mais simples.</p>
+                    <span class="inline-example">AB ➔ A + B</span>
+                    
+                    <div class="visual-area">
+                        <svg width="200" height="60" viewBox="0 0 200 60">
+                            <rect x="10" y="10" width="30" height="40" rx="10" fill="#10B981"/>
+                            <path d="M 50 30 L 70 30" fill="none" stroke="#0F172A" stroke-width="3" marker-end="url(#arrow)"/>
+                            <circle cx="100" cy="30" r="20" fill="#3B82F6"/>
+                            <text x="135" y="38" font-size="24" font-weight="bold" fill="#0F172A">+</text>
+                            <circle cx="170" cy="30" r="20" fill="#F59E0B"/>
+                        </svg>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>Nomes Especiais:</strong><br>
+                        🔥 <strong>Pirólise:</strong> Decomposição pelo calor (símbolo Δ).<br>
+                        ⚡ <strong>Eletrólise:</strong> Decomposição pela eletricidade.<br>
+                        ☀️ <strong>Fotólise:</strong> Decomposição pela luz (símbolo λ).
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔄 3. Reação de Simples Troca</div>
+                <article class="theory-box search-target">
+                    <h3>O Deslocamento</h3>
+                    <p>Ocorre quando uma substância simples reage com uma composta, "expulsando" um dos elementos e assumindo o seu lugar.</p>
+                    <span class="inline-example">A + BC ➔ AC + B</span>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="60" viewBox="0 0 250 60">
+                            <circle cx="30" cy="30" r="15" fill="#EF4444"/>
+                            <text x="55" y="38" font-size="24" font-weight="bold" fill="#0F172A">+</text>
+                            <rect x="80" y="15" width="40" height="30" rx="10" fill="#3B82F6"/>
+                            <path d="M 130 30 L 150 30" fill="none" stroke="#0F172A" stroke-width="3" marker-end="url(#arrow)"/>
+                            <rect x="170" y="15" width="40" height="30" rx="10" fill="#8B5CF6"/>
+                            <text x="220" y="38" font-size="24" font-weight="bold" fill="#0F172A">+</text>
+                            <circle cx="245" cy="30" r="15" fill="#3B82F6"/>
+                            <defs>
+                                <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0F172A"/></marker>
+                            </defs>
+                        </svg>
+                    </div>
+                    <p><strong>Exemplo:</strong> Zn + 2HCl ➔ ZnCl₂ + H₂<br>
+                    <em>Nota: Só acontece se o elemento "A" for mais reativo que o elemento "B".</em></p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔀 4. Reação de Dupla Troca</div>
+                <article class="theory-box search-target">
+                    <h3>A Troca de Casais</h3>
+                    <p>Duas substâncias compostas trocam os seus íons entre si, formando duas novas substâncias compostas.</p>
+                    <span class="inline-example">AB + CD ➔ AD + CB</span>
+                    
+                    <p><strong>Exemplo:</strong> NaCl + AgNO₃ ➔ AgCl + NaNO₃<br>
+                    (A clássica reação de neutralização Ácido + Base ➔ Sal + Água também é uma dupla troca!)</p>
+                    
+                    <div class="highlight-box blue">
+                        <strong>Condições para ocorrer:</strong> Uma dupla troca só acontece se formar pelo menos um produto que seja:<br>
+                        1. Um precipitado (sólido insolúvel que vai para o fundo).<br>
+                        2. Um gás (substância volátil).<br>
+                        3. Uma substância mais fraca (menos ionizada), como a água.
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre os 4 tipos clássicos de reações inorgânicas. Acerte <strong>80% (24/30)</strong> para dominar!
+                </p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    const questionsDatabase = [
+        { level: "Fácil", text: "Uma reação onde duas ou mais substâncias se unem para formar um único produto é classificada como:", options: ["Decomposição.", "Síntese ou Adição.", "Dupla Troca.", "Deslocamento."], correctIndex: 1, explanation: { correctText: "Síntese ou Adição segue a fórmula geral A + B -> AB, formando um único produto mais complexo.", otherOptions: [] } },
+        { level: "Fácil", text: "A equação química N2 + 3 H2 -> 2 NH3 é um exemplo clássico de reação de:", options: ["Análise.", "Síntese.", "Simples Troca.", "Dupla Troca."], correctIndex: 1, explanation: { correctText: "Dois reagentes (N2 e H2) unem-se para formar apenas um produto (NH3). É uma Síntese.", otherOptions: [] } },
+        { level: "Fácil", text: "Na reação CaCO3 -> CaO + CO2, observamos uma única substância reagente originando dois produtos. Como se chama este tipo de reação?", options: ["Síntese.", "Dupla Troca.", "Análise ou Decomposição.", "Simples Troca."], correctIndex: 2, explanation: { correctText: "A Decomposição (ou Análise) é o oposto da síntese: AB -> A + B.", otherOptions: [] } },
+        { level: "Médio", text: "A decomposição de uma substância provocada exclusivamente pelo CALOR recebe um nome técnico específico. Qual é?", options: ["Eletrólise.", "Fotólise.", "Hidrólise.", "Pirólise."], correctIndex: 3, explanation: { correctText: "O prefixo 'Piro' significa fogo/calor. Pirólise é a quebra pelo calor (representada pelo símbolo do triângulo Δ na seta da reação).", otherOptions: [] } },
+        { level: "Médio", text: "A quebra da molécula de água em gás hidrogênio e oxigênio (2 H2O -> 2 H2 + O2) utilizando uma corrente elétrica contínua é chamada de:", options: ["Eletrólise.", "Pirólise.", "Catálise.", "Fotólise."], correctIndex: 0, explanation: { correctText: "O prefixo 'Eletro' refere-se à eletricidade. A quebra pela eletricidade é a Eletrólise.", otherOptions: [] } },
+        { level: "Médio", text: "A água oxigenada (H2O2) decompõe-se naturalmente em água e oxigênio quando exposta à luz. Por isso é guardada em frascos opacos. Como se chama a decomposição pela luz?", options: ["Radiólise.", "Fotólise.", "Pirólise.", "Eletrólise."], correctIndex: 1, explanation: { correctText: "O prefixo 'Foto' significa luz. A quebra induzida por fótons de luz é a Fotólise.", otherOptions: [] } },
+        { level: "Fácil", text: "A reação A + BC -> AC + B é a fórmula geral de qual tipo de reação química?", options: ["Síntese.", "Análise.", "Simples Troca ou Deslocamento.", "Dupla Troca."], correctIndex: 2, explanation: { correctText: "Uma substância simples (A) reage com uma composta (BC), deslocando B e assumindo o seu lugar. É uma Simples Troca.", otherOptions: [] } },
+        { level: "Médio", text: "Para que uma reação de Simples Troca ocorra espontaneamente (ex: Zn + CuSO4 -> ZnSO4 + Cu), é necessário que:", options: ["O metal Zn seja mais REATIVO que o metal Cu.", "O metal Zn seja menos reativo que o Cu.", "As duas substâncias sejam gasosas.", "A reação ocorra no escuro."], correctIndex: 0, explanation: { correctText: "Numa simples troca, o elemento 'solteiro' tem de ter força (reatividade) suficiente para expulsar e roubar o lugar do elemento que já está ligado no composto.", otherOptions: [] } },
+        { level: "Fácil", text: "A reação AB + CD -> AD + CB ilustra o mecanismo onde dois compostos trocam os seus íons entre si. Esta reação é a:", options: ["Síntese.", "Simples Troca.", "Dupla Troca.", "Decomposição."], correctIndex: 3, explanation: { correctText: "Duas substâncias compostas trocam parceiros, formando duas novas substâncias compostas. É a Dupla Troca.", otherOptions: [] } },
+        { level: "Fácil", text: "A clássica Reação de Neutralização (Ácido + Base -> Sal + Água) pertence a qual das quatro categorias principais de reações?", options: ["Síntese.", "Análise.", "Simples Troca.", "Dupla Troca."], correctIndex: 3, explanation: { correctText: "Na neutralização, o H+ do ácido junta-se ao OH- da base, e os íons restantes formam o sal. Há uma troca dupla de parceiros.", otherOptions: [] } },
+        { level: "Médio", text: "Uma reação de Dupla Troca só ocorre na prática se um dos produtos formados for favorável. Qual das opções abaixo NÃO é uma condição para a ocorrência da dupla troca?", options: ["Formação de um precipitado (sólido insolúvel).", "Formação de uma substância mais volátil (gás).", "Formação de uma substância mais fraca (menos ionizada), como a água.", "Formação de um produto metálico puro."], correctIndex: 3, explanation: { correctText: "A formação de um metal puro indica que houve transferência de elétrons (oxirredução), característica de Simples Troca, e não de Dupla Troca iônica.", otherOptions: [] } },
+        { level: "Médio", text: "Identifique o tipo da seguinte reação: 2 Na + 2 H2O -> 2 NaOH + H2.", options: ["Síntese.", "Simples Troca.", "Dupla Troca.", "Análise."], correctIndex: 1, explanation: { correctText: "O metal Sódio (simples) desloca o Hidrogênio da água (composta), formando um novo composto (NaOH) e libertando gás H2 (simples).", otherOptions: [] } },
+        { level: "Médio", text: "Identifique o tipo da seguinte reação: AgNO3 + NaCl -> AgCl + NaNO3.", options: ["Simples Troca.", "Dupla Troca.", "Síntese.", "Decomposição."], correctIndex: 1, explanation: { correctText: "Ambos os reagentes são compostos e trocam cátions e ânions entre si. O Ag liga-se ao Cl, e o Na liga-se ao NO3.", otherOptions: [] } },
+        { level: "Médio", text: "A queima do magnésio produzindo uma luz branca intensa é representada por: 2 Mg + O2 -> 2 MgO. Esta reação é uma:", options: ["Síntese.", "Decomposição.", "Simples Troca.", "Dupla Troca."], correctIndex: 0, explanation: { correctText: "Dois reagentes (Mg e O2) unem-se para formar um único produto (MgO).", otherOptions: [] } },
+        { level: "Difícil", text: "A produção de aço envolve a reação: Fe2O3 + 3 C -> 2 Fe + 3 CO. Observando as substâncias, esta reação é classificada como:", options: ["Dupla Troca.", "Síntese.", "Simples Troca (Deslocamento).", "Análise."], correctIndex: 2, explanation: { correctText: "O Carbono (simples) reage com o óxido (composto), roubando o oxigênio e deslocando o Ferro, que sai como substância simples.", otherOptions: [] } },
+        { level: "Médio", text: "Os airbags dos automóveis inflam-se rapidamente devido à decomposição explosiva da azida de sódio: 2 NaN3 -> 2 Na + 3 N2. Classifique a reação.", options: ["Adição.", "Análise (Decomposição).", "Deslocamento.", "Dupla Troca."], correctIndex: 1, explanation: { correctText: "Uma única substância (NaN3) quebra-se originando duas substâncias simples (Na e N2).", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das reações abaixo representa uma SÍNTESE?", options: ["2 H2O -> 2 H2 + O2", "C + O2 -> CO2", "Zn + 2 HCl -> ZnCl2 + H2", "NaOH + HCl -> NaCl + H2O"], correctIndex: 1, explanation: { correctText: "Apenas C + O2 -> CO2 forma um único produto a partir de múltiplos reagentes.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das reações abaixo representa uma DECOMPOSIÇÃO?", options: ["2 KClO3 -> 2 KCl + 3 O2", "H2 + Cl2 -> 2 HCl", "NaCl + AgNO3 -> AgCl + NaNO3", "Fe + CuSO4 -> FeSO4 + Cu"], correctIndex: 0, explanation: { correctText: "O Clorato de potássio é um único reagente que se parte em dois produtos (KCl e O2).", otherOptions: [] } },
+        { level: "Médio", text: "Quando colocamos um prego de ferro (Fe) numa solução azul de sulfato de cobre (CuSO4), o prego fica avermelhado porque o cobre metálico se deposita nele. A equação é Fe + CuSO4 -> FeSO4 + Cu. Por que a reação ocorreu?", options: ["Porque é uma dupla troca com precipitado.", "Porque o Ferro é MAIS reativo que o Cobre, conseguindo deslocá-lo do sulfato.", "Porque o Cobre é mais reativo que o Ferro.", "Porque houve pirólise."], correctIndex: 1, explanation: { correctText: "Na fila de reatividade dos metais, o Ferro é mais 'forte' (reativo) que o Cobre, conseguindo assumir o seu lugar no composto.", otherOptions: [] } },
+        { level: "Difícil", text: "Se mergulharmos uma placa de Prata (Ag) num frasco contendo Ácido Clorídrico (HCl), a reação Ag + HCl NÃO acontece. Qual a justificativa química?", options: ["A Prata é um metal nobre e MENOS reativo que o Hidrogênio, logo não tem 'força' para deslocá-lo do ácido.", "A Prata forma uma dupla troca com a água.", "O Hidrogênio evapora antes da prata tocar.", "A Prata é mais reativa que o Cloro."], correctIndex: 0, explanation: { correctText: "Na fila de reatividade, os metais nobres (Cu, Ag, Au) são menos reativos que o Hidrogênio. Eles não conseguem realizar a simples troca em ácidos comuns.", otherOptions: [] } },
+        { level: "Médio", text: "A formação de estalactites nas cavernas envolve a reação: Ca(HCO3)2 -> CaCO3 + H2O + CO2. Esta equação representa uma:", options: ["Síntese total.", "Simples Troca.", "Decomposição (Análise).", "Dupla Troca."], correctIndex: 2, explanation: { correctText: "Um único reagente (Bicarbonato de cálcio) decompõe-se originando três produtos diferentes.", otherOptions: [] } },
+        { level: "Difícil", text: "Muitos extintores de incêndio usam a reação entre o bicarbonato de sódio e o ácido sulfúrico: 2 NaHCO3 + H2SO4 -> Na2SO4 + 2 H2CO3. O ácido carbônico formado (H2CO3) decompõe-se em H2O e CO2. A PRIMEIRA parte desta equação é uma reação de:", options: ["Síntese.", "Dupla Troca.", "Simples Troca.", "Pirólise."], correctIndex: 1, explanation: { correctText: "Temos dois compostos reagindo e trocando parceiros. O Na junta-se ao SO4, e o H junta-se ao HCO3. É uma Dupla Troca clássica.", otherOptions: [] } },
+        { level: "Fácil", text: "Na digestão de alimentos, grandes moléculas de amido são quebradas em moléculas menores de glicose pelo nosso corpo. Quimicamente, este tipo de reação macroscópica assemelha-se a uma:", options: ["Adição.", "Síntese.", "Simples Troca.", "Análise (Decomposição)."], correctIndex: 3, explanation: { correctText: "Quebrar algo grande e complexo em várias partes menores é a definição exata de Análise ou Decomposição.", otherOptions: [] } },
+        { level: "Fácil", text: "O gás carbônico reage com a água das nuvens formando ácido carbônico (CO2 + H2O -> H2CO3). Esta é uma reação de:", options: ["Decomposição.", "Síntese.", "Simples Troca.", "Dupla Troca."], correctIndex: 1, explanation: { correctText: "Duas moléculas menores (CO2 e H2O) unem-se formando apenas um produto (H2CO3). É Síntese.", otherOptions: [] } },
+        { level: "Médio", text: "A precipitação ocorre em reações de dupla troca quando:", options: ["Os produtos formam um gás invisível.", "O produto formado é um sal ou base insolúvel na água, que decanta (cai) para o fundo do recipiente como um sólido.", "Os reagentes evaporam instantaneamente.", "Ocorre a formação exclusiva de água."], correctIndex: 1, explanation: { correctText: "Precipitado é a poeira/sólido insolúvel que se forma numa mistura líquida e assenta no fundo. É uma força motriz vital para a dupla troca ocorrer.", otherOptions: [] } },
+        { level: "Difícil", text: "A fotossíntese nas plantas (6 CO2 + 6 H2O -> C6H12O6 + 6 O2) é um processo bioquímico complexo. Se tivéssemos de olhar apenas para a formação da Glicose (C6H12O6) a partir de moléculas menores, o processo aproxima-se conceptualmente de uma:", options: ["Análise total.", "Simples troca apenas.", "Síntese endotérmica.", "Pirólise."], correctIndex: 2, explanation: { correctText: "A planta 'sintetiza' (fabrica) glicose juntando moléculas menores. Absorve energia da luz (endotérmica) para construir a molécula complexa.", otherOptions: [] } },
+        { level: "Médio", text: "A reação H2 + Cl2 -> 2 HCl. Qual afirmação é correta sobre ela?", options: ["É uma decomposição.", "É uma reação de síntese onde duas substâncias simples formam uma substância composta.", "É uma dupla troca.", "É uma simples troca iônica."], correctIndex: 1, explanation: { correctText: "Substância simples (só 1 elemento) reage com outra simples para formar uma composta (mais de 1 elemento). É uma síntese total.", otherOptions: [] } },
+        { level: "Médio", text: "Qual das representações visuais melhor descreve a Dupla Troca?", options: ["Um casal a dançar e uma pessoa solteira entra na pista e rouba o parceiro.", "Dois casais a dançar que trocam de parceiros entre si, formando dois novos pares.", "Duas pessoas solteiras que se abraçam.", "Um casal que se zanga e separa-se."], correctIndex: 1, explanation: { correctText: "Na dupla troca (AB + CD -> AD + CB), dois compostos (casais) permutam as suas partes.", otherOptions: [] } },
+        { level: "Difícil", text: "Num laboratório, o aluno mistura Cloreto de Sódio (NaCl) com Nitrato de Potássio (KNO3), ambos sais muito solúveis. Nenhuma reação ocorre no copo. Porquê?", options: ["Porque a simples troca não funciona com potássio.", "Porque faltou oxigênio no ar.", "Porque, numa dupla troca virtual, os produtos seriam KCl e NaNO3, que também são totalmente solúveis. Sem a formação de precipitado, gás ou água fraca, a dupla troca não acontece; os íons ficam apenas misturados na água.", "Porque o Sódio e o Potássio repelem-se."], correctIndex: 2, explanation: { correctText: "Para a dupla troca ser viável, a troca de parceiros tem que gerar algo que 'saia' da solução (como um gás ou pó insolúvel). Se os produtos também forem 100% solúveis, não há reação química, apenas uma sopa de íons.", otherOptions: [] } },
+        { level: "Fácil", text: "A ferrugem forma-se quando o ferro interage com o oxigênio do ar húmido (4 Fe + 3 O2 -> 2 Fe2O3). Esta é uma típica reação de:", options: ["Decomposição do ferro.", "Simples troca.", "Dupla troca iônica.", "Síntese (e também oxidação)."], correctIndex: 3, explanation: { correctText: "O Ferro une-se ao Oxigênio formando a ferrugem (um único produto). É uma reação de Adição/Síntese.", otherOptions: [] } }
+    ];
+
+    const STORAGE_KEY = 'promover_quimica_reacoes_progress';
+    let quizState = { currentIndex: 0, userAnswers: new Array(questionsDatabase.length).fill(null), confettiAnimationId: null };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) { lastAnswered = i; break; }
+                    }
+                    quizState.currentIndex = lastAnswered < questionsDatabase.length - 1 ? lastAnswered + 1 : questionsDatabase.length - 1;
+                    if (parsed.filter(a => a !== null).length > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if (btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function saveProgress() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers)); } catch (e) { console.error(e); }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', e => {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let found = 0;
+            contentGroups.forEach(g => {
+                const match = g.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+                g.style.display = match ? 'flex' : 'none';
+                if (match) found++;
+            });
+            noResultsMsg.style.display = found === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(view) {
+        ['viewExplanation', 'viewPractice', 'viewResult'].forEach(v => document.getElementById(v)?.classList.remove('active'));
+        const footer = document.getElementById('quizFooter');
+        if (footer) footer.style.display = view === 'practice' ? 'flex' : 'none';
+        document.getElementById('btnExp')?.classList.toggle('active', view === 'explanation');
+        document.getElementById('btnPrac')?.classList.toggle('active', view === 'practice');
+        
+        const viewId = view === 'explanation' ? 'viewExplanation' : view === 'practice' ? 'viewPractice' : 'viewResult';
+        document.getElementById(viewId)?.classList.add('active');
+        
+        if (view === 'practice') { renderCurrentQuestion(); renderNavigationMap(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        return level === 'Fácil' ? 'dif-facil' : level === 'Médio' ? 'dif-medio' : 'dif-dificil';
+    }
+
+    function buildOptionsHTML(q, sel) {
+        const letters = ['A', 'B', 'C', 'D'];
+        return q.options.map((opt, i) => {
+            let cls = '';
+            if (sel !== null) {
+                cls = i === q.correctIndex ? 'correct' : i === sel ? 'wrong' : 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleOptionSelection(${i})" ${sel !== null ? 'disabled' : ''}>
+                <div class="opt-circle">${letters[i]}</div><div>${opt}</div></button>`;
+        }).join('');
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+        const q = questionsDatabase[quizState.currentIndex];
+        const sel = quizState.userAnswers[quizState.currentIndex];
+        const badge = getDifficultyBadgeClass(q.level);
+        let fb = '';
+        if (sel !== null) {
+            const isC = sel === q.correctIndex;
+            fb = `<div class="feedback-box show"><div class="feedback-title ${isC ? 'success' : 'error'}" style="color: ${isC ? 'var(--correct-border)' : 'var(--wrong-border)'}">${isC ? '✅ Certo!' : '❌ Errado!'}</div>
+            <div class="feedback-item correct-opt"><strong>Correta:</strong> ${q.options[q.correctIndex]}</div>
+            <div style="margin-top:15px; font-weight:600;">${q.explanation.correctText}</div></div>`;
+        }
+        container.innerHTML = `<div class="quiz-question-card"><div class="quiz-question-counter"><span class="difficulty-badge ${badge}" style="margin:0;">${q.level}</span><span>QUESTÃO ${quizState.currentIndex + 1}/${questionsDatabase.length}</span></div>
+        <h2 class="quiz-question-text">${q.text}</h2><div class="options-list">${buildOptionsHTML(q, sel)}</div>${fb}</div>`;
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(idx) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        quizState.userAnswers[quizState.currentIndex] = idx;
+        saveProgress();
+        if (idx === questionsDatabase[quizState.currentIndex].correctIndex) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const c = document.getElementById('quizContainer');
+        if (c) { c.classList.remove('shake-effect'); void c.offsetWidth; c.classList.add('shake-effect'); setTimeout(() => c.classList.remove('shake-effect'), 500); }
+    }
+
+    function startSuccessAnimation() {
+        stopSuccessAnimation();
+        const end = Date.now() + 1500;
+        function frame() {
+            if(window.confetti) {
+                confetti({ particleCount: 5, spread: 55, colors: ['#6D28D9', '#8B5CF6', '#10B981'], angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ particleCount: 5, spread: 55, colors: ['#6D28D9', '#8B5CF6', '#10B981'], angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(frame);
+        }
+        frame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && confetti.reset) confetti.reset();
+        if (quizState.confettiAnimationId) { cancelAnimationFrame(quizState.confettiAnimationId); quizState.confettiAnimationId = null; }
+    }
+
+    function renderNavigationMap() {
+        const map = document.getElementById('qMap');
+        if (!map) return;
+        map.innerHTML = questionsDatabase.map((q, i) => {
+            let cls = 'map-dot' + (i === quizState.currentIndex ? ' active' : '');
+            if (quizState.userAnswers[i] !== null) cls += quizState.userAnswers[i] === q.correctIndex ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cls}" onclick="goToQuestion(${i})">${i + 1}</div>`;
+        }).join('');
+        setTimeout(() => { const dot = map.querySelector('.map-dot.active'); if (dot) dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }, 50);
+    }
+
+    function goToQuestion(idx) { stopSuccessAnimation(); quizState.currentIndex = idx; renderCurrentQuestion(); renderNavigationMap(); }
+    function navigateQuestion(dir) { const next = quizState.currentIndex + dir; if (next >= 0 && next < questionsDatabase.length) goToQuestion(next); }
+
+    function updateNavigationButtons() {
+        const prev = document.getElementById('btnPrev'), next = document.getElementById('btnNext');
+        if (prev) prev.disabled = quizState.currentIndex === 0;
+        if (next) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) {
+                next.textContent = "Finalizar Avaliação";
+                next.onclick = finishQuiz;
+            } else {
+                next.textContent = "Próxima ➡️";
+                next.onclick = () => navigateQuestion(1);
+            }
+        }
+    }
+
+    function finishQuiz() {
+        const unans = quizState.userAnswers.filter(a => a === null).length;
+        if (unans > 0 && !confirm(`Existem ${unans} questões sem resposta. Deseja terminar mesmo assim?`)) return;
+        stopSuccessAnimation();
+        const correct = quizState.userAnswers.filter((a, i) => a === questionsDatabase[i].correctIndex).length;
+        const total = questionsDatabase.length;
+        const pct = Math.round((correct / total) * 100);
+        document.getElementById('finalPercent').textContent = `${pct}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${total}`;
+        document.getElementById('finalStars').textContent = pct === 100 ? "⭐⭐⭐⭐⭐" : pct >= 80 ? "⭐⭐⭐⭐" : pct >= 60 ? "⭐⭐⭐" : pct >= 40 ? "⭐⭐" : pct > 0 ? "⭐" : "🌑";
+        
+        const review = document.getElementById('review-container');
+        review.innerHTML = pct >= 80 
+            ? `<div class="result-summary-box success"><strong>🎉 DOMÍNIO DAS REAÇÕES!</strong> Compreendes perfeitamente os mecanismos de quebra e união da matéria.</div>`
+            : `<div class="result-summary-box error"><strong>⚠️ REAÇÃO INCOMPLETA!</strong> Precisas rever os 4 tipos clássicos. Lembra-te das trocas de parceiros!</div>`;
+        
+        if (correct < total) {
+            review.innerHTML += '<h4 style="margin-bottom:15px;">Erros:</h4>';
+            questionsDatabase.forEach((q, i) => {
+                if (quizState.userAnswers[i] !== q.correctIndex) {
+                    review.innerHTML += `<div class="error-log-item"><strong>Q${i+1}: ${q.text}</strong><br>
+                    <span style="color:var(--wrong-border);">Sua resposta: ${quizState.userAnswers[i] === null ? 'Em branco' : q.options[quizState.userAnswers[i]]}</span><br>
+                    <span style="color:var(--correct-border);">Correta: ${q.options[q.correctIndex]}</span></div>`;
+                }
+            });
+        }
+        document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 REFAZER AVALIAÇÃO</button>`;
+        changeApplicationView('result');
+    }
+    
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

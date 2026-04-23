@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Ligação Metálica - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: LIGAÇÃO METÁLICA (Aço e Ouro/Âmbar) --- */
+        :root {
+            --bg-color: #F8FAFC; 
+            --text-color: #0F172A; 
+            --border-color: #334155; 
+            --white: #FFFFFF;
+            
+            --theme-light: #E2E8F0; 
+            --theme-medium: #64748B; 
+            --theme-dark: #475569; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #3B82F6; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: #F8FAFC; border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FFFBEB; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #92400E; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #EFF6FF; border-left-color: #3B82F6; color: #1E3A8A; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">⚙️</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Ligações Químicas: Metálica</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Mar de elétrons, Ligas, Ouro)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">⚙️ 1. O Que é a Ligação Metálica?</div>
+                <article class="theory-box search-target">
+                    <h3>Metal com Metal</h3>
+                    <p>Ao contrário da ligação iônica (que doa e recebe) e da covalente (que compartilha pares exatos), a <strong>Ligação Metálica</strong> ocorre exclusivamente entre átomos de <strong>Metais</strong> (que são muito eletropositivos).</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>O Problema:</strong> Todos os metais têm baixa eletronegatividade (pouca força para puxar elétrons) e querem PERDER os elétrons da última camada. Se todos querem perder, quem recebe? Ninguém!</li>
+                        <li><strong>A Solução:</strong> Eles "desistem" dos elétrons. Cada átomo de metal liberta os seus elétrons de valência, tornando-se um <strong>Cátion</strong>. Estes elétrons ficam soltos e passam a pertencer a todos os átomos simultaneamente.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🌊 2. O Mar de Elétrons</div>
+                <article class="theory-box search-target">
+                    <h3>A Nuvem Eletrônica</h3>
+                    <p>O modelo clássico que explica a ligação metálica é conhecido como <strong>Modelo do Mar de Elétrons</strong> (ou Modelo da Nuvem Eletrônica).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="280" height="140" viewBox="0 0 280 140">
+                            <!-- Cátions Fixos -->
+                            <circle cx="50" cy="40" r="18" fill="#94A3B8" stroke="#334155" stroke-width="2"/>
+                            <text x="50" y="45" font-size="14" font-weight="900" fill="#334155" text-anchor="middle">+</text>
+                            
+                            <circle cx="140" cy="40" r="18" fill="#94A3B8" stroke="#334155" stroke-width="2"/>
+                            <text x="140" y="45" font-size="14" font-weight="900" fill="#334155" text-anchor="middle">+</text>
+                            
+                            <circle cx="230" cy="40" r="18" fill="#94A3B8" stroke="#334155" stroke-width="2"/>
+                            <text x="230" y="45" font-size="14" font-weight="900" fill="#334155" text-anchor="middle">+</text>
+
+                            <circle cx="95" cy="100" r="18" fill="#94A3B8" stroke="#334155" stroke-width="2"/>
+                            <text x="95" y="105" font-size="14" font-weight="900" fill="#334155" text-anchor="middle">+</text>
+
+                            <circle cx="185" cy="100" r="18" fill="#94A3B8" stroke="#334155" stroke-width="2"/>
+                            <text x="185" y="105" font-size="14" font-weight="900" fill="#334155" text-anchor="middle">+</text>
+
+                            <!-- Elétrons Livres (Mar) -->
+                            <circle cx="20" cy="20" r="4" fill="#F59E0B"/>
+                            <path d="M 15 15 Q 10 20 20 20" fill="none" stroke="#F59E0B" stroke-width="1"/>
+                            
+                            <circle cx="95" cy="30" r="4" fill="#F59E0B"/>
+                            <path d="M 85 25 Q 90 20 95 30" fill="none" stroke="#F59E0B" stroke-width="1"/>
+
+                            <circle cx="190" cy="20" r="4" fill="#F59E0B"/>
+                            <circle cx="260" cy="50" r="4" fill="#F59E0B"/>
+                            <circle cx="50" cy="100" r="4" fill="#F59E0B"/>
+                            <circle cx="140" cy="80" r="4" fill="#F59E0B"/>
+                            <circle cx="230" cy="110" r="4" fill="#F59E0B"/>
+                            <circle cx="140" cy="120" r="4" fill="#F59E0B"/>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); text-align: center;">Cátions fixos imersos numa nuvem de elétrons deslocalizados.</p>
+                    </div>
+
+                    <p>O retículo metálico não se desfaz porque os cátions positivos são fortemente atraídos pela nuvem de elétrons negativos que flui livremente entre eles, funcionando como uma "cola" flexível.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔨 3. Propriedades dos Metais</div>
+                <article class="theory-box search-target">
+                    <h3>Por que o metal amassa e o sal quebra?</h3>
+                    <p>As propriedades físicas fantásticas dos metais devem-se inteiramente a este "Mar de Elétrons":</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Condutividade Elétrica e Térmica:</strong> Altíssima! Como os elétrons já estão soltos e livres para se moverem, eles transportam a corrente elétrica e o calor com enorme facilidade, mesmo no estado <strong>SÓLIDO</strong> (diferente dos compostos iônicos).</li>
+                        <li><strong>Maleabilidade e Ductilidade:</strong> Os metais amassam em chapas (maleáveis) ou fios (dúcteis) sem quebrar. Se bater num metal, os cátions deslizam uns sobre os outros, e a "nuvem" de elétrons move-se junto, impedindo que cátions iguais se toquem e se repilam (como ocorre no sal).</li>
+                        <li><strong>Brilho Metálico:</strong> Os elétrons livres absorvem e reemitem a luz visível de forma muito eficiente, gerando o brilho característico.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🏅 4. Ligas Metálicas</div>
+                <article class="theory-box search-target">
+                    <h3>Misturas de Sucesso</h3>
+                    <p>Os metais puros muitas vezes são moles demais (como o Ouro 24k) ou oxidam fácil (como o Ferro). A solução é derretê-los e misturá-los com outros elementos para melhorar as suas propriedades físicas. Estas misturas sólidas homogêneas chamam-se <strong>Ligas Metálicas</strong>.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="100" viewBox="0 0 250 100">
+                            <!-- Metal Puro (Ferro) -->
+                            <rect x="20" y="20" width="80" height="60" fill="#94A3B8" stroke="#334155" stroke-width="2"/>
+                            <text x="60" y="55" font-size="14" font-weight="900" fill="#FFF" text-anchor="middle">Fe + Fe</text>
+                            
+                            <text x="125" y="55" font-size="18" font-weight="900" fill="#334155" text-anchor="middle">➔</text>
+
+                            <!-- Liga (Aço = Ferro + Carbono) -->
+                            <rect x="150" y="20" width="80" height="60" fill="#64748B" stroke="#334155" stroke-width="2"/>
+                            <text x="190" y="55" font-size="14" font-weight="900" fill="#FFF" text-anchor="middle">Fe + C</text>
+                            <!-- Impurezas de carbono -->
+                            <circle cx="160" cy="30" r="3" fill="#1E293B"/>
+                            <circle cx="180" cy="65" r="3" fill="#1E293B"/>
+                            <circle cx="210" cy="40" r="3" fill="#1E293B"/>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); text-align: center;">Átomos menores (como o C) "travam" as camadas, tornando o Aço mais duro que o Ferro puro.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔥 5. Ligas que caem no ENEM</div>
+                <article class="theory-box search-target">
+                    <h3>Decore as Composições Clássicas</h3>
+                    
+                    <div class="highlight-box blue">
+                        <strong>AÇO:</strong> Ferro (Fe) + Carbono (C). Muito duro e resistente. O <em>Aço Inoxidável</em> leva Cromo (Cr) e Níquel (Ni) para não enferrujar.
+                    </div>
+                    
+                    <div class="highlight-box" style="background-color: #FEF3C7; border-left-color: #F59E0B; color: #92400E; margin-top: 10px;">
+                        <strong>LATÃO:</strong> Cobre (Cu) + Zinco (Zn). Usado em moedas, fechaduras e instrumentos musicais (como o trompete).
+                    </div>
+                    
+                    <div class="highlight-box" style="background-color: #F3E8FF; border-left-color: #A855F7; color: #581C87; margin-top: 10px;">
+                        <strong>BRONZE:</strong> Cobre (Cu) + Estanho (Sn). A primeira liga da humanidade. Usado em sinos, estátuas e medalhas.
+                    </div>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px; margin-top: 10px;">
+                        <li><strong>Ouro 18 Quilates:</strong> O ouro 24k (puro) amassa com as mãos. O 18k é uma liga de 75% Ouro + 25% Cobre ou Prata, tornando a joia resistente.</li>
+                        <li><strong>Amálgama:</strong> Qualquer liga metálica onde um dos metais é o <strong>Mercúrio (Hg)</strong> líquido. Era usado na odontologia (obturações).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - ENEM & Vestibulares</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões rigorosas sobre o Mar de Elétrons, Ligas e Condutividade. Acerte <strong>80% (24/30)</strong> para dominar os Metais!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Ligação Metálica PT-BR) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "A ligação metálica ocorre estritamente entre átomos de metais. O modelo atômico que melhor explica o funcionamento desta ligação é conhecido como:", options: ["Modelo do Mar de Prótons.", "Modelo do Gás Eletrônico (ou Mar de Elétrons).", "Modelo do Retículo Covalente.", "Modelo de Transferência Específica."], correctIndex: 1, explanation: { correctText: "Na ligação metálica, os elétrons de valência ficam deslocalizados, formando uma nuvem ou 'mar de elétrons' no qual os cátions do metal 'nadam' mantendo a estrutura unida.", otherOptions: [] } },
+        { level: "Fácil", text: "Os metais possuem uma propriedade atômica que justifica o fato de libertarem os seus elétrons para formar o 'mar de elétrons'. Qual é essa propriedade?", options: ["Alta eletronegatividade (querem ganhar elétrons).", "Baixa energia de ionização e alta eletropositividade (querem perder elétrons facilmente).", "Baixo raio atômico.", "Alta afinidade eletrônica."], correctIndex: 1, explanation: { correctText: "Como os metais têm 1, 2 ou 3 elétrons na valência, eles têm baixa energia de ionização. É muito fácil para eles doarem esses elétrons, ficando 'soltos' no material.", otherOptions: [] } },
+        { level: "Médio", text: "No retículo cristalino metálico (ex: numa barra de ferro), o que exatamente mantém a estrutura sólida unida e impede que os átomos se separem?", options: ["As ligações covalentes simples entre cada núcleo.", "A forte atração eletrostática entre os Cátions metálicos fixos e a nuvem de elétrons negativos (mar de elétrons) que flui por eles.", "O compartilhamento exato de pares de elétrons.", "A fusão a frio dos núcleos no estado sólido."], correctIndex: 1, explanation: { correctText: "A cola do metal! Os núcleos ficaram positivos (cátions) porque soltaram os elétrons. O mar de elétrons é negativo. A atração + e - mantém o bloco de metal coeso.", otherOptions: [] } },
+        { level: "Fácil", text: "Os metais (com exceção do Mercúrio) são sólidos à temperatura ambiente e são amplamente utilizados pela sua EXCELENTE capacidade de:", options: ["Atuar como isolantes térmicos em casas.", "Conduzir corrente elétrica e calor de forma extremamente eficiente no estado SÓLIDO.", "Reagir com gases nobres.", "Dissolverem-se em óleos apolares."], correctIndex: 1, explanation: { correctText: "Diferente do sal (iônico) que só conduz eletricidade derretido, os metais são os reis da condução elétrica no estado sólido, graças aos seus elétrons já livres e soltos na estrutura.", otherOptions: [] } },
+        { level: "Médio", text: "Por que motivo os elétrons soltos na ligação metálica são chamados de 'elétrons deslocalizados'?", options: ["Porque eles saem voando para o ar, abandonando o metal.", "Porque eles evaporam à temperatura ambiente.", "Porque eles não pertencem a um átomo específico; eles movem-se livremente por toda a rede cristalina do pedaço de metal.", "Porque eles são absorvidos pelos nêutrons no núcleo."], correctIndex: 2, explanation: { correctText: "Deslocalizado significa que não tem local fixo. O elétron de um átomo de Cobre viaja livremente pelo fio de cobre inteiro, não ficando preso ao seu átomo de origem.", otherOptions: [] } },
+        { level: "Médio", text: "Quando um ourives pega um martelo e bate com força numa barra de ouro, ela não quebra nem estilhaça, mas sim amassa-se, formando uma lâmina fina (Maleabilidade). Qual fenômeno estrutural explica por que o metal não quebra sob impacto?", options: ["Porque o ouro tem ligações covalentes duplas elásticas.", "Porque, no impacto, as camadas de cátions deslizam umas sobre as outras. O 'mar de elétrons' acompanha o movimento e age como um lubrificante elétrico, impedindo que cátions iguais se toquem e se repilam.", "Porque o ouro absorve a energia mecânica transformando-a em elétrons.", "Porque o ouro é o único metal que forma macromoléculas de carbono."], correctIndex: 1, explanation: { correctText: "No sal (iônico), se você bate e o + encosta no +, o cristal racha. No metal, os elétrons movem-se rápido e ficam sempre entre os cátions, protegendo a estrutura de rachar mesmo quando é esmagada (Maleabilidade/Ductilidade).", otherOptions: [] } },
+        { level: "Fácil", text: "A grande maioria dos fios elétricos que percorrem as nossas casas é feita de Cobre (Cu). Qual é a propriedade do metal que permite esticá-lo até formar fios longos e finos?", options: ["Condutividade térmica.", "Maleabilidade.", "Ductilidade.", "Ponto de Ebulição."], correctIndex: 2, explanation: { correctText: "Ductilidade é a capacidade mecânica de produzir dutos e FIOS finos de metal. Maleabilidade seria transformá-lo em lâminas/chapas.", otherOptions: [] } },
+        { level: "Fácil", text: "O que é, por definição química rigorosa, uma Liga Metálica?", options: ["Uma mistura homogênea (solução sólida) composta por dois ou mais elementos, sendo que pelo menos o elemento em maior quantidade é um Metal.", "Um metal puro retirado diretamente da mina sem processamento.", "Um composto formado exclusivamente por ligação covalente de transição.", "A ferrugem gerada pela oxidação do metal puro."], correctIndex: 0, explanation: { correctText: "Ligas metálicas são misturas! Derretem-se dois metais (ou um metal e um ametal), mistura-se o líquido e deixa-se endurecer. O Aço e o Bronze são exemplos disto.", otherOptions: [] } },
+        { level: "Médio", text: "O Aço é sem dúvida a liga metálica mais importante da história moderna da construção civil. É formado pela mistura de Ferro (Fe) com uma pequena percentagem de um NÃO-METAL. Qual é esse ametal vital para formar o aço?", options: ["Enxofre (S).", "Carbono (C).", "Oxigênio (O).", "Silício (Si)."], correctIndex: 1, explanation: { correctText: "Aço = Ferro + Carbono. O carbono é muito pequeno e enfia-se nos buracos do retículo de ferro (liga intersticial), travando o deslizamento das camadas e tornando a liga muito mais dura que o ferro puro.", otherOptions: [] } },
+        { level: "Médio", text: "O Cobre (Cu) e o Zinco (Zn) são derretidos juntos para formar uma liga metálica muito brilhante, amarelada, usada em maçanetas de portas, moedas e em instrumentos de sopro (como trompetes). Que liga é esta?", options: ["Bronze.", "Ouro 18k.", "Latão.", "Aço Inoxidável."], correctIndex: 2, explanation: { correctText: "Latão = Cobre + Zinco. É uma liga muito resistente à corrosão e acústicamente excelente, sendo a base dos instrumentos de metal.", otherOptions: [] } },
+        { level: "Médio", text: "Antes do Latão, a humanidade teve uma era histórica focada em misturar Cobre (Cu) e Estanho (Sn) para criar armas e armaduras resistentes, e hoje em dia usa-se em estátuas e sinos de igrejas. Como se chama esta liga?", options: ["Bronze.", "Alumínio aeronáutico.", "Latão.", "Amálgama."], correctIndex: 0, explanation: { correctText: "A 'Era do Bronze' mudou a civilização. O Bronze (Cu + Sn) é mais duro e durável que o cobre puro e retém muito bem o som e os formatos moldados.", otherOptions: [] } },
+        { level: "Difícil", text: "Na antiga medicina dentária (e ainda em algumas minerações de ouro clandestinas), utilizava-se uma liga metálica em que o solvente ou componente obrigatório era o metal líquido Mercúrio (Hg). Como se chama qualquer liga metálica à base de Mercúrio?", options: ["Ouro branco.", "Aço cirúrgico.", "Amálgama.", "Liga de solda forte."], correctIndex: 2, explanation: { correctText: "Amálgama é o nome técnico para qualquer liga onde um dos metais é o Mercúrio (ex: Amálgama de Prata usado para fechar cáries nos dentes, pois endurecia na boca).", otherOptions: [] } },
+        { level: "Fácil", text: "Se comprar um anel de Ouro 24 quilates, está a adquirir Ouro 100% puro. No entanto, os joalheiros raramente usam ouro 24k para fazer alianças. Por que motivo usam Ouro 18k (que é uma liga com 75% Ouro e 25% Cobre/Prata)?", options: ["Porque o ouro 24k é muito tóxico para a pele humana.", "Porque o ouro 24k não brilha na luz.", "Porque o ouro puro (24k) é muito maleável e 'mole', amassando facilmente no dia a dia. A liga (18k) confere a dureza e a resistência mecânica necessárias para uma joia.", "Porque o cobre anula a radioatividade do ouro."], correctIndex: 2, explanation: { correctText: "Uma das grandes razões para se fazer ligas metálicas é AUMENTAR a dureza. O ouro 24k risca e entorta com as unhas. Ao adicionar cobre (liga 18k), a estrutura trava e fica sólida para uso diário.", otherOptions: [] } },
+        { level: "Médio", text: "Observe três fios elétricos idênticos na grossura, feitos dos seguintes materiais puros do bloco d: Cobre (Cu), Prata (Ag) e Ouro (Au). Destes três, qual é considerado, na física, o metal com a MELHOR condutividade elétrica à temperatura ambiente?", options: ["Cobre.", "Ouro.", "Prata.", "Todos conduzem exatamente por igual."], correctIndex: 2, explanation: { correctText: "A Prata (Ag) é o melhor condutor elétrico e térmico conhecido. No entanto, a indústria usa o Cobre porque é absurdamente mais barato e conduz quase tão bem como a prata.", otherOptions: ["O ouro tem a vantagem de não oxidar, sendo usado em contatos finos de computadores, mas a Prata é melhor condutora bruta."] } },
+        { level: "Fácil", text: "As panelas de alumínio e ferro aquecem muito rápido quando colocadas na chama do fogão. Qual é o papel do 'mar de elétrons' nesta condução térmica espetacular?", options: ["Os elétrons evaporam e levam o calor para o teto.", "Apenas os prótons vibram, gerando atrito no fundo da panela.", "O calor aumenta a energia cinética dos elétrons livres, que viajam quase à velocidade da luz através da estrutura do metal, espalhando a energia térmica por toda a panela num instante.", "O núcleo do alumínio funde-se libertando gás."], correctIndex: 2, explanation: { correctText: "A condutividade de calor e a de eletricidade partilham o mesmo mecanismo: mobilidade. Os elétrons soltos funcionam como mensageiros hiperativos que levam a energia de um lado do metal para o outro muito rapidamente.", otherOptions: [] } },
+        { level: "Médio", text: "O brilho metálico (reflexão intensa da luz) é uma propriedade que salta aos olhos. Como o modelo do mar de elétrons explica que um espelho de prata seja tão brilhante?", options: ["Porque a prata é um gás nobre condensado.", "A luz (fótons) incide sobre os elétrons livres na superfície, estes excitam-se ligeiramente e de imediato reemitem (refletem) a luz na mesma frequência, gerando o brilho reflexivo.", "Porque a eletrosfera do metal é feita de luz armazenada.", "Porque o metal não possui elétrons de valência para absorver energia."], correctIndex: 1, explanation: { correctText: "Os elétrons deslocalizados à superfície do metal reagem rapidamente aos fótons da luz visível, 'quicando' a luz de volta (reflexão espelular).", otherOptions: [] } },
+        { level: "Médio", text: "Ao observar o ponto de fusão (P.F.) dos compostos puros, notamos que o P.F. dos metais é, em regra, bastante elevado, mas pode variar brutalmente (Tungstênio derrete a 3400ºC, Gálio a 30ºC). Por que motivo o Tungstênio (W) é usado nos filamentos das lâmpadas antigas incandescentes?", options: ["Porque tem o Ponto de Fusão MAIS ALTO entre os metais, não derretendo mesmo a ficar incandescente pela passagem violenta da corrente elétrica.", "Porque tem o ponto de fusão mais baixo, emitindo luz fria.", "Porque é um isolante térmico puro que não deixa o calor sair do vidro.", "Porque é o único metal gasoso à temperatura de 100ºC."], correctIndex: 0, explanation: { correctText: "Lâmpadas incandescentes geram muito calor (efeito Joule). O filamento precisa de ser de um metal que suporte ser aquecido a 2000 ºC sem pingar líquido. O Tungstênio aguenta até ~3422 ºC.", otherOptions: [] } },
+        { level: "Difícil", text: "Para além do Aço comum (Ferro + Carbono), a indústria metalúrgica moderna utiliza amplamente o 'Aço Inoxidável', vital para talheres, panelas e uso hospitalar. Que elementos METÁLICOS extras são adicionados ao aço normal para criar esta película protetora anti-ferrugem?", options: ["Ouro e Prata.", "Cromo (Cr) e Níquel (Ni).", "Sódio e Potássio.", "Chumbo e Urânio."], correctIndex: 1, explanation: { correctText: "O Cromo e o Níquel são os 'mágicos' do inox. O Cromo, em especial, forma uma microcamada de óxido de cromo na superfície que impede o oxigênio do ar de chegar ao ferro e enferrujá-lo (passivação).", otherOptions: [] } },
+        { level: "Difícil", text: "O Sódio (Na) e o Potássio (K) são metais do Grupo 1 (Alcalinos). Estranhamente, ao contrário do Ferro ou do Cobre, eles são tão macios que podem ser cortados com uma faca de manteiga. Como se justifica a fraca dureza destes metais pela ligação metálica?", options: ["Porque eles são ametais disfarçados.", "Eles possuem apenas 1 elétron de valência para contribuir para a nuvem de elétrons. Com um 'mar' tão 'raso' de elétrons e íons de carga +1, a atração eletrostática que une a barra do metal é fraca e cede facilmente à faca.", "Porque o raio atômico deles é microscópico, não havendo espaço físico.", "Eles têm alta eletronegatividade, repelindo a faca ativamente."], correctIndex: 1, explanation: { correctText: "A força da ligação metálica depende de quantos elétrons são 'despejados' na nuvem. Um metal alcalino despeja 1 elétron fraco. O Cobre/Ferro despejam vários e têm íons +2/+3, criando uma 'cola' muito mais rija.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das opções a seguir é uma propriedade que NÃO pertence, em regra geral, à classe dos Metais?", options: ["Condutividade térmica alta.", "Maleabilidade (amassam em lâminas).", "Alta eletronegatividade (forte atração por elétrons em ligações com ametais).", "Ductilidade (transformam-se em fios)."], correctIndex: 2, explanation: { correctText: "Esta é a pegadinha clássica! Os metais têm BAIXA eletronegatividade (são Eletropositivos). Quem tem ALTA eletronegatividade e quer puxar elétrons agressivamente são os Não-Metais (Ametais) como o Flúor.", otherOptions: [] } },
+        { level: "Médio", text: "Muitas vezes, uma ligação química é identificada pela natureza do material que ela produz. Se tiver em mãos uma substância sólida que conduz corrente elétrica perfeitamente, e que quando aquecida a 1000ºC vira líquida e CONTINUA a conduzir eletricidade, que tipo de ligação ela tem?", options: ["Ligação Iônica (tipo NaCl).", "Ligação Metálica.", "Ligação Covalente Molecular (tipo Açúcar).", "Ligação de Força de Van der Waals fraca."], correctIndex: 1, explanation: { correctText: "A ligação METÁLICA é a única que garante alta condutividade ELÉTRICA em AMBOS os estados: Sólido e Líquido. O sal (Iônica) só conduz no líquido. O açúcar (Covalente) não conduz em nenhum.", otherOptions: [] } },
+        { level: "Médio", text: "As Ligas Metálicas Substitucionais e Intersticiais são formadas pela acomodação de átomos diferentes no retículo. A liga 'Aço' (Ferro e Carbono) é predominantemente classificada como Intersticial. O que significa isso a nível atômico?", options: ["O Carbono é arrancado do metal.", "O átomo de Carbono (que é minúsculo) enfia-se nos pequenos buracos (interstícios) vazios entre as grandes esferas de Ferro da rede de metal, travando a estrutura.", "O Carbono substitui totalmente os átomos de Ferro no núcleo puro.", "O Carbono evapora para criar espaços de ar na panela vazia."], correctIndex: 1, explanation: { correctText: "Interstício = buraco/fresta. O carbono pequeno age como 'areia' no meio dos pedregulhos de ferro. Isto trava o deslizamento natural dos metais, endurecendo o aço de forma espetacular.", otherOptions: [] } },
+        { level: "Fácil", text: "Entre os elementos listados, assinale a dupla que, no estado puro, se uniria preferencialmente através de uma Ligação Metálica simples de rede eletrônica livre:", options: ["Carbono e Oxigênio.", "Ouro e Cobre.", "Sódio e Cloro.", "Flúor e Hélio."], correctIndex: 1, explanation: { correctText: "Para ter ligação metálica, precisamos que os parceiros sejam METAIS (Metal + Metal). Ouro (Au) e Cobre (Cu) são os dois metais de transição.", otherOptions: ["Carbono e Oxigênio formam Covalente. Sódio e Cloro formam Iônica."] } },
+        { level: "Difícil", text: "O Nitinol (Níquel + Titânio) é uma liga metálica moderna famosa em implantes médicos e odontologia por possuir 'Memória de Forma'. O que isto significa na mecânica avançada das ligas metálicas?", options: ["Que ele guarda elétrons no disco rígido do núcleo atômico sólido livre cego.", "Se o fio for entortado a frio, ao ser aquecido (ou pela temperatura do corpo), as camadas do retículo cristalino recuperam instantaneamente o alinhamento original em que a liga foi fundida, desamassando-se sozinho.", "Que o metal lembra a química do oxigênio cego vazio e livre no sangue nulo.", "O metal funde as cargas frias puras limpas."], correctIndex: 1, explanation: { correctText: "O Nitinol é magia da metalurgia! As suas fases cristalinas mudam com a temperatura. Nos aparelhos ortodônticos, o calor da boca faz o fio repuxar para o formato reto original, alinhando os dentes sem esforço manual.", otherOptions: [] } },
+        { level: "Médio", text: "Os aviões comerciais usam intensivamente uma liga de Alumínio batizada de Duralumínio (Alumínio + Cobre + Magnésio). Porquê usar Duralumínio em vez de Ferro ou Aço puro na fuselagem?", options: ["O Duralumínio é invisível aos radares eletrostáticos livres brandos soltos frios.", "Porque os metais perdem a eletrosfera no ar superior rarefeito quente.", "O Alumínio puro é muito mole. Ao formar a liga com Cu/Mg, a estrutura atinge a força e resistência do Aço, mantendo o peso extremamente BAIXO (baixa densidade) do Alumínio base, o que é crucial para voar com economia de combustível.", "Porque o ferro puro flutua sozinho na atmosfera fria."], correctIndex: 2, explanation: { correctText: "Dureza de aço, peso de pena! O Alumínio tem uma densidade de apenas 2,7 g/cm³ (o ferro tem quase 8). O Duralumínio salva a aviação mundial garantindo que as asas não rachem, sem pesar toneladas a mais.", otherOptions: [] } },
+        { level: "Fácil", text: "Resumo Estrutural Final do ENEM: O Sódio (Na) e o Cloro (Cl) reagem. Qual o tipo de ligação e o estado físico ambiente do produto NaCl?", options: ["Ligação Metálica, Estado Sólido.", "Ligação Covalente Molecular, Estado Gasoso.", "Ligação Iônica Eletrovalente, Estado Sólido Cristalino.", "Ligação Covalente Reticular, Líquido Oco."], correctIndex: 2, explanation: { correctText: "Na (Metal) + Cl (Ametal) = Ligação Iônica (doação de elétron). Todos os compostos iônicos são sólidos a 25ºC devido à fortíssima rede cristalina magnética de íons.", otherOptions: [] } },
+        { level: "Médio", text: "Comparando os 3 grandes laços da química: Iônica (Transferência), Covalente (Compartilhamento) e Metálica (Nuvem/Deslocalização). Qual destas três ligações resulta APENAS na formação de CÁTIONS fixos durante o seu processo principal?", options: ["Covalente Dativa.", "Metálica.", "Iônica.", "Covalente Apolar simples dupla limpa longa franca livre."], correctIndex: 1, explanation: { correctText: "A ligação Metálica! Todos os metais abandonam os elétrons de valência para o mar. Como todos doam e ninguém absorve, apenas sobram os 'núcleos positivos' (Cátions) rodeados pela nuvem solta.", otherOptions: ["Na Iônica formam-se Cátions e Ânions. Na Covalente formam-se moléculas neutras na maioria sem íons soltos na estrutura plana base do modelo frio livre calmo mudo liso de partilha."] } },
+        { level: "Difícil", text: "Se forçares um aumento de temperatura brutal no Cobre sólido até que ele derreta (estado líquido a 1085ºC). O que acontece com o 'Mar de Elétrons' e a condutividade?", options: ["A nuvem de elétrons evapora totalmente e a ligação rompe. Fica isolante livre mole.", "O mar de elétrons mantém-se presente! Apenas os cátions ganham mais mobilidade de deslize fluido livre no líquido. O metal derretido continua a ser um excelente condutor de elétrons velozes.", "Os elétrons congelam no líquido nulo rico calmo oco franco duro liso puro mudo sujo vazio.", "A condução elétrica para, ficando com ligação covalente apolar mole."], correctIndex: 1, explanation: { correctText: "Mesmo em fusão (líquido), o modelo atômico do mar de elétrons de valência mantém as cargas livres ativas e móveis. A condução elétrica continua sem problema nenhum na sopa brilhante de cobre derretido.", otherOptions: [] } },
+        { level: "Fácil", text: "Se misturarmos a quente e fundirmos Estanho (Sn) e Chumbo (Pb), formamos a liga popularmente chamada de 'Solda', muito usada para colar fios em placas eletrônicas de computadores porque tem uma característica vantajosa. Qual é?", options: ["Ter um Ponto de Fusão baixíssimo (derrete fácil com um ferro de solda de mão sem estragar os plásticos do circuito elétrico).", "Ficar transparente como vidro calmo franco leve.", "Não conduzir corrente elétrica, servindo de fita isolante térmica dura macia limpa franca pura nula solta lisa livre de elétron lento.", "Absorver a umidade para inflamar fofo rápido nulo."], correctIndex: 0, explanation: { correctText: "A magia da Liga de Solda é que derrete a cerca de 180ºC, muito menos do que o Cobre puro (1085ºC). Com um pequeno ferro de mão derretes a solda, ligando os fios do circuito sem derreter e queimar a placa verde do computador ou telemóvel livre murcha morna fria rasa e doce fofa e plana da química da tabela rica suada nula calada oca e branda de valência morta limpa e viva solta e nula mole dura cega franca.", otherOptions: [] } },
+        { level: "Médio", text: "Os Metais como o Ferro (Fe) e o Níquel (Ni) têm no seu interior estruturas chamadas 'domínios'. Se passares um íman forte pelo ferro, estes domínios alinham-se. Como se chama esta propriedade rara em apenas três elementos da tabela (Fe, Ni, Co)?", options: ["Diamagnetismo opaco nulo mudo calmo vivo puro cego raso liso frio longo fofo.", "Paramagnetismo leve falso sujo oco doce livre rústico cru mole denso suado.", "Ferromagnetismo (Forte e brutal atração sob a ação imantada, formando também ímans permanentes).", "Radioatividade gama dura de valência morta mansa e calada nula rica cega."], correctIndex: 2, explanation: { correctText: "O Ferro é tão especial no eletromagnetismo que deu nome ao fenômeno! Os metais Ferromagnéticos sentem uma atração avassaladora por ímãs, e se alinhados na fábrica, podem tornar-se ímãs permanentes que usamos nos motores, fechos de bolsas e colunas de música limpas rasas longas cruas francas velhas moles sujas duras lisas mansas cegas claras e calmas doces suadas frias puras falsas morna oca brandas e nulas vagos ricos fofas cegas fortes da eletrosfera livre.", otherOptions: [] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_metalica_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame em Andamento (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja limpar todo o seu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLE DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Metálico Perfeito!' : '❌ Liga Quebrada!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#475569', '#64748B', '#F59E0B', '#3B82F6'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem resposta. Deseja terminar a prova mesmo assim (as em branco serão consideradas erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 MESTRE DAS LIGAS METÁLICAS!</strong> Você compreende perfeitamente a Teoria do Mar de Elétrons e domina as propriedades macroscópicas dos metais!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ NUVEM DISSIPADA!</strong> Você foi avaliado abaixo da meta (80%). Lembre-se: Metais doam os elétrons de valência para um mar compartilhado que conduz corrente sempre!
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Você deixou em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">Sua resposta: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">A Resposta Correta: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>
