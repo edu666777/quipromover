@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Substâncias e Misturas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: QUÍMICA (Azul Petróleo / Teal) --- */
+        :root {
+            --bg-color: #F0FDFA; 
+            --text-color: #134E4A; 
+            --border-color: #042F2E; 
+            --white: #FFFFFF;
+            
+            --theme-light: #CCFBF1; 
+            --theme-medium: #14B8A6; 
+            --theme-dark: #0F766E; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #E11D48; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-medium) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .theory-box h4 { font-size: 1.1rem; font-weight: 800; color: var(--text-color); margin-top: 10px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: var(--theme-dark); font-weight: 700; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.teal { background-color: #F0FDFA; border-left-color: #0D9488; color: #115E59; }
+        .highlight-box.alert { background-color: #FFE4E6; border-left-color: #E11D48; color: #881337; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧪</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Substâncias Puras e Misturas</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <!-- VISTA: TEORIA -->
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Homogénea, Alotropia)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <!-- 1. SUBSTÂNCIAS PURAS -->
+            <section class="content-group">
+                <div class="section-badge">💎 1. Substâncias Puras (O Ideal)</div>
+                <article class="theory-box search-target">
+                    <h3>Simples vs. Compostas</h3>
+                    <p>Uma substância é dita <strong>PURA</strong> quando o recipiente contém apenas <strong>um único tipo de molécula</strong>. Nada de misturas. Contudo, essa molécula única pode ser formada por átomos iguais ou diferentes.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="450" height="150" viewBox="0 0 400 150">
+                            <!-- Substância Simples -->
+                            <rect x="20" y="20" width="100" height="90" fill="#CCFBF1" stroke="#042F2E" stroke-width="3" rx="8"/>
+                            <text x="70" y="130" font-size="12" font-weight="900" fill="#042F2E" text-anchor="middle">S. SIMPLES</text>
+                            <text x="70" y="145" font-size="10" font-weight="700" fill="#0F766E" text-anchor="middle">Ex: Gás Oxigénio (O₂)</text>
+                            
+                            <!-- Moléculas O2 -->
+                            <circle cx="50" cy="50" r="10" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="65" cy="50" r="10" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            
+                            <circle cx="80" cy="80" r="10" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="95" cy="80" r="10" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            
+                            <!-- Substância Composta -->
+                            <rect x="150" y="20" width="100" height="90" fill="#DBEAFE" stroke="#042F2E" stroke-width="3" rx="8"/>
+                            <text x="200" y="130" font-size="12" font-weight="900" fill="#042F2E" text-anchor="middle">S. COMPOSTA</text>
+                            <text x="200" y="145" font-size="10" font-weight="700" fill="#1D4ED8" text-anchor="middle">Ex: Água (H₂O)</text>
+                            
+                            <!-- Moléculas H2O -->
+                            <circle cx="200" cy="65" r="12" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="188" cy="50" r="8" fill="#F8FAFC" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="212" cy="50" r="8" fill="#F8FAFC" stroke="#042F2E" stroke-width="2"/>
+
+                            <!-- MISTURA -->
+                            <rect x="280" y="20" width="100" height="90" fill="#FEF2F2" stroke="#042F2E" stroke-width="3" rx="8"/>
+                            <text x="330" y="130" font-size="12" font-weight="900" fill="#042F2E" text-anchor="middle">MISTURA</text>
+                            <text x="330" y="145" font-size="10" font-weight="700" fill="#BE123C" text-anchor="middle">Várias moléculas</text>
+
+                            <!-- Moléculas O2 e H2O misturadas -->
+                            <circle cx="310" cy="45" r="8" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="322" cy="45" r="8" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+
+                            <circle cx="350" cy="80" r="10" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="340" cy="70" r="6" fill="#F8FAFC" stroke="#042F2E" stroke-width="2"/>
+                            <circle cx="360" cy="70" r="6" fill="#F8FAFC" stroke="#042F2E" stroke-width="2"/>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Substância Simples:</strong> Formada por átomos de um ÚNICO elemento químico. (Ex: O₂, Fe, Au, H₂). O gás O₂ só tem átomos de Oxigénio.</li>
+                        <li><strong>Substância Composta:</strong> Formada por átomos de DOIS OU MAIS elementos químicos diferentes ligados entre si. (Ex: H₂O, CO₂, NaCl). A água tem Hidrogénio e Oxigénio, mas se o copo SÓ tiver moléculas de H₂O, é uma substância pura (composta).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- 2. MISTURAS -->
+            <section class="content-group">
+                <div class="section-badge">🧪 2. Misturas (O Mundo Real)</div>
+                <article class="theory-box search-target">
+                    <h3>Homogéneas vs. Heterogéneas</h3>
+                    <p>Na natureza, é raríssimo encontrar substâncias 100% puras. Quase tudo o que tocamos é uma Mistura (união de 2 ou mais substâncias diferentes num mesmo recipiente).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="350" height="180" viewBox="0 0 350 180">
+                            <!-- Copo Homogêneo -->
+                            <path d="M 50 30 L 50 130 A 10 10 0 0 0 60 140 L 100 140 A 10 10 0 0 0 110 130 L 110 30" fill="none" stroke="#042F2E" stroke-width="4"/>
+                            <ellipse cx="80" cy="30" rx="30" ry="6" fill="none" stroke="#042F2E" stroke-width="4"/>
+                            <path d="M 52 70 L 108 70 L 108 130 A 8 8 0 0 1 100 138 L 60 138 A 8 8 0 0 1 52 130 Z" fill="#93C5FD"/>
+                            <text x="80" y="165" font-size="12" font-weight="900" fill="#042F2E" text-anchor="middle">HOMOGÉNEA</text>
+                            <text x="80" y="100" font-size="10" font-weight="900" fill="#1E3A8A" text-anchor="middle">1 FASE</text>
+                            <text x="80" y="115" font-size="9" font-weight="700" fill="#1E3A8A" text-anchor="middle">(Água + Sal)</text>
+
+                            <!-- Copo Heterogêneo -->
+                            <path d="M 240 30 L 240 130 A 10 10 0 0 0 250 140 L 290 140 A 10 10 0 0 0 300 130 L 300 30" fill="none" stroke="#042F2E" stroke-width="4"/>
+                            <ellipse cx="270" cy="30" rx="30" ry="6" fill="none" stroke="#042F2E" stroke-width="4"/>
+                            
+                            <!-- Óleo -->
+                            <rect x="242" y="50" width="56" height="25" fill="#FCD34D"/>
+                            <!-- Água -->
+                            <rect x="242" y="75" width="56" height="35" fill="#93C5FD"/>
+                            <!-- Areia -->
+                            <path d="M 242 110 L 298 110 L 298 130 A 8 8 0 0 1 290 138 L 250 138 A 8 8 0 0 1 242 130 Z" fill="#9CA3AF"/>
+                            
+                            <line x1="242" y1="75" x2="298" y2="75" stroke="#042F2E" stroke-width="2"/>
+                            <line x1="242" y1="110" x2="298" y2="110" stroke="#042F2E" stroke-width="2"/>
+
+                            <text x="270" y="165" font-size="12" font-weight="900" fill="#042F2E" text-anchor="middle">HETEROGÉNEA</text>
+                            <text x="270" y="65" font-size="10" font-weight="900" fill="#B45309" text-anchor="middle">Óleo</text>
+                            <text x="270" y="95" font-size="10" font-weight="900" fill="#1E3A8A" text-anchor="middle">Água</text>
+                            <text x="270" y="125" font-size="10" font-weight="900" fill="#374151" text-anchor="middle">Areia</text>
+                            <text x="330" y="90" font-size="12" font-weight="900" fill="#E11D48" text-anchor="middle">3 FASES</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Misturas Homogéneas (Soluções):</strong> Apresentam apenas UMA FASE visual. Dissolvem-se perfeitamente. O ar que respiramos, o álcool a 70% e o bronze (cobre + estanho) são exemplos clássicos.</li>
+                        <li><strong>Misturas Heterogéneas:</strong> Apresentam DUAS OU MAIS FASES visuais. Não se dissolvem. Água + Óleo (2 fases), Granito (3 fases minerais).</li>
+                    </ul>
+
+                    <div class="highlight-box alert">
+                        <strong>⚠️ O Sangue e o Leite:</strong><br>
+                        A olho nu parecem homogéneos, mas <strong>são misturas HETEROGÉNEAS!</strong> Sob um microscópio, o sangue revela plasma, glóbulos brancos e vermelhos separados. O leite revela gotículas de gordura a flutuar na água.
+                    </div>
+                </article>
+            </section>
+
+            <!-- 3. FASES VS COMPONENTES -->
+            <section class="content-group">
+                <div class="section-badge">🕵️ 3. Fases vs. Componentes</div>
+                <article class="theory-box search-target">
+                    <h3>A Armadilha Suprema das Provas</h3>
+                    <p>Cuidado para não confundires quantas substâncias puseste no copo com quantas coisas os teus olhos conseguem distinguir.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Componente:</strong> É a identidade química da substância (A receita). Ex: H₂O é um componente, NaCl (sal) é outro.</li>
+                        <li><strong>Fase:</strong> É a porção visualmente distinta. O que os teus olhos veem separadamente.</li>
+                    </ul>
+
+                    <div class="highlight-box teal">
+                        <strong>Exemplo Crítico: Água Líquida + Cubos de Gelo</strong><br>
+                        Quantos componentes tem o copo? <strong>APENAS 1.</strong> (Tanto a água como o gelo são H₂O, não há mistura de químicas).<br>
+                        Quantas fases tem o copo? <strong>SÃO 2 FASES.</strong> (Tu vês claramente o líquido e os cubos sólidos).<br><br>
+                        <em>Conclusão:</em> É um <strong>Sistema Heterogéneo</strong>, mas <strong>NÃO É uma Mistura Heterogénea</strong>, pois só há uma substância pura lá dentro!
+                    </div>
+                </article>
+            </section>
+
+            <!-- 4. ALOTROPIA -->
+            <section class="content-group">
+                <div class="section-badge">🎭 4. Alotropia</div>
+                <article class="theory-box search-target">
+                    <h3>O Átomo Disfarçado</h3>
+                    <p>Ocorre quando o <strong>mesmo elemento químico</strong> é capaz de formar <strong>Substâncias Simples DIFERENTES</strong>, arrumando os seus átomos de formas estruturais distintas.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Carbono (C):</strong> Pode formar o Carvão/Grafite do teu lápis (macio, preto) ou o Diamante (o mais duro mineral do planeta, transparente). Tudo depende da pressão em que os átomos de carbono se ligaram.</li>
+                        <li><strong>Oxigénio (O):</strong> Pode formar o Gás Oxigénio vital (O₂) ou o Gás Ozono tóxico/protetor UV (O₃).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Progresso 🔄
+            </button>
+        </main>
+
+        <!-- VISTA: PRÁTICA (QUIZ) -->
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - IFCE</h2>
+                <p style="color: var(--theme-contrast); font-size: 0.95rem; font-weight:600;">
+                    30 questões cirúrgicas. Acerta <strong>80% (24/30)</strong> para provares que não te deixas enganar pelas falsas soluções. O progresso fica salvo!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <!-- VISTA: RESULTADOS -->
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Acertaste 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <!-- RODAPÉ DE NAVEGAÇÃO -->
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - IFCE Foco: Misturas) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Como se classifica uma substância formada exclusivamente por átomos de um mesmo elemento químico (ex: O₂, N₂, Fe)?", options: ["Substância Composta.", "Mistura Homogénea.", "Substância Simples.", "Alótopo Híbrido."], correctIndex: 2, explanation: { correctText: "Se olhares para a molécula e só vires UM símbolo da tabela periódica (ex: O no O₂), ela é uma Substância Simples.", otherOptions: ["Substância composta tem 2 ou mais elementos (H₂O).", "Mistura requer mais de uma substância no copo."] } },
+        { level: "Médio", text: "A água pura e destilada de laboratório é representada pela fórmula química H₂O. O que podemos afirmar rigorosamente sobre a sua classificação?", options: ["É uma Mistura de Hidrogénio e Oxigénio.", "É uma Substância Simples Pura.", "É uma Mistura Homogénea Perfeita.", "É uma Substância Composta Pura."], correctIndex: 3, explanation: { correctText: "A água (H₂O) é formada por átomos de DOIS elementos diferentes ligados quimicamente (H e O), logo é Composta. E se o copo só tiver moléculas de água lá dentro, ela é Pura.", otherOptions: ["Mistura química não é o mesmo que ligação química. Se os átomos estão ligados covalentemente formando H₂O, geraram uma substância nova, não uma mistura de gases H e O.", "Não é simples pois tem dois elementos."] } },
+        { level: "Fácil", text: "O ar atmosférico limpo que respiramos (composto por Nitrogénio, Oxigénio, Argónio e Gás Carbónico) é classicamente definido como:", options: ["Uma substância pura gasosa.", "Uma Mistura Homogénea.", "Uma Mistura Heterogénea.", "Um sistema de 4 fases."], correctIndex: 1, explanation: { correctText: "O ar é uma união de vários gases diferentes (logo, é uma mistura). Como tu não consegues ver os gases separados no ar a voar à tua frente (só vês 'ar' transparente e uniforme), ele é uma mistura Homogénea (1 fase).", otherOptions: ["Todos os gases se misturam perfeitamente entre si."] } },
+        { level: "Médio", text: "Atenção: A clássica rasteira do laboratório! O Sangue humano extraído e colocado num tubo de ensaio, visto a olho nu e ao microscópio, é, respetivamente:", options: ["Homogéneo a olho nu, mas Heterogéneo ao microscópio.", "Heterogéneo a olho nu e ao microscópio.", "Uma substância pura vermelha.", "Uma solução (Mistura Homogénea perfeita) em ambos os casos."], correctIndex: 0, explanation: { correctText: "A olho nu, parece um líquido vermelho liso (homogéneo). Mas sob um microscópio (ou quando deixado a descansar), ele separa-se em plasma (líquido amarelo) e glóbulos vermelhos/brancos. A ciência classifica o sangue oficialmente como MISTURA HETEROGÉNEA.", otherOptions: ["Acreditar que é homogéneo é o erro mais fatal em exames."] } },
+        { level: "Fácil", text: "A famosa mistura de Água + Óleo de cozinha não se dissolve nem se funde. Como a classificamos visualmente no laboratório?", options: ["Substância composta de 2 fases.", "Mistura Homogénea.", "Mistura Heterogénea (Bifásica).", "Substância simples oleosa."], correctIndex: 2, explanation: { correctText: "Como não se misturam (líquidos imiscíveis), vês claramente uma camada de água no fundo e uma camada de óleo a flutuar (2 fases). Qualquer mistura com mais de 1 fase é Heterogénea.", otherOptions: ["Homogénea seria se ficasse um líquido só (como água e álcool)."] } },
+        { level: "Difícil", text: "O copo maldito: Num copo, o aluno deita ÁGUA PURA LÍQUIDA, e depois adiciona 3 CUBOS DE GELO. Quantos Componentes Químicos e quantas Fases tem o sistema?", options: ["2 Componentes e 2 Fases.", "1 Componente (H₂O) e 2 Fases (Líquida e Sólida).", "1 Componente e 1 Fase.", "2 Componentes e 1 Fase."], correctIndex: 1, explanation: { correctText: "Rigor máximo: Componente é a identidade química (só existe H₂O ali dentro, não existe sal nem sumo). Logo, 1 Componente. Mas os teus olhos veem duas coisas diferentes (líquido e cubos). Logo, 2 Fases.", otherOptions: ["Este sistema NÃO é uma mistura (pois só tem água), mas é um Sistema Heterogéneo. É uma rasteira semântica de nível universitário que cai muito nos IFs."] } },
+        { level: "Médio", text: "O Granito é a rocha usada nas bancadas das cozinhas. Ao olhar para ele, vês pintas de quartzo (brancas), feldspato (rosadas) e mica (pretas). O Granito é:", options: ["Uma substância pura sólida.", "Uma mistura homogénea sólida.", "Uma mistura heterogénea trifásica.", "Uma liga metálica."], correctIndex: 2, explanation: { correctText: "Se consegues ver três cores (pintas) diferentes a olho nu na mesma rocha, significa que ela não é uniforme. Tem 3 fases distintas visíveis. Logo, Mistura Heterogénea.", otherOptions: ["Homogénea teria de ter uma cor e textura perfeitamente uniformes."] } },
+        { level: "Fácil", text: "Quando adicionas sal de cozinha (NaCl) em água e mexes muito bem, o sal 'desaparece' na água límpida. Esta mistura resultante (Salmoura Límpida) é cientificamente chamada de:", options: ["Solução (Mistura Homogénea).", "Suspensão Heterogénea.", "Substância Composta Única.", "Alotropia cristalina."], correctIndex: 0, explanation: { correctText: "Toda a Mistura Homogénea (que só apresenta 1 fase visual limpa, como água salgada ou água com açúcar bem mexida) ganha o nome oficial de SOLUÇÃO química.", otherOptions: ["Não é uma substância única porque a água e o sal continuam a ser água e sal no copo, só estão espalhados."] } },
+        { level: "Médio", text: "O Leite branco de supermercado é outra ilusão visual tremenda na química. Qual é a classificação científica exata do Leite?", options: ["Mistura Homogénea proteica.", "Substância Pura Branca (Lactato).", "Mistura Heterogénea (Coloide).", "Substância simples líquida."], correctIndex: 2, explanation: { correctText: "Tal como o sangue, o leite mente aos olhos. Sob um microscópio, verás gotículas de gordura (nata) a flutuar na parte líquida (soro). Como não se dissolve perfeitamente a nível microscópico, é uma mistura Heterogénea (da categoria dos Coloides).", otherOptions: ["O mesmo princípio do sangue. Parecer limpo a olho nu não basta na química fina."] } },
+        { level: "Difícil", text: "O Fenómeno da Alotropia ocorre quando o MESMO elemento químico consegue formar substâncias simples diferentes na natureza. Qual é o par clássico de alótropos do elemento Carbono (C)?", options: ["Gelo e Água Líquida.", "Ouro e Cobre.", "Grafite (do lápis) e Diamante.", "Gás Oxigénio e Gás Ozono."], correctIndex: 2, explanation: { correctText: "Tanto a Grafite macia do teu lápis como o Diamante duro do anel são feitos 100% de átomos de Carbono puros. O que muda é a geometria da ligação entre eles devido à pressão gigante no fundo da terra. São alótropos.", otherOptions: ["Oxigénio e Ozono (O₂ e O₃) são alótropos do oxigénio, não do carbono."] } },
+        { level: "Médio", text: "Ligas Metálicas (Ouro de 18 Quilates, O Bronze, O Aço). Como se classificam estruturalmente as ligas metálicas depois de derretidas e solidificadas e prontas a usar nas indústrias e joalharias?", options: ["Misturas Heterogéneas, pois os metais nunca se unem.", "Misturas Homogéneas (Soluções Sólidas).", "Substâncias Puras Simples Metálicas.", "Sistemas Polifásicos."], correctIndex: 1, explanation: { correctText: "Quando derretes ferro com carbono (para fazer aço) ou cobre com estanho (para fazer bronze), eles misturam-se perfeitamente de forma uniforme. Ao arrefecer, ficas com um bloco liso de uma única fase (Mistura Homogénea ou Solução Sólida).", otherOptions: ["O Ouro puro (24K) seria uma substância pura, mas o de 18K é uma mistura homogénea com cobre e prata para ficar duro."] } },
+        { level: "Fácil", text: "Um recipiente de laboratório está cheio APENAS com Gás Oxigénio (O₂). Qual das seguintes descrições rotula de forma cientificamente impecável o conteúdo deste recipiente?", options: ["Mistura de Oxigénio duplo.", "Substância Composta.", "Substância Pura Simples.", "Alótropos Heterogéneos."], correctIndex: 2, explanation: { correctText: "Como só existe O₂ no frasco, é Pura. Como o O₂ só é formado pela letra 'O' (apenas um elemento), é Simples. Logo, Substância Pura Simples.", otherOptions: ["Misturas exigiriam que houvesse, por exemplo, O₂ e N₂ no mesmo frasco."] } },
+        { level: "Difícil", text: "Soma de Fases: Num béquer gigante foram deitados os seguintes ingredientes por esta ordem: 1L de Água, 200g de Areia, 200g de Sal (que se dissolveu todo na água), e 200mL de Óleo em cima. Quantas FASES visíveis tem este sistema final depois de assentar?", options: ["2 Fases.", "3 Fases.", "4 Fases.", "1 Fase."], correctIndex: 1, explanation: { correctText: "Atenção: O Sal dissolve-se na água, tornando-se uma coisa só visualmente com a água (Fase 1: Água salgada). A Areia vai para o fundo pois não se dissolve (Fase 2: Areia). O Óleo flutua no topo (Fase 3: Óleo). Logo, vês 3 Fases.", otherOptions: ["Se o sal não se dissolvesse (excesso), ficaria areia+sal no fundo, mas como o enunciado diz que dissolveu todo, ele some aos teus olhos."] } },
+        { level: "Médio", text: "No mesmo copo da questão anterior (Água, Areia, Sal dissolvido e Óleo), quantos COMPONENTES QUÍMICOS diferentes estão presentes no sistema?", options: ["2 Componentes.", "3 Componentes.", "4 Componentes.", "5 Componentes."], correctIndex: 2, explanation: { correctText: "Componente é a lista de compras/identidade química! 1: Água(H₂O). 2: Areia(SiO₂). 3: Sal(NaCl). 4: Óleo(Lípidos). Temos 4 substâncias químicas diferentes lá dentro, independentemente de se dissolverem ou não.", otherOptions: ["Fases são 3, Componentes são 4. Cuidado para não confundir os dois conceitos na prova!"] } },
+        { level: "Fácil", text: "A água mineral engarrafada que compras no supermercado não é apenas H₂O. O rótulo mostra Cálcio, Magnésio, Sódio e Fluoreto dissolvidos nela. Portanto, a água mineral potável é estritamente:", options: ["Uma Substância Pura Composta.", "Uma Mistura Homogénea (Solução).", "Uma Mistura Heterogénea.", "Um Elemento Químico Simples."], correctIndex: 1, explanation: { correctText: "Como tem a base de H₂O + todos esses sais minerais invisíveis dissolvidos perfeitamente, ela é uma excelente Mistura Homogénea.", otherOptions: ["Água PURA (só H₂O) é apenas a Água Destilada de baterias de laboratório. A água de beber é sempre uma mistura saudável."] } },
+        { level: "Médio", text: "Observa as fórmulas químicas: Gás Carbónico (CO₂), Gás Hidrogénio (H₂) e Cloreto de Sódio (NaCl). Como se classificam estruturalmente de acordo com a sua formação elemental?", options: ["Todas são substâncias simples.", "H₂ é simples; CO₂ e NaCl são compostas.", "H₂ é composta; CO₂ e NaCl são simples.", "Todas são misturas heterogéneas."], correctIndex: 1, explanation: { correctText: "H₂ (apenas o elemento Hidrogénio = Simples). CO₂ (Carbono e Oxigénio = Composta). NaCl (Sódio e Cloro = Composta). A letra maiúscula e minúscula ajuda: Na é um elemento só, Cl é outro.", otherOptions: ["Basta contar quantas letras Maiúsculas tem a fórmula para saber quantos elementos a formam (na ausência de polímeros complexos)."] } },
+        { level: "Difícil", text: "O que diz a Regra dos Gráficos de Mudança de Estado Físico para identificar Substâncias Puras vs Misturas?", options: ["Misturas derretem a uma temperatura fixa exata.", "Substâncias Puras têm Patamares Retos e constantes de Fusão e Ebulição. Misturas (comuns) fervem e derretem enquanto a temperatura continua a variar (linha oblíqua).", "Substâncias Puras nunca fervem, apenas sublimam.", "Apenas o Gelo Seco tem um gráfico válido."], correctIndex: 1, explanation: { correctText: "A 'Impressão Digital' térmica: Se a água for destilada (Pura), ela ferve aos 100ºC e fica travada nos 100ºC. Se a água tiver sal (Mistura), ela começa a ferver aos 100ºC, mas sobe para 102ºC, 105ºC enquanto borbulha.", otherOptions: ["Os patamares horizontais perfeitos no Txt são o carimbo de pureza química."] } },
+        { level: "Fácil", text: "O fumo que sai de uma fogueira ardente contendo cinzas fuliginosas microscópicas e gases quentes voando no ar. Classifica o sistema FUMO no espetro químico macroscópico.", options: ["Mistura Homogénea límpida.", "Substância Pura.", "Mistura Heterogénea Coloidal (sólido disperso em gás).", "Elemento Fogo Puro Newtoniano."], correctIndex: 2, explanation: { correctText: "O fumo tem fuligem (sólidos negros microscópicos de carvão) não dissolvida num mar de gás do ar. Sendo um sistema onde as partículas não estão diluídas molecularmente, o fumo bloqueia a luz espalhando-a. É uma mistura Heterogénea em suspensão fina (aerossol sólido).", otherOptions: ["Homogéneo seria se fosse invisível cristalino puro limpo como o ar respirável da montanha."] } },
+        { level: "Médio", text: "A Água Oxigenada vendida nas farmácias para desinfetar feridas é rotulada como H₂O₂ 'a 10 volumes'. Fisicamente, o que há no frasco opaco escuro?", options: ["Peróxido de Hidrogénio (H₂O₂) puro cristalino brilhante.", "Uma Substância Simples letal venenosa pura.", "Uma MISTURA de Água (H₂O) como solvente primário e o soluto Peróxido de Hidrogénio (H₂O₂) misturados homogeneamente num líquido só.", "Água destilada pura com oxigénio gasoso a flutuar heterogeneamente."], correctIndex: 2, explanation: { correctText: "Os frascos de farmácia vendem uma Solução Aquosa. O peróxido de hidrogênio (H₂O₂) 100% puro explodiria tudo e não é estabilizado. A água oxigenada doméstica tem 3% de H₂O₂ misturados homogeneamente em 97% de água limpa comum.", otherOptions: ["A venda comercial de saúde é sempre de uma mistura solução diluída segura."] } },
+        { level: "Difícil", text: "Dois cilindros idênticos de laboratório A e B. O Cilindro A contém gás N₂ e gás O₂ puros fechados. O Cilindro B contém gás CO₂ e gás N₂ puros fechados. Analisando APENAS a quantidade de fases visuais formadas no interior dos cilindros A e B, afirma-se categoricamente:", options: ["Ambos contêm Sistemas Monofásicos (1 única fase) e, portanto, são Misturas Homogéneas Perfeitas.", "O A é homogéneo e o B é heterogéneo cego nulo falho baço mole.", "Ambos são Sistemas Bifásicos heterogéneos falsos ralos porque as moléculas são de tamanhos desiguais mortos vazios soltos lúgubres ocos fofos limpos.", "Os gases pesados caem e formam estratos fases densas sólidas impenetráveis rasas."], correctIndex: 0, explanation: { correctText: "A MAIOR REGRA DOS GASES: Todas as misturas exclusivas de gases no universo (nas pressões e temperaturas habituais) SÃO SEMPRE HOMOGÉNEAS! Os gases não formam camadas que não se misturam (como a água e o óleo fazem). O gás espalha-se caoticamente diluindo-se 100% nos vizinhos do ar criando uma única fase transparente.", otherOptions: ["Não existem misturas de fases gasosas heterogéneas separadas visuais normais limpas claras mortas vagas."] } },
+        { level: "Fácil", text: "Uma Aliança de prata esterlina (Prata 925 usada em joalharia) é formada por 92,5% de Prata e 7,5% de Cobre derretidos juntos e depois solidificados num aro prateado liso brilhante rígido duro metálico cego sólido. Química e cientificamente, o anel final polido é:", options: ["Uma Substância Pura Prata Composta", "Um Elemento Prateado de Laboratório Liso Morto Fofo Vago Nulo Limpo.", "Uma Solução Sólida (Mistura Homogénea) Metálica", "Uma Mistura Bifásica Rústica Baça de Metal Cru."], correctIndex: 2, explanation: { correctText: "As ligas metálicas depois de solidificadas e polidas uniformemente são o exemplo canônico primário fundamental base duro fixo rústico forte mudo de Soluções Sólidas (Misturas Homogéneas). O olho humano (nem os aparelhos ópticos normais) conseguem ver a fronteira de divisão entre a prata e o cobre na joia de prata de lei da montra brilhante solta.", otherOptions: ["Bifásica implicaria ver as pintas cor de cobre no meio do cinzento da prata como as vacas malhadas de quinta mansa."] } },
+        { level: "Médio", text: "Ao misturar num frasco longo translúcido límpido estéril: Água Limpa Doce Fina Ténue, Álcool Etílico Líquido a 96% Claro Liso, e Areia Lavada de Praia Dourada. Qual é a configuração do Sistema Final da Bancada Científica de Biologia Escolar Superior?", options: ["3 Fases (Líquido Álcool Subiu ao Topo Oco, Líquido Água Afunda e Areia Cai Oca Morta Vaga Cega e Limpa Murcha Falsa Lúgubre).", "2 Fases (A Água e o Álcool diluem-se numa única mistura homogénea líquida lúmpida aquosa no topo e a Areia fica isolada decantada solitária dura no fundo).", "1 Fase Total Solta.", "A Areia Oculta dissolve-se lenta morna falsa e quente fina rasa murcha fofa baça fina lisa solta limpa murcha clara oca morta falha murcha mole e nula no álcool base."], correctIndex: 1, explanation: { correctText: "A Água e o Álcool são solúveis/miscíveis infinitamente um no outro num copo químico doméstico (fazem os dois juntos apenas 1 Fase visual clara como vodca transparente). Mas a Areia não se dissolve em líquidos destes e vai direto afundar bruta pesada rústica cega para o fundo da proveta de vidro cristalino formando a 2ª Fase do sistema impenetrável base denso mudo calmo morto raso firme forte limpo exato liso rígido certo pleno e total.", otherOptions: ["Álcool não faz camada flutuante por cima da água como o óleo maldito rural. Álcool dissolve-se na água como açúcar!"] } },
+        { level: "Difícil", text: "Falso ou Verdadeiro Magistral? 'Sistemas Formados pelo MESMO Elemento Químico Alotrópico podem incrivelmente gerar um Sistema HETEROGÉNEO Visual Cego Mudo Pálido Murcho Liso Cru Morno.' (Ex: Pó de Diamante misturado com Pó de Grafite Lápis Preto Mudo Fechado no mesmo pote oco vago fraco fofo fino).", options: ["Falso! Se ambos são da Tabela Periódica Carbono (C) Puro Limpo Cego Lento Fraco Falho Sujo Mudo Quente Falso Raso Ralo Oco Vago Limpo Fino Cego Nulo Doce Suado Fofo, Eles são obrigatoriamente homogéneos na vista global clara lisa do ecrã.", "Verdadeiro! O Diamante é Carbono e a Grafite é Carbono, Mas sendo ALÓTROPOS distintos fisicamente puros limpos mortos com redes cristalinas letais opostas cegas densas fundas rasas falsas nulas, tu vês claramente o Brilhante cristalino e o Carvão preto negro fosco misturados! Logo, 2 Fases Visuais Opostas Mágicas. (Sistema Heterogéneo de 1 único Componente Elemental).", "Falso da Morte! Diamante derrete grafite.", "Apenas no Espaço Vazio Cósmico Mudo Morto Livre e Oco."], correctIndex: 1, explanation: { correctText: "A maravilha da Alotropia em exames da Universidade: O copo só tem Carbono (Elemento), mas a Grafite é preta e o Diamante é transparente. Os olhos veem os dois pós separados nitidamente misturados na terra do vaso lúgubre denso mudo cego e liso oco calmo fixo. Logo, Sistema Bifásico (Heterogéneo) formado estranhamente por uma base pura letal elementar dura e bruta. O Gelo flutuando na água é a mesma falcatrua visual aquosa fria lisa doce mansa mole fina macia viva pura plena nula clara fina.", otherOptions: ["Homogeneidade requer dissolução estrutural invisível aos olhos frios rústicos nus humanos rasos limpos limpos brutos grossos soltos lentos vazios secos nulos rasos puros limpos plenos cegos ocos finos vagos vivos fofos brandos doces moles vivos cegos ralos finos lisos secos nulos puros finos vagos fofos vivos fortes e nulos nus e francos lisos doces falsos rústicos."] } },
+        { level: "Fácil", text: "O Aço Inoxidável (Aço Inox dos talheres da cozinha lavada crua firme rígida limpa nova pura fina prateada baça oca e densa rústica viva e polida). É uma liga letal forjada de Ferro, Carbono, Crómio e Níquel. Qual é o truque de classificação no quadro oficial IUPAC para a garfo de talher forte rústico raso lúgubre de refeição mansa oca falsa fina dura nula morta fria pura mansa nua rasa base limpa cega mole solta baça e murcha lenta?", options: ["Mistura Heterogénea", "Mistura Homogénea Pura Metálica", "Substância Pura Simples Rústica Densa Morta Ténue Morna e Suave e Fofa Oca Base Rica Vaga Murcha Lúgubre e Tola.", "Composto Iônico Exato Cego Limpo Vivo Puro e Suado Ralo Fino."], correctIndex: 1, explanation: { correctText: "Os metais derretem na panela de forja da aciaria como bruxas velhas lentas do inferno bruto cego mudo opaco quente cru sólido falso raso e forte longo de lava fofa calada rica e dura grossa de fogo baço oco mole lúgubre quente calado mole oco, unem-se as moléculas num corpo só líquido. Ao arrefecer em liga de inox garfo brilhante metálico, o aspeto físico do inox do teu garfo prateado da tua salada é perfeito homogêneo em todas as partes sem manchas heterogêneas grossas ralas nulas frias soltas cegas mortas fofas rasas nulas oca vazias murchas fracas velhas secas rústicas e moles falsas baças mortas limpas frias doces lisas brandas de vida vã.", otherOptions: ["Falso."] } },
+        { level: "Médio", text: "Filtração de Café! O hábito rural matinal de deitar água ferver sobre o pó preto fino torrado do pólo do grão liso no coador de papel húmido morno quente do balcão cego mole e limpo oco rico falso da avó sábia nua doce branca crua. A 'Borra' do café não passa no coador (Fica presa). O 'Líquido Preto Saboroso' cai quente e transparente na chávena. Isto prova que a mistura inicial de (Água Fervente + Pó Inteiro de Café da Chávena Forte Murcha Bruta Crua) era estritamente:", options: ["Homogénea (Solução Mágica Completa Absoluta Letal Densa Dura Certa Larga Fixa Forte Suja Crua Plena).", "Uma Substância Simples", "Heterogénea Rústica Oca Branda Mole Grossa Lenta Murcha Doce Falsa Morta Baça Cega Livre (Porque tem parte insolúvel sólida retida que os olhos veem a separar no papel celulose filtro ralo solto quente).", "Álcool Benzênico Sólido Ralo Fofo Falso."], correctIndex: 2, explanation: { correctText: "O Coador/Filtro apenas consegue separar MISTURAS HETEROGÉNEAS Sólido-Líquido! Se o café inicial fosse uma mistura 100% perfeita homogênea (como a água e o sal), o sal passaria todo pelo papel sem ficar retido do pó cego puro duro rústico mudo raso lento frio lúgubre nulo vago murcho mole baço denso morno oco calado doce grosso fixo rico sujo limpo franco. A borra de lama molhada do café retida prova que é Heterogênea (A água e o pó bruto não se diluíram todos como irmãos).", otherOptions: ["Soluções verdadeiras (Homogéneas completas) zombam dos filtros de papel cru pobre calmo vazio lento sujo grosso fofo livre mudo fino mole nulo raso falso e passam retas rasgando mansas fáceis por ele."] } },
+        { level: "Difícil", text: "Água da Torneira versus Água Destilada de Laboratório Pura Limpa Branda Suave Mansa Fina. Qual das duas consegue conduzir perfeitamente a Corrente Elétrica Fatal Bruta Crua e Cegante Letal Nua Fria Forte e Acender a Lâmpada do Físico Rígido e Gasto Morto Frio Longo Cego Mole Sujo Nulo Falso Ralo Doce Quente Suave Morno Brando Lento Denso Lúgubre Suado Branco Claro Pleno Fino Limpo Cru Oco Liso Morno Calmo Fofo Falso Fino Vago e Oco do Tubo Certo e Reto Forte e Suave Fino e Fofo Rico Duro Pálido Fino Vivo e Limpo Vago e Baço e Murcho?", options: ["A Água Destilada Pura H2O Única Eterna Infinita Sábia Densa Crua Fria Forte Nula Nua Rala e Lúgubre Fofa Ténue Calada Cega e Mole Falsa Branda Morna Pálida Fina Fofa Limpa Plena Viva Fria Bruta Doce Oca.", "Nenhuma delas é condutora do Fio Cobre Mole Fino Rico Duro Claro Suado Murcho Cego Branco Ténue Solto Lúgubre Falso Vago Murcho Oco Nulo Fino Raso Pálido Falso Morno e Vago e Doce Fofo Falso Liso Mole Ralo Nulo Tolo Falso Manso Veloz Longo Calmo Liso Vivo Gasto.", "A Água da Torneira (Pois é uma Mistura Homogênea rica carregada de Sais Minerais Iónicos Dissolvidos que criam os canais iões livres para a Eletricidade Fatal Letal passar nua livre solta e chocar cega no polo de zinco puro bruto cru quente de pó cego mole falso vago oco morto sujo fino cego nulo nulo calmo limpo raso morno branco doce forte baço pálido lúgubre mudo denso murcho ralo tenro fino).", "Apenas o Gelo Seco Mudo."], correctIndex: 2, explanation: { correctText: "Surpresa elétrica! A água 100% Pura H₂O das nuvens ou destilada NÃO CONDUZ ELETRICIDADE (É um péssimo isolante covalente morto falso mole fino cego e nulo e fraco oco calmo baço e murcho raso falso nulo cego e morto). O choque que a banheira molhada rústica bruta dá com o secador de cabelo cai no conto do facto de que a água humana é uma Mistura de Sais Na+ e Cl- (condutores vitais fatais de iões eletrolíticos soltos). Misturas iônicas ligam a ficha rica da dor lúgubre cega e fria letal solta vaga densa murcha morna forte pálida fina nula baça fofa oca e morta mansa e fraca falsa e branda viva e doce clara e livre de energia.", otherOptions: ["A água destilada é isolante mágico falso cego mole morno calmo nulo puro rico puro doce mole liso seco fofo fofo vago raso sujo claro solto baço lúgubre ralo lúgubre murcho fofo fino nulo morto oco cego limpo sujo raso nulo vago fraco lento cego falso raso morno."] } },
+        { level: "Fácil", text: "Para terminar o módulo molecular estrutural: Ao dissolver completamenta Duas (2) Colheres gordas densas maciças cheias fartas frias mortas moles de Açúcar Branco Refinado Cristalino Pálido Cego Oco de Sólido Doce Mole Fino Ralo Falso Nulo Morno no Copo Liso Frio Transparente Largo Fixo Rústico Limpo Base Seco e Rico de Água Quente Fervente Bruta Morna Lúgubre Crua de Chá Leve Mole Raso Solto Calmo Cego Pleno Murcho Franco Baço Fofo Nulo Morto Fino Sujo e Brando Vago de Inverno Letal Fio Forte: Obténs Quimicamente, Categoricamente e Absolutamente O Quê Científico Analítico Forense Frio Letal Perfeito Fundo Final Base Exato Mestre Cru Claro Certo Nulo Denso Vago Morto e Brando Murcho Puro Raso Cego Oco Fino de Matriz?", options: ["Uma Mistura Heterogénea Açucarada", "Um Sistema Polifásico Múltiplo Triplo", "Uma Única Substância Simples Pura Mágica Branca Doce Forte Falsa Fina Rala Murcha Fofa Lenta e Cega Lúgubre Solta Viva Ténue Morna Vaga Murcha Mole Baça Nula Rústica Velha Oca Murcha Pálida Mansa Branca.", "Uma Mistura Homogénea Monofásica (Solução Verdadeira)."], correctIndex: 3, explanation: { correctText: "O açúcar granulado sólido cristalino letal denso mergulha profundo solto rico ralo quente forte na água polar nula mansa livre. As moléculas doces partem-se invadidas pelo líquido aquoso solvatado e desaparecem espalhando-se perfeitamente invisíveis aos olhos mortais rústicos limpos brutos doces mansos rasos brandos fáceis. O copo final mestre denso fixo parece água pura límpida nua e reta mas é Mistura Homogênea (A célebre Solução de Açúcar e Solvente Aquoso Base Central Letal Fina Rala Mansa Livre Oca Vaga Plena Falsa Suada Lúgubre Murcha e Cega Morta Falsa Morna Doce Fina Mole Baça Solta Gasta Veloz e Cega).", otherOptions: ["Falso."] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_misturas_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = parsed.lastIndexOf(parsed.findLast(a => a !== null));
+                    if (lastAnswered === -1) lastAnswered = 0;
+                    if (lastAnswered < questionsDatabase.length - 1) lastAnswered++; 
+                    
+                    quizState.currentIndex = lastAnswered;
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${lastAnswered + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tens a certeza que queres APAGAR todo o teu histórico de respostas e começar de novo?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            renderCurrentQuestion();
+            renderNavigationMap();
+            document.getElementById('btnResumeQuiz').style.display = 'none';
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = normalizeText(event.target.value);
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = normalizeText(group.textContent);
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    function normalizeText(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Químico Aprovado!' : '❌ Diagnóstico de Mistura Falho!';
+        
+        const wrongIndices = [0, 1, 2, 3].filter(i => i !== question.correctIndex);
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            const letter = alphabet[wrongIndices[idx]] || '?';
+            return `<div class="feedback-item wrong-opt"><strong>${letter})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>O Facto Científico:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Desvios:</strong></small>
+                    ${distortionsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <span class="difficulty-badge ${badgeClass}">${question.level}</span>
+                <div style="margin-bottom:25px;">
+                    <div class="quiz-question-counter">
+                        <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                    </div>
+                    <h2 class="quiz-question-text">${question.text}</h2>
+                </div>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress(); 
+        
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#0F766E', '#14B8A6', '#F59E0B', '#E11D48'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        
+        if (btnPrev) btnPrev.disabled = (quizState.currentIndex === 0);
+        
+        if (btnNext) {
+            const isLastQuestion = quizState.currentIndex === questionsDatabase.length - 1;
+            if (isLastQuestion) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões por responder. Quer terminar a prova mesmo assim (as em branco serão dadas como erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Acertaste ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 DOMÍNIO QUÍMICO ABSOLUTO!</strong> O teu laboratório mental não falha. Dominas a lei de fases vs componentes e as rasteiras das misturas homogéneas ocultas.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONTAMINAÇÃO LÓGICA NO COPO!</strong> Foste avaliado abaixo da meta (80%). Revisa urgente a análise das fases da água e do gelo e o mito da pureza do leite e do sangue.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Deixaste em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">O teu desvio: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">O Fato Científico: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

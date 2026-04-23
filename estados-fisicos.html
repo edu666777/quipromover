@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Estados Físicos e Mudanças - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: QUÍMICA (Azul Petróleo / Teal) --- */
+        :root {
+            --bg-color: #F0FDFA; 
+            --text-color: #134E4A; 
+            --border-color: #042F2E; 
+            --white: #FFFFFF;
+            
+            --theme-light: #CCFBF1; 
+            --theme-medium: #14B8A6; 
+            --theme-dark: #0F766E; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #E11D48; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-medium) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .theory-box h4 { font-size: 1.1rem; font-weight: 800; color: var(--text-color); margin-top: 10px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: var(--theme-dark); font-weight: 700; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.teal { background-color: #F0FDFA; border-left-color: #0D9488; color: #115E59; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">🧊</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Estados Físicos e Mudanças</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <!-- VISTA: TEORIA -->
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Fusão, Gráfico, Ebulição)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <!-- 1. OS TRÊS ESTADOS -->
+            <section class="content-group">
+                <div class="section-badge">🧊 1. Os Três Estados Físicos</div>
+                <article class="theory-box search-target">
+                    <h3>Como a matéria se organiza?</h3>
+                    <p>O que diferencia um bloco de gelo, a água da torneira e o vapor invisível não é a substância (todas são H₂O), mas sim a <strong>Agitação (Energia Cinética)</strong> e o grau de união entre as moléculas.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="500" height="160" viewBox="0 0 450 160">
+                            <!-- SÓLIDO -->
+                            <rect x="20" y="20" width="100" height="100" fill="#CCFBF1" stroke="#042F2E" stroke-width="3"/>
+                            <text x="70" y="145" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">SÓLIDO</text>
+                            <!-- Grelha compacta (Sólido) -->
+                            <circle cx="45" cy="45" r="8" fill="#0F766E"/> <circle cx="65" cy="45" r="8" fill="#0F766E"/> <circle cx="85" cy="45" r="8" fill="#0F766E"/>
+                            <circle cx="45" cy="65" r="8" fill="#0F766E"/> <circle cx="65" cy="65" r="8" fill="#0F766E"/> <circle cx="85" cy="65" r="8" fill="#0F766E"/>
+                            <circle cx="45" cy="85" r="8" fill="#0F766E"/> <circle cx="65" cy="85" r="8" fill="#0F766E"/> <circle cx="85" cy="85" r="8" fill="#0F766E"/>
+                            
+                            <!-- LÍQUIDO -->
+                            <rect x="175" y="20" width="100" height="100" fill="#DBEAFE" stroke="#042F2E" stroke-width="3"/>
+                            <text x="225" y="145" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">LÍQUIDO</text>
+                            <!-- Moléculas soltas no fundo (Líquido) -->
+                            <path d="M 175 60 Q 200 70 225 60 T 275 60 L 275 120 L 175 120 Z" fill="#93C5FD" opacity="0.5"/>
+                            <circle cx="195" cy="95" r="8" fill="#1D4ED8"/> <circle cx="215" cy="105" r="8" fill="#1D4ED8"/> <circle cx="235" cy="90" r="8" fill="#1D4ED8"/>
+                            <circle cx="255" cy="105" r="8" fill="#1D4ED8"/> <circle cx="205" cy="80" r="8" fill="#1D4ED8"/> <circle cx="240" cy="75" r="8" fill="#1D4ED8"/>
+                            <circle cx="190" cy="110" r="8" fill="#1D4ED8"/> <circle cx="260" cy="90" r="8" fill="#1D4ED8"/>
+                            
+                            <!-- GASOSO -->
+                            <rect x="330" y="20" width="100" height="100" fill="#FEF2F2" stroke="#042F2E" stroke-width="3"/>
+                            <text x="380" y="145" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">GASOSO</text>
+                            <!-- Moléculas muito espalhadas e a voar (Gás) -->
+                            <circle cx="350" cy="40" r="8" fill="#E11D48"/>
+                            <path d="M 355 45 L 365 55" stroke="#E11D48" stroke-width="2" stroke-dasharray="2,2"/>
+                            
+                            <circle cx="400" cy="30" r="8" fill="#E11D48"/>
+                            <path d="M 390 35 L 380 45" stroke="#E11D48" stroke-width="2" stroke-dasharray="2,2"/>
+                            
+                            <circle cx="360" cy="90" r="8" fill="#E11D48"/>
+                            <path d="M 365 80 L 375 70" stroke="#E11D48" stroke-width="2" stroke-dasharray="2,2"/>
+                            
+                            <circle cx="410" cy="80" r="8" fill="#E11D48"/>
+                            <path d="M 400 85 L 390 95" stroke="#E11D48" stroke-width="2" stroke-dasharray="2,2"/>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Sólido:</strong> Forma Constante e Volume Constante. As partículas estão compactadas, lado a lado, apenas a vibrar.</li>
+                        <li><strong>Líquido:</strong> Forma Variável (ganha a forma do copo onde o pões) e Volume Constante. As partículas escorregam umas sobre as outras.</li>
+                        <li><strong>Gasoso:</strong> Forma Variável e Volume Variável (enche totalmente qualquer sala onde o soltes). Partículas caóticas, soltas e a alta velocidade.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- 2. MUDANÇAS DE FASE -->
+            <section class="content-group">
+                <div class="section-badge">🔥 2. Nomenclatura das Mudanças</div>
+                <article class="theory-box search-target">
+                    <h3>Aquecer vs. Arrefecer</h3>
+                    <p>A matéria muda de estado quando absorve calor (Endotérmico) ou perde calor (Exotérmico).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="500" height="220" viewBox="0 0 500 220">
+                            <!-- Blocos dos Estados -->
+                            <rect x="30" y="80" width="100" height="50" rx="10" fill="#D1FAE5" stroke="#042F2E" stroke-width="3"/>
+                            <text x="80" y="110" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">SÓLIDO</text>
+                            
+                            <rect x="200" y="80" width="100" height="50" rx="10" fill="#DBEAFE" stroke="#042F2E" stroke-width="3"/>
+                            <text x="250" y="110" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">LÍQUIDO</text>
+                            
+                            <rect x="370" y="80" width="100" height="50" rx="10" fill="#FCE7F3" stroke="#042F2E" stroke-width="3"/>
+                            <text x="420" y="110" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">GASOSO</text>
+
+                            <!-- SETAS ENDOTÉRMICAS (Aquecimento - VERMELHAS para a direita) -->
+                            <!-- Fusão -->
+                            <path d="M 135 90 L 190 90" fill="none" stroke="#E11D48" stroke-width="3"/>
+                            <polygon points="190,90 180,85 180,95" fill="#E11D48"/>
+                            <text x="162" y="80" font-size="11" font-weight="800" fill="#E11D48" text-anchor="middle">Fusão</text>
+                            
+                            <!-- Vaporização -->
+                            <path d="M 305 90 L 360 90" fill="none" stroke="#E11D48" stroke-width="3"/>
+                            <polygon points="360,90 350,85 350,95" fill="#E11D48"/>
+                            <text x="332" y="80" font-size="11" font-weight="800" fill="#E11D48" text-anchor="middle">Vaporização</text>
+
+                            <!-- Sublimação (Arco Superior) -->
+                            <path d="M 80 75 Q 250 -10 420 75" fill="none" stroke="#E11D48" stroke-width="4" stroke-dasharray="6,4"/>
+                            <polygon points="420,75 410,65 410,85" fill="#E11D48"/>
+                            <text x="250" y="30" font-size="13" font-weight="900" fill="#E11D48" text-anchor="middle">SUBLIMAÇÃO (Direta)</text>
+
+                            <!-- SETAS EXOTÉRMICAS (Arrefecimento - AZUIS para a esquerda) -->
+                            <!-- Condensação -->
+                            <path d="M 365 120 L 310 120" fill="none" stroke="#2563EB" stroke-width="3"/>
+                            <polygon points="310,120 320,115 320,125" fill="#2563EB"/>
+                            <text x="337" y="138" font-size="11" font-weight="800" fill="#2563EB" text-anchor="middle">Condensação</text>
+
+                            <!-- Solidificação -->
+                            <path d="M 195 120 L 140 120" fill="none" stroke="#2563EB" stroke-width="3"/>
+                            <polygon points="140,120 150,115 150,125" fill="#2563EB"/>
+                            <text x="167" y="138" font-size="11" font-weight="800" fill="#2563EB" text-anchor="middle">Solidificação</text>
+
+                            <!-- Ressublimação (Arco Inferior) -->
+                            <path d="M 420 135 Q 250 220 80 135" fill="none" stroke="#2563EB" stroke-width="4" stroke-dasharray="6,4"/>
+                            <polygon points="80,135 90,125 90,145" fill="#2563EB"/>
+                            <text x="250" y="195" font-size="13" font-weight="900" fill="#2563EB" text-anchor="middle">RESSUBLIMAÇÃO</text>
+                        </svg>
+                    </div>
+
+                    <div class="highlight-box teal" style="margin-bottom: 5px;">
+                        <strong>O Mistério da Sublimação:</strong><br>
+                        A <strong>Sublimação</strong> atua como um "teletransporte" da matéria. O sólido vira gás diretamente, sem derreter e passar pelo líquido primeiro. É por isso que a <strong>Naftalina</strong> no guarda-roupa desaparece sem molhar as roupas, e o <strong>Gelo Seco</strong> (CO₂ sólido) cria aquela fumaça cinematográfica de palco sem deixar poças de água. O inverso (Gás ➔ Sólido) chama-se <strong>Ressublimação</strong> (ex: formação de geada severa no inverno).
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>Os 3 Tipos de Vaporização:</strong><br>
+                        A passagem do Líquido para Gás pode ocorrer de 3 maneiras distintas:<br>
+                        <strong>1. Evaporação:</strong> Lenta e natural à temperatura ambiente (ex: roupa a secar ao sol).<br>
+                        <strong>2. Ebulição:</strong> Rápida e turbulenta (ex: água a ferver no fogão a 100ºC, criando bolhas).<br>
+                        <strong>3. Calefação:</strong> Choque térmico instantâneo (ex: pingo de água a bater numa frigideira a ferver).
+                    </div>
+                </article>
+            </section>
+
+            <!-- 3. GRÁFICOS DE AQUECIMENTO -->
+            <section class="content-group">
+                <div class="section-badge">📈 3. O Gráfico de Aquecimento</div>
+                <article class="theory-box search-target">
+                    <h3>Pura vs. Mistura (O Ponto Crítico)</h3>
+                    <p>O IFCE adora testar a tua capacidade de olhar para uma curva de aquecimento e descobrir se o pó no laboratório é uma substância <strong>Pura</strong> (como a água destilada) ou uma <strong>Mistura</strong> (como a água do mar).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="450" height="200" viewBox="0 0 400 200">
+                            <!-- Eixos -->
+                            <line x1="40" y1="180" x2="380" y2="180" stroke="#042F2E" stroke-width="3"/>
+                            <line x1="40" y1="10" x2="40" y2="180" stroke="#042F2E" stroke-width="3"/>
+                            <text x="20" y="20" font-size="12" font-weight="900" fill="#042F2E">T(ºC)</text>
+                            <text x="380" y="195" font-size="12" font-weight="900" fill="#042F2E">t(min)</text>
+                            
+                            <!-- Gráfico de Substância Pura -->
+                            <!-- Aquecimento Sólido -->
+                            <line x1="40" y1="160" x2="100" y2="120" stroke="#E11D48" stroke-width="4"/>
+                            <text x="60" y="155" font-size="12" font-weight="bold" fill="#E11D48">Sólido</text>
+                            
+                            <!-- Fusão (Patamar Constante) -->
+                            <line x1="100" y1="120" x2="180" y2="120" stroke="#1D4ED8" stroke-width="5"/>
+                            <text x="140" y="115" font-size="12" font-weight="bold" fill="#1D4ED8" text-anchor="middle">S + L (PF)</text>
+                            <line x1="40" y1="120" x2="100" y2="120" stroke="#042F2E" stroke-width="1" stroke-dasharray="3,3"/>
+                            <text x="10" y="125" font-size="10" font-weight="bold" fill="#042F2E">0ºC</text>
+
+                            <!-- Aquecimento Líquido -->
+                            <line x1="180" y1="120" x2="240" y2="60" stroke="#E11D48" stroke-width="4"/>
+                            <text x="220" y="105" font-size="12" font-weight="bold" fill="#E11D48">Líquido</text>
+                            
+                            <!-- Ebulição (Patamar Constante) -->
+                            <line x1="240" y1="60" x2="320" y2="60" stroke="#1D4ED8" stroke-width="5"/>
+                            <text x="280" y="55" font-size="12" font-weight="bold" fill="#1D4ED8" text-anchor="middle">L + G (PE)</text>
+                            <line x1="40" y1="60" x2="240" y2="60" stroke="#042F2E" stroke-width="1" stroke-dasharray="3,3"/>
+                            <text x="10" y="65" font-size="10" font-weight="bold" fill="#042F2E">100ºC</text>
+
+                            <!-- Aquecimento Gás -->
+                            <line x1="320" y1="60" x2="360" y2="20" stroke="#E11D48" stroke-width="4"/>
+                            <text x="350" y="45" font-size="12" font-weight="bold" fill="#E11D48">Gás</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>A Regra de Ouro (O Patamar):</strong> Quando uma substância é <strong>PURA</strong> (como no desenho acima), enquanto ela está a derreter (Fusão) ou a ferver (Ebulição), a temperatura <strong>congela</strong>. A linha do gráfico fica reta e deitada (constante).</li>
+                        <li><strong>O que é uma Mistura?</strong> Se tentares derreter plástico ou ferver água do mar (mistura com sal), a linha <em>não fica reta</em>. A temperatura continua a subir (na diagonal) durante as mudanças de fase.</li>
+                        <li><strong>Durante a linha reta:</strong> Coexistem dois estados físicos (ex: no patamar de fusão, o gelo e a água líquida estão a partilhar o mesmo copo a 0ºC).</li>
+                    </ul>
+
+                    <div class="highlight-box teal">
+                        <strong>Misturas Especiais:</strong><br>
+                        - Mistura <strong>Eutética</strong>: Engana a ciência derretendo como se fosse pura (PF constante), mas ferve mal (PE variável). Muito comum em ligas metálicas (ex: Bronze).<br>
+                        - Mistura <strong>Azeotrópica</strong>: Derrete mal (PF variável), mas ferve maravilhosamente reta (PE constante). Ex: Mistura de Álcool a 96% com Água.
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Progresso 🔄
+            </button>
+        </main>
+
+        <!-- VISTA: PRÁTICA (QUIZ) -->
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - IFCE</h2>
+                <p style="color: var(--theme-contrast); font-size: 0.95rem; font-weight:600;">
+                    30 questões de Nível Técnico. Acerta <strong>80% (24/30)</strong> para dominares a termodinâmica básica e os gráficos. O teu progresso fica salvo automaticamente!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <!-- VISTA: RESULTADOS -->
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Acertaste 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <!-- RODAPÉ DE NAVEGAÇÃO -->
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - IFCE Foco: Estados Físicos) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Um pedaço de gelo foi retirado do congelador e deixado em cima da mesa. Passado algum tempo, ele derreteu completamente, transformando-se em água líquida. Como se chama a mudança de estado físico que ocorreu com o gelo?", options: ["Vaporização", "Condensação", "Fusão", "Sublimação"], correctIndex: 2, explanation: { correctText: "A passagem direta do estado sólido para o estado líquido chama-se Fusão. O gelo absorveu calor da sala para derreter.", otherOptions: ["Vaporização é de líquido para gás.", "Condensação é de gás para líquido.", "Sublimação é de sólido direto para gás."] } },
+        { level: "Médio", text: "Qual das seguintes características é comum e exclusiva a todas as substâncias no estado SÓLIDO?", options: ["Possuem forma variável, adaptando-se a qualquer recipiente.", "Possuem altíssima energia cinética (agitação) nas suas moléculas.", "Possuem volume variável, podendo ser comprimidas infinitamente.", "Possuem Forma Constante e Volume Constante, devido à forte atração entre as suas partículas."], correctIndex: 3, explanation: { correctText: "No estado sólido, a força de coesão é tão alta que as moléculas formam retículos de cristal rígidos. Não mudam de forma e o seu volume não é espremível na prática humana comum.", otherOptions: ["Forma variável é para líquidos e gases.", "Alta energia cinética é nos gases."] } },
+        { level: "Fácil", text: "A água líquida dentro de uma seringa tapada não pode ser empurrada/comprimida pelo êmbolo. Mas se a seringa estiver vazia (com ar), o êmbolo desce facilmente. O que justifica esse comportamento estrutural ao nível das partículas?", options: ["Os líquidos não têm massa, logo não podem ser apertados.", "No gás (ar), as partículas estão muito afastadas (espaço vazio enorme), permitindo compressão. No líquido, elas já estão encostadas, deslizando mas não se comprimindo mais.", "O ar evapora quando tocamos nele.", "A água tem uma forma constante impenetrável igual ao granito."], correctIndex: 1, explanation: { correctText: "Os gases têm um volume altamente variável porque a maior parte do que constitui um gás é o nada (espaço vazio). Os líquidos têm volume constante.", otherOptions: ["Líquidos têm massa.", "A água tem forma variável, mas volume constante."] } },
+        { level: "Médio", text: "Tirar a roupa molhada da máquina e estendê-la no estendal num dia de sol permite que ela seque após algumas horas. Qual foi o tipo EXATO de vaporização que ocorreu na roupa?", options: ["Ebulição", "Calefação", "Sublimação", "Evaporação"], correctIndex: 3, explanation: { correctText: "A vaporização natural, lenta, que ocorre tranquilamente à temperatura ambiente na superfície do líquido, chama-se Evaporação.", otherOptions: ["Ebulição requer que se atinja a temperatura máxima de fervura (100ºC para a água) fazendo bolhas ruidosas.", "Calefação é bater numa chapa a 200ºC (pffff!) instantaneamente."] } },
+        { level: "Fácil", text: "Ao tomar um banho muito quente no inverno, percebes que o espelho da casa de banho fica completamente embaciado, coberto de gotas de água. Que mudança de fase originou este embaciamento?", options: ["Solidificação", "Condensação (ou Liquefação)", "Sublimação", "Evaporação do vidro"], correctIndex: 1, explanation: { correctText: "O vapor de água invisível que vinha do banho quente bateu no vidro frio do espelho. Ele perdeu calor (exotérmico) e voltou a ser água líquida na forma de gotículas. Isto é Condensação.", otherOptions: ["Não formou gelo (Solidificação).", "Evaporação seria a água desaparecer do espelho."] } },
+        { level: "Difícil", text: "Uma substância foi encontrada no planeta Marte. Um rover da NASA determinou que essa matéria possui VOLUME CONSTANTE, mas a sua FORMA É VARIÁVEL, moldando-se instantaneamente ao fundo da cratera onde caiu. Em que estado físico se encontra a matéria marciana?", options: ["Estado Sólido", "Estado Gasoso", "Estado Plasma", "Estado Líquido"], correctIndex: 3, explanation: { correctText: "Volume constante (não pode ser comprimido num balão fechado sem estourar) mas Forma variável (ganha a forma da bacia/cratera que a contiver) é a definição exata do estado Líquido em todo o universo.", otherOptions: ["Sólido tem forma constante.", "Gasoso tem volume variável (ocupa a cratera inteira até ao teto)."] } },
+        { level: "Médio", text: "A Naftalina (aquelas bolinhas brancas que as avós punham nas gavetas da roupa para matar traças) vai desaparecendo com o tempo, sem nunca molhar a roupa. Como se chama a passagem direta de Sólido para Gás que a naftalina sofre?", options: ["Sublimação", "Calefação Direta", "Efusão", "Ressublimação"], correctIndex: 0, explanation: { correctText: "A Sublimação é a passagem do estado Sólido diretamente para o Gás, pulando o estado líquido. O Gelo Seco (CO2 sólido) em festas de fumo faz exatamente o mesmo.", otherOptions: ["Calefação é de líquido para gás instantaneamente.", "Ressublimação é o inverso (Gás -> Sólido)."] } },
+        { level: "Fácil", text: "O IFCE apresenta um fluxograma de mudanças de estado físico (Sólido -> Líquido -> Gasoso). Do ponto de vista Termodinâmico, o que têm em comum a Fusão e a Vaporização?", options: ["Ambas são reações nucleares de fissão.", "Ambas são processos EXOTÉRMICOS (o corpo liberta calor para arrefecer).", "Ambas são processos ENDOTÉRMICOS (o corpo tem de absorver/receber calor do fogo ou do ambiente para acontecerem).", "Ambas ocorrem instantaneamente à pressão de 10 atmosferas."], correctIndex: 2, explanation: { correctText: "Tudo o que for para a 'direita' (S -> L -> G) exige aquecimento. O corpo precisa de ENTRAR calor para dentro de si (Endo = dentro, Térmico = Calor).", otherOptions: ["Exotérmico é o que deita frio para fora (L -> S, congelar, o frigorífico tira-lhe o calor)."] } },
+        { level: "Médio", text: "Cozinhar ovos: A dona de casa põe água a ferver no fogão. Quando a água atinge uma fervura caótica, com muitas bolhas a rebentar no interior do líquido aos 100ºC, qual o nome técnico exato dessa vaporização?", options: ["Evaporação", "Ebulição", "Calefação", "Solidificação"], correctIndex: 1, explanation: { correctText: "A Ebulição é o processo rápido, forçado por aquecimento externo extremo e que ocorre em toda a massa do líquido (e não apenas na superfície), criando as características bolhas.", otherOptions: ["Evaporação é lenta.", "Calefação é choque brutal numa chapa mil vezes mais quente."] } },
+        { level: "Difícil", text: "A água pura entra em Ebulição a 100ºC quando testada ao nível do mar (pressão de 1 atmosfera). O que acontece se tentares ferver a mesma água pura no alto de uma montanha (como nos Andes, onde a pressão do ar é muito MENOR)?", options: ["A água vai ferver a UMA TEMPERATURA MAIS BAIXA (ex: 85ºC), pois há menos ar 'esmagando' o líquido e as moléculas escapam mais facilmente.", "A água vai ferver a 120ºC, pois faz mais frio.", "A água pura vai ferver a 100ºC na mesma, pois é uma constante universal independente de onde estiver.", "A água nunca ferverá."], correctIndex: 0, explanation: { correctText: "Para ferver, as moléculas de água do fundo da panela têm de ter força suficiente para bater na pressão do ar atmosférico e subir. Se estás no monte e a pressão do ar é fraca, a água precisa de muito pouca força térmica (85ºC) para virar vapor.", otherOptions: ["O Ponto de Ebulição não é universal, ele depende dramaticamente da Pressão."] } },
+        { level: "Médio", text: "Análise de Gráfico: Ao traçar a curva de aquecimento de um misterioso pó branco de laboratório, o aluno notou que, durante a Fusão (derretimento), a temperatura do termómetro não subia de jeito nenhum, ficando cravada nos 50ºC. Mas quando começou a ferver (Ebulição), a temperatura variou dos 120ºC até aos 140ºC na diagonal. Que tipo de material é este pó?", options: ["Uma Substância Pura Absoluta.", "Uma Mistura Azeotrópica.", "Uma Mistura Eutética (Enganou na fusão como pura, mas falhou na ebulição).", "Uma Mistura Comum Completa."], correctIndex: 2, explanation: { correctText: "Mistura Eutética: Comporta-se como uma campeã Pura durante a Fusão (tem Patamar Fixo), mas denuncia-se como mistura na Ebulição (não tem patamar fixo, a linha sobe na diagonal). As ligas de metal/solda geralmente são eutéticas.", otherOptions: ["Substância pura teria ambos retos.", "Azeotrópica tem o patamar de Ebulição reto e o de Fusão inclinado (exato oposto)."] } },
+        { level: "Difícil", text: "Gráfico de Aquecimento (O Teste Decisivo): Se tivermos o gráfico T(ºC) vs tempo de uma amostra de ÁGUA PURA que começou a -10ºC. No momento em que o gráfico mostra uma linha RETA HORIZONTAL nos 100ºC, o que está fisicamente dentro da panela nesse exato minuto?", options: ["Apenas vapor gasoso muito quente.", "Apenas água líquida pronta a ferver amanhã.", "Estão a coexistir DUAS fases em simultâneo: Água Líquida e Vapor a lutar pela transição.", "Há um erro, a água pura não tem linhas horizontais, só na diagonal."], correctIndex: 2, explanation: { correctText: "Isto é crucial! Durante TODO o patamar (a linha horizontal do Ponto de Ebulição ou Fusão), tu tens uma MISTURA FÍSICA DE ESTADOS. Nos 100ºC, tens o líquido que ainda não teve tempo de evaporar E o gás que está a nascer. Enquanto a última gota de líquido não virar gás, a temperatura NÃO sai dos 100ºC.", otherOptions: ["Erro clássico: achar que a linha de 100ºC já é só gás puríssimo imediato."] } },
+        { level: "Fácil", text: "De madrugada, as folhas das plantas acordam com gotas de água brilhantes em cima (o orvalho), mesmo que não tenha chovido. Qual a origem desta água?", options: ["A planta chora suco gástrico pelas folhas à noite.", "O vapor de água presente no ar da madrugada embate nas folhas frias, perde energia exotérmica e Condensa (Liquefaz) na forma de orvalho líquido.", "É o fenómeno da Sublimação Noturna.", "O gelo derreteu por Fusão."], correctIndex: 1, explanation: { correctText: "A condensação é a conversão do gás para líquido. O ar da nossa atmosfera está carregado de umidade gasosa. Ao arrefecer durante a noite nas superfícies frias, volta a virar água. É o mesmo processo de uma lata de refrigerante gelada a 'suar' no verão.", otherOptions: ["As plantas podem sofrer gutação natural, mas o orvalho típico sobre carros e vidros é 100% condensação atmosférica."] } },
+        { level: "Médio", text: "A que temperatura exata ocorre a passagem da água LÍQUIDA pura para o estado SÓLIDO (Gelo) ao nível do mar, e que nome técnico tem este ponto no gráfico termodinâmico?", options: ["A 100ºC, Ponto de Ebulição (PE).", "A 0ºC, Ponto de Solidificação (PS), que ocorre na mesma marca térmica exata que o Ponto de Fusão (PF).", "A -10ºC, Ponto de Eutético Total.", "A 0ºC, Ponto de Calefação."], correctIndex: 1, explanation: { correctText: "Regra mágica das substâncias puras: A temperatura em que derrete (0ºC) é a EXATA mesma temperatura em que congela (0ºC). O patamar de subida e descida térmica ocorre na mesma morada do termómetro.", otherOptions: ["Não confunda, a fusão é uma ida, a solidificação é a volta, ambas a 0 graus na água destilada."] } },
+        { level: "Difícil", text: "Tens um copo fechado com Água Misturada com Sal (uma salmoura). Se a levares ao fogo para criar um Gráfico de Aquecimento, como se comportará a linha do termómetro no Ponto de Ebulição?", options: ["A linha ficará perfeitamente RETA e paralela ao eixo do tempo, como dita a lei pura de 100ºC de Kelvin.", "A temperatura começará a subir aos 100ºC, e não ficará reta. Em vez de estabilizar, a linha vai continuar a SUBIR na diagonal durante toda a fervura do líquido.", "A água salgada irá descer de temperatura e congelar.", "Ficará reta mas aos 80ºC."], correctIndex: 1, explanation: { correctText: "Misturas COMUNS (não eutéticas nem azeotrópicas) NUNCA têm patamares retos no gráfico. Elas derretem torto e fervem torto (diagonal). À medida que a água evapora da panela, a concentração de sal lá dentro fica gigante, o que obriga o fogo a dar ainda mais calor para ferver o resto, subindo a temperatura.", otherOptions: ["Reta paralela é a identidade e cartão de cidadão exclusivo das substâncias puras isoladas."] } },
+        { level: "Fácil", text: "Ao cair um pingo de água numa chapa de churrasco de aço a 300ºC, ele ferve instantaneamente num micro-segundo fazendo o barulho 'Tshssss'. Que tipo de vaporização violenta e traumática ocorreu?", options: ["Evaporação", "Ebulição", "Calefação", "Fusão Lenta"], correctIndex: 2, explanation: { correctText: "A Calefação é a vaporização de choque brutal. Ocorre quando o líquido atinge uma superfície que está muito acima do seu ponto normal de ebulição (100ºC).", otherOptions: ["Evaporação leva horas. Ebulição demora uns bons 5 minutos a borbulhar numa panela comum."] } },
+        { level: "Médio", text: "Análise Reversa de Gráfico de Arrefecimento: Num gráfico onde a temperatura começou nos 150ºC e VEM DESCENDO com o tempo. Qual a ORDEM de surgimento dos estados físicos numa substância pura até chegar aos -20ºC?", options: ["Sólido, Líquido, Gasoso.", "Gás, Patamar de Condensação, Líquido, Patamar de Solidificação, Sólido.", "Líquido, Sólido, Gás.", "O gráfico vai explodir nos -20ºC."], correctIndex: 1, explanation: { correctText: "Arrefecer é vir de cima para baixo! A 150ºC é Gás quente. A curva desce. Pára no Ponto de Condensação (vira água). Desce a curva do líquido. Pára no Ponto de Solidificação (vira gelo duro). E depois desce a curva do gelo negativo até -20ºC.", otherOptions: ["A primeira opção seria se fosse Aquecimento de baixo para cima."] } },
+        { level: "Médio", text: "Num laboratório de criminalística do IFCE, foi pedido aos alunos para identificar uma Substância PURA sem errar. Eles têm apenas um aquecedor e um papel de gráfico. O que procuram eles freneticamente ver na linha de tinta vermelha do gráfico?", options: ["Dois patamares oblíquos (tortos) cruzados no centro.", "A presença inconfundível de DOIS patamares HORIZONTAIS puros (retas deitadas paralelas ao eixo t) - um na Fusão e outro na Ebulição.", "Um círculo indicando sublimação dupla.", "Uma única reta infinita."], correctIndex: 1, explanation: { correctText: "O carimbo de Substância Pura é ter o PF e o PE fixos como rochas matemáticas. Se a linha do termômetro não se mexe nesses dois momentos do teste térmico, podes carimbar o relatório: a amostra é 100% Pura sem misturas.", otherOptions: ["Qualquer linha oblíqua ali denuncia a fraude: é uma mistura adulterada!"] } },
+        { level: "Difícil", text: "Misturas Azeotrópicas. A mais famosa de Portugal e Brasil é o Álcool Étílico hidratado (a 96% de álcool e 4% de água). Se os alunos da saúde colocarem este álcool específico a ferver na lamparina, que mentira gráfica esta mistura lhes irá pregar?", options: ["Vai fazer o frasco de vidro virar sólido.", "Ela vai enganar o gráfico e comportar-se exatamente como uma substância PURA apenas no momento de FERVER (Ebulição Reta), com ambas as substâncias a evaporarem de mãos dadas a 78,1ºC.", "Ela não vai ferver nunca porque tem água misturada a anular o fogão forte.", "Vai derreter reto na Fusão (Eutética falsa)."], correctIndex: 1, explanation: { correctText: "Azeo (A ferver). Esta mistura é o pesadelo das destilarias. Quando chega aos 78,1ºC, a água e o álcool entram num acordo mágico e vaporizam juntos num patamar perfeitamente RETO como se fossem uma só substância Pura! É por isso que não dá para tirar os últimos 4% de água do álcool aquecendo-o normalmente num alambique simples.", otherOptions: ["Eutética (como Solda Metálica) é a que engana no patamar do gelo/derretimento da Fusão, não na fervura gasta."] } },
+        { level: "Fácil", text: "Qualitativamente, o que é que a temperatura de um corpo mede na realidade microscópica invisível ao olho humano?", options: ["A cor azulada radiante das moléculas quentes no infravermelho de gelo.", "O grau de Agitação (Energia Cinética) das partículas. Mais quente = partículas a tremerem ou a voarem como loucas e furiosas.", "O peso invisível do fogo puro de Prometeu em latim gótico.", "A inércia gravitacional das moléculas gordas do ferro baço maciço."], correctIndex: 1, explanation: { correctText: "O calor não é uma gosma que entra no corpo. Calor é agitação pura. Congelar o pão é tirar as moléculas a tremer do pão e forçá-las a ficar imóveis e duras coladas umas nas outras. Fogo forte é fazer as moléculas dançarem mosh pit.", otherOptions: ["Cor não define temperatura de forma básica molecular rústica fundamental.", "Fogo pesa zero, não é matéria rústica final."] } },
+        { level: "Médio", text: "Ao passar de Gás para Líquido e de Líquido para Sólido (arrefecimento glacial noturno frio), as moléculas do corpo estão a:", options: ["Ganhar Energia Térmica forte para se libertarem do cárcere do metal prisional do copo.", "Aumentar brutalmente os espaços vazios mortos mortais do vácuo entre elas na atmosfera solta fina.", "PERDER Energia (processo Exotérmico), o que as obriga a abrandar a sua agitação insana, perdendo a força e aproximando-se muito mais de forma a darem as mãos no estado cristalino calmo duro final.", "Mudar os seus átomos para hidrogênio puro claro rico falso."], correctIndex: 2, explanation: { correctText: "O arrefecimento rouba-lhes a força. Sem o calor da agitação para lutarem contra a gravidade e as forças de atração, elas colapsam. O gás condensa. O líquido fica exausto e congela endurecendo a sua matéria fina lenta no gelo.", otherOptions: ["Ganhar energia gera fervura.", "Aumentar os espaços ocorre na vaporização caótica."] } },
+        { level: "Difícil", text: "Gráficos Extremos IFCE: Num laboratório de testes do Exército, o Ferro Sólido a 20ºC foi aquecido no alto forno de ensaios militares. O Ponto de Fusão do Ferro é de 1538ºC. O seu Ponto de Ebulição é incrível, aos 2862ºC. Se o sensor da caldeira marcava 2000ºC, em que estado físico mergulhado estava o ferro?", options: ["Plasma Radiante Verde", "Estado Gasoso (nuvem de ferro).", "Estado Líquido (ferro derretido como lava avermelhada de vulcão escorrendo a correr na vala do tanque pesado bruto do ferro cru).", "Estado Sólido de bigorna militar intacta rígida dura pesada cega."], correctIndex: 2, explanation: { correctText: "Raciocínio lógico na linha termométrica vital do exame! Os 2000ºC estão a MEIO CAMINHO. Já passou os 1538ºC (onde derreteu abandonando a barra rígida), mas ainda não atingiu o calor excruciante dos 2862ºC para o metal ferver e virar nuvem de gás denso. Logo, a 2000ºC está no meio: Líquido ardente fatal letal puro claro bruto quente.", otherOptions: ["Ferveria para virar vapor de ferro de solda só aos 2862 graus.", "Continuaria Sólido se o termómetro lido do teste marcasse apenas 1000ºC falhos e parcos."] } },
+        { level: "Médio", text: "No Ciclo da Água no meio ambiente puro brasileiro agrário global, o vapor de água originado pelas árvores e rios quentes sobe aos céus, encontra as camadas muito frias e agrestes de altitude e transforma-se novamente em gotas minúsculas líquidas, formando uma Nuvem de algodão doce escuro letal. Qual a transição química oficial meteorológica desta etapa exata?", options: ["Ebulição Solar de Nuvens Claras", "Condensação (ou Liquefação) Térmica", "Sublimação Espontânea Celeste Branca Seca Fofa Pura Viva Gélida", "Efusão Lógica do Sol Verde Falso Oco"], correctIndex: 1, explanation: { correctText: "A condensação é a conversão atmosférica final natural do ar. O vapor invisível gélido toca na poeira do céu e nas nuvens, arrefece o ar, condensa (vira líquido), a nuvem fica saturada de peso negro e, fatalmente inerte, chove.", otherOptions: ["A formação de nuvens de água não é evaporação primária, isso foi o rio no chão.", "Efusão é de gás em micro furos."] } },
+        { level: "Fácil", text: "O gás butano (o gás de isqueiro de bolso da mochila de rua rural) é vendido pressurizado e 'Líquido' lá dentro do pequeno tanque de acrílico opaco fino. Porquê que ele está líquido lá dentro sem nunca ser arrefecido no gelo?", options: ["Porque as empresas juntaram uma enorme dose de água barata da chuva para vender o isqueiro.", "Porque o estado do gás é regido por Temperatura E Pressão. Como o isqueiro tem as paredes sob Pressão Esmagadora Externa bruta, as moléculas do gás foram empurradas violentamente forçadas até se encostarem dando as mãos em Líquido.", "Porque a fábrica aplicou feitiço químico do petróleo frio escuro baço.", "Porque butano nunca foi gás puro do planeta da rocha fria mansa de cor amarela nua da vila morta chata livre doce fina lúgubre solta gorda cega pura."], correctIndex: 1, explanation: { correctText: "A Pressão muda as regras da termodinâmica de compressibilidade. A fábrica comprime tanto o gás no cilindro de metal e plástico, apertando o volume microscópico livre dele que as moléculas desistem e viram líquido para caberem sem destruir a parede da bala crua. No botão do dedo tu abres a panela, dás-lhe espaço e ela evapora como gás no jato.", otherOptions: ["A água arruinaria a queima letal bruta rústica fatal.", "Falso, butano é gás do crude do fundo cru cego do óleo denso raso frio da pedra nua calada de poço seco."] } },
+        { level: "Médio", text: "Qualidade do Laboratório: Uma linha reta inclinada subindo num Gráfico de Aquecimento (antes do Ponto de Fusão letal, desde os -50ºC até aos 0ºC na água sólida de gelo pálido mudo fino livre) significa essencialmente para a ciência física termodinâmica da engenharia limpa central básica rústica dura quente do frio da câmara oca:", options: ["Que ali coexistem ambos os estados Físicos Gelo da Neve e a Água da Torneira Quente Doce Límpida de Rua.", "Que tu estás efetivamente A AQUECER apenas e somente SÓLIDO (Gelo ganhando energia, subindo a febre até derreter).", "Que tu ligaste a refrigeração noturna da cidade de gelo frio rústico calmo morto de nevoeiro escuro de lua de vento puro vago gélido brando cego claro macio doce.", "O ponto exato de Eutético puro branco sujo nulo falho livre solto murcho vago ralo mole cego fino morto mudo calmo."], correctIndex: 1, explanation: { correctText: "Subir oblíquo (Reta inclinada em T x t termal) é apenas uma fase a ser aquecida! De -50 a 0 estás a aquecer gelo puríssimo. Chegas ao 0 e a linha tomba horizontal, e AÍ SIM misturam-se Gelo/Água, parado durante 10 min. Quando derreter o fim do gelo negro rústico nulo mudo fino de bloco gordo largo a linha volta a subir oblíqua só para a Água aquecer e se queimar livre para fora.", otherOptions: ["Patamar reto é que tem as duas fases do copo vivo forte duro limpo claro solto liso falso lúgubre denso mudo livre fino oco raso.", "Descer a linha seria refrigeração clara pura falsa limpa cega mole solta baça murcha fina fofa rala calma oca fria rica doce de morte lenta livre."] } },
+        { level: "Difícil", text: "Para além dos 3 estados comuns mortais rústicos base finais primários plenos cegos fundamentais centrais, a Ciência e o Cosmos são regidos por um 4º Estado da Matéria que compõe quase 99% das estrelas reais verdadeiras solares luminosas brutas de fogo limpo livre do universo do vácuo solto nulo vago do campo cósmico raso calmo. Qual o nome grandioso da matriz da estrela morta dura fina cega maciça gorda e lúgubre de rastro de gás de choque térmico gigante do núcleo cego livre e opaco mudo?", options: ["Gás Oco Nobre Fechado Sólido Oculto Morno Frio Mudo de Cor Verde da Sombra Lenta Morta Base Seca Dura", "Líquido de Cristal Fixo Puro Opaco Negro Liso Cru Calado de Cor Pura Bruta Branda Forte Seca Dura de Metal Baço.", "PLASMA (Gás Altamente Ionizado Sob Condições Extremas de Altíssima Temperatura Nuclear Magnética Violenta que arranca as cascas dos átomos elétricos soltos das órbitas livres vitais cósmicas cruas cruciais brutas densas finais soltas das camadas cegas duras de plasma branco e quente).", "Bose-Einstein Físico Absoluto Termal da Poeira Solta Velha Baça Rasa e Suave Morna Falsa Ténue Morta do Sal Puro."], correctIndex: 2, explanation: { correctText: "Plasma é Rei! Nosso Sol brilhante limpo rico quente e bruto não tem fogo comum (ele não queima oxigénio de floresta). O sol é um gás de hidrogênio exposto a milhões de graus, rasgando o átomo, virando uma sopa elétrica de iões soltos de matéria nuclear densa bruta rica letal final chamada Plasma de estrela quente solar pura livre e branca de plasma total central e absoluto cru de raio cego limpo duro raso fino livre de choque de raio.", otherOptions: ["Bose-Einstein é o 5º estado no zero absoluto negativo gelado lento do inferno rústico cósmico negro baço fofo livre mudo denso murcho raso morto solto de ar mudo falso calmo puro cego de gás ralo lúgubre mole fino liso.", "Cristal líquido é visor de TV."] } },
+        { level: "Fácil", text: "Nas manhãs de inverno congelante na serra gaúcha brasileira, o orvalho condensa e imediatamente congela nas folhas, formando pequenas pedras minúsculas brancas na erva de prata rústica pálida branca livre solta doce limpa seca macia falsa e doce. Este fenômeno ambiental final da botânica livre morta baça e lenta de campo raso verde baço solto e nulo frio murcho branco de água morta fria pura recebe na língua nativa geral global comum geral cega de ciência da vida botânica letal natural global universal rural pura a alcunha letal baça calma fria clara viva exata doce pura livre crua dura de:", options: ["Saraiva Morta Quente Baça Falsa Rala Oca Vaga Seca Fria Pura Mole Fina Livre de Solo Limpo Falso.", "GEADA (Condensação seguida pela Solidificação Tardia e Fria Pura do Chão Raso Mudo Forte Limpo Branco e Fino da Relva Seca Dura Pálida do Inverno Forte Morto Frio Cego).", "Neve Subliminar Celeste Cega Morta Nula Fofa Quente Viva e Azul Falsa Morna Doce Mole Pura Murcha.", "Granizo Fixo Estático de Solo Mudo Grosso e Seco e Calmo Raro Fofo Frio Forte Raro Morno."], correctIndex: 1, explanation: { correctText: "Geada de Inverno clássica! Ela não choveu! É a água rústica do próprio ar rural do vapor gasoso molhado cego ralo quente mole do dia anterior, que embateu no frio, condensou (orvalho) e quando a terra baixou dos 0ºC, o termômetro endureceu a gota ali mesmo onde estava (Solidificou na geada branca de pó brilhante liso cego mudo opaco seco raso duro de relva falsa doce do campo forte pálido cego nulo limpo falso).", otherOptions: ["Neve cai das nuvens de altitude brancas calmas frias finas rasas.", "Granizo é gelo meteorológico do céu revolto rápido quente e frio fofo de choque e queda solta bruta forte forte bruta cega suada crua oca fina livre murcha baça de impacto sujo lúgubre denso mudo da trovoada negra negra."] } },
+        { level: "Médio", text: "Último Teste! Um balão mágico termodinâmico flexível cheio de gás de hidrogênio limpo quente falso solto mudo cego opaco seco é aquecido livre na cidade sem aumentar a parede da borracha fina dura forte lúgubre rústica gorda branca de pressão nula rasa de elástico forte do parque calmo nulo puro ralo fofo fino claro mudo morto e seco. Qual das variáveis da Matéria Gasosa Rígida de Engenharia a seguir listada é imediatamente alterada no cilindro esférico do balão a inflar gordo cru pleno liso mole macio oco rico denso fofo vivo final e calmo para se expandir maior para o teto cego?", options: ["Sua Massa Gravitacional e Sólida Baça.", "A Sua Elasticidade Inerte Química Falsa Fofa Lenta e Oca Branca Rala Dura Falsa Solta Vaga Lisa Lúgubre.", "Seu Ponto Eutético Estável Oculto Base Fino Mudo Limpo Gélido Morno Doce Fofo Seco Mole Branco Raso.", "Seu VOLUME Físico Macroscópico Geral Expandido Puro Expansível Pleno Central Aberto (Ele incha com o calor ganhando espaço nulo fofo do ar bruto cego claro morno falso denso forte baço cego limpo sujo)."], correctIndex: 3, explanation: { correctText: "Expansibilidade Térmica Gasosa de Charles e Boyle de base! O ar do balão absorve energia térmica. As moléculas enlouquecem as suas asas batendo nas paredes plásticas do elástico empurrando-o para fora. Como a massa não saiu do nó apertado cego, é o Espaço Geométrico Cúbico 3D da forma a alargar-se gordo rústico do balão limpo, ou seja, o VOLUME incha gigante e pleno duro até estalar.", otherOptions: ["A Massa da bolha é sagrada, nenhum átomo escapa do nó do elástico baço forte.", "Ponto Eutético é para metal fundido limpo grosso forte opaco." ] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_estados_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = parsed.lastIndexOf(parsed.findLast(a => a !== null));
+                    if (lastAnswered === -1) lastAnswered = 0;
+                    if (lastAnswered < questionsDatabase.length - 1) lastAnswered++; 
+                    
+                    quizState.currentIndex = lastAnswered;
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${lastAnswered + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tens a certeza que queres APAGAR todo o teu histórico de respostas e começar a prova de novo?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            renderCurrentQuestion();
+            renderNavigationMap();
+            document.getElementById('btnResumeQuiz').style.display = 'none';
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = normalizeText(event.target.value);
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = normalizeText(group.textContent);
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    function normalizeText(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Químico Aprovado!' : '❌ Diagnóstico de Falha Térmica!';
+        
+        // Mapeia corretamente as opções erradas ignorando o índice correto
+        const wrongIndices = [0, 1, 2, 3].filter(i => i !== question.correctIndex);
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            const letter = alphabet[wrongIndices[idx]] || '?';
+            return `<div class="feedback-item wrong-opt"><strong>${letter})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>O Facto Científico:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Desvios:</strong></small>
+                    ${distortionsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <span class="difficulty-badge ${badgeClass}">${question.level}</span>
+                <div style="margin-bottom:25px;">
+                    <div class="quiz-question-counter">
+                        <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                    </div>
+                    <h2 class="quiz-question-text">${question.text}</h2>
+                </div>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress(); 
+        
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#0F766E', '#14B8A6', '#F59E0B', '#E11D48'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        
+        if (btnPrev) btnPrev.disabled = (quizState.currentIndex === 0);
+        
+        if (btnNext) {
+            const isLastQuestion = quizState.currentIndex === questionsDatabase.length - 1;
+            if (isLastQuestion) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões por responder. Quer terminar a prova mesmo assim (as em branco serão dadas como erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Acertaste ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 DOMÍNIO TÉRMICO ABSOLUTO!</strong> O teu laboratório mental está impecável. Dominas a lei dos Gráficos de Aquecimento e não te deixas enganar pelas transições de estado.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONTAMINAÇÃO LÓGICA NO GRÁFICO!</strong> Foste avaliado abaixo da meta (80%). Revisa urgente a análise de Gráficos de Aquecimento para distinguires Substância Pura de Mistura e os 3 Tipos de Vaporização.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Deixaste em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+                    
+                    let plainQuestionText = question.text.replace(/<div class="q-svg-container">[\s\S]*?<\/div>/gi, ' [Gráfico Omitido] ');
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${plainQuestionText}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">O teu desvio: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">O Fato Científico: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

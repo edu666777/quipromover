@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Separação de Misturas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: QUÍMICA (Azul Petróleo / Teal) --- */
+        :root {
+            --bg-color: #F0FDFA; 
+            --text-color: #134E4A; 
+            --border-color: #042F2E; 
+            --white: #FFFFFF;
+            
+            --theme-light: #CCFBF1; 
+            --theme-medium: #14B8A6; 
+            --theme-dark: #0F766E; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #E11D48; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-medium) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .theory-box h4 { font-size: 1.1rem; font-weight: 800; color: var(--text-color); margin-top: 10px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: var(--theme-dark); font-weight: 700; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.teal { background-color: #F0FDFA; border-left-color: #0D9488; color: #115E59; }
+        .highlight-box.alert { background-color: #FFE4E6; border-left-color: #E11D48; color: #881337; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">⚗️</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Separação de Misturas</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <!-- VISTA: TEORIA -->
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Filtração, Destilação)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <!-- 1. MISTURAS HETEROGÉNEAS (Sólido-Líquido / Líquido-Líquido) -->
+            <section class="content-group">
+                <div class="section-badge">🧹 1. Separar o que não se mistura</div>
+                <article class="theory-box search-target">
+                    <h3>Para Misturas Heterogéneas</h3>
+                    <p>Se as fases estão separadas visualmente (ex: Água e Areia, ou Água e Óleo), os métodos são mais mecânicos e dependem da gravidade ou de barreiras físicas.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="450" height="200" viewBox="0 0 450 200">
+                            <!-- FILTRAÇÃO -->
+                            <text x="100" y="20" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">FILTRAÇÃO</text>
+                            <!-- Funil -->
+                            <path d="M 60 40 L 140 40 L 110 90 L 110 120 L 90 120 L 90 90 Z" fill="#F8FAFC" stroke="#042F2E" stroke-width="3"/>
+                            <!-- Papel Filtro -->
+                            <path d="M 70 40 L 130 40 L 100 85 Z" fill="#E2E8F0" stroke="#042F2E" stroke-width="2" stroke-dasharray="2,2"/>
+                            <!-- Areia Retida -->
+                            <path d="M 85 60 L 115 60 L 100 80 Z" fill="#9CA3AF"/>
+                            <!-- Gotas -->
+                            <circle cx="100" cy="130" r="3" fill="#3B82F6"/>
+                            <circle cx="100" cy="140" r="3" fill="#3B82F6"/>
+                            <!-- Béquer -->
+                            <path d="M 70 150 L 70 190 A 5 5 0 0 0 75 195 L 125 195 A 5 5 0 0 0 130 190 L 130 150" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <!-- Água no béquer -->
+                            <path d="M 72 170 L 128 170 L 128 190 A 3 3 0 0 1 125 193 L 75 193 A 3 3 0 0 1 72 190 Z" fill="#93C5FD"/>
+
+                            <line x1="225" y1="20" x2="225" y2="180" stroke="#042F2E" stroke-width="2" stroke-dasharray="4,4"/>
+
+                            <!-- DECANTAÇÃO (Ampola) -->
+                            <text x="350" y="20" font-size="14" font-weight="900" fill="#042F2E" text-anchor="middle">DECANTAÇÃO (Ampola)</text>
+                            <!-- Ampola -->
+                            <path d="M 320 40 L 380 40 Q 390 80 355 120 L 355 150 L 345 150 L 345 120 Q 310 80 320 40 Z" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <!-- Óleo -->
+                            <path d="M 322 50 L 378 50 Q 382 70 375 80 L 325 80 Q 318 70 322 50 Z" fill="#FCD34D"/>
+                            <!-- Água -->
+                            <path d="M 325 80 L 375 80 Q 365 110 353 120 L 347 120 Q 335 110 325 80 Z" fill="#93C5FD"/>
+                            <!-- Torneira -->
+                            <line x1="340" y1="135" x2="360" y2="135" stroke="#E11D48" stroke-width="4"/>
+                            <!-- Béquer -->
+                            <path d="M 320 160 L 320 190 A 5 5 0 0 0 325 195 L 375 195 A 5 5 0 0 0 380 190 L 380 160" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <path d="M 322 180 L 378 180 L 378 190 A 3 3 0 0 1 375 193 L 325 193 A 3 3 0 0 1 322 190 Z" fill="#93C5FD"/>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Filtração:</strong> Separa Sólido de Líquido (ou Sólido de Gás). O sólido insolúvel fica retido no papel de filtro. Ex: Fazer café, aspirador de pó.</li>
+                        <li><strong>Decantação:</strong> Baseia-se na diferença de <strong>Densidade</strong>. Deixa-se a mistura repousar; o mais denso (pesado) vai para o fundo. Usamos a Ampola de Decantação (imagem direita) para separar Água e Óleo.</li>
+                        <li><strong>Centrifugação:</strong> É apenas uma decantação acelerada artificialmente por rotação rápida. Ex: Separar o plasma do sangue ou secar roupa na máquina.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- 2. MISTURAS HETEROGÉNEAS SÓLIDO-SÓLIDO -->
+            <section class="content-group">
+                <div class="section-badge">🧲 2. Sólidos com Sólidos</div>
+                <article class="theory-box search-target">
+                    <h3>Pó com Pó</h3>
+                    <p>Quando temos dois sólidos misturados (ex: Areia e Sal, ou Lixo Reciclável), usamos as propriedades físicas de cada um para os separar.</p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Catação:</strong> Método manual. Escolher com as mãos ou pinças. Ex: Escolher os feijões bons dos estragados ou separar lixo no ecoponto.</li>
+                        <li><strong>Peneiração (Tamisação):</strong> Separa por <strong>Tamanho</strong>. O pó fino passa na malha da peneira, as pedras grandes ficam presas. Ex: Areia e brita nas obras.</li>
+                        <li><strong>Separação Magnética:</strong> Usa-se um íman para atrair apenas o metal com propriedades magnéticas (Ferro, Níquel ou Cobalto). Ex: Separar limalha de ferro da areia.</li>
+                        <li><strong>Ventilação e Levigação:</strong> Usam o vento ou a corrente de água para arrastar o sólido MAIS LEVE (menos denso). Ex: O vento a soprar a casca do amendoim (ventilação) ou a água a lavar a terra para sobrar o ouro no fundo da bateia (levigação).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- 3. MISTURAS HOMOGÉNEAS (Soluções) -->
+            <section class="content-group">
+                <div class="section-badge">🔥 3. Separar o Invisível (Soluções)</div>
+                <article class="theory-box search-target">
+                    <h3>A Batalha do Ponto de Ebulição</h3>
+                    <p>Como separas Água e Sal se o sal está completamente dissolvido e invisível aos olhos? Se usares um filtro, passa tudo! Aqui temos de ferver a mistura.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="100%" max-width="450" height="180" viewBox="0 0 450 180">
+                            <!-- DESTILAÇÃO SIMPLES -->
+                            <text x="225" y="20" font-size="16" font-weight="900" fill="#042F2E" text-anchor="middle">DESTILAÇÃO SIMPLES</text>
+                            
+                            <!-- Bico de Bunsen (Fogo) -->
+                            <path d="M 80 150 L 100 150 L 90 120 Z" fill="#F59E0B" stroke="#E11D48" stroke-width="2"/>
+                            <!-- Balão de Destilação -->
+                            <circle cx="90" cy="100" r="25" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <path d="M 80 77 L 80 40 L 100 40 L 100 77" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <!-- Água salgada a ferver -->
+                            <path d="M 67 110 L 113 110 A 23 23 0 0 1 67 110 Z" fill="#93C5FD"/>
+                            <!-- Termómetro -->
+                            <rect x="88" y="20" width="4" height="40" fill="#E2E8F0" stroke="#042F2E" stroke-width="1"/>
+                            
+                            <!-- Tubo Condensador (Inclinado) -->
+                            <path d="M 100 60 L 250 120" fill="none" stroke="#042F2E" stroke-width="6"/>
+                            <!-- Camisa de Refrigeração do Condensador -->
+                            <rect x="130" y="55" width="100" height="20" rx="10" transform="rotate(22 130 55)" fill="#CCFBF1" stroke="#042F2E" stroke-width="2" opacity="0.8"/>
+                            <text x="180" y="60" font-size="10" font-weight="bold" fill="#0F766E" transform="rotate(22 180 60)">Água Fria</text>
+
+                            <!-- Béquer Coletor -->
+                            <path d="M 240 130 L 240 170 A 5 5 0 0 0 245 175 L 295 175 A 5 5 0 0 0 300 170 L 300 130" fill="none" stroke="#042F2E" stroke-width="3"/>
+                            <!-- Água Pura Destilada -->
+                            <path d="M 242 160 L 298 160 L 298 170 A 3 3 0 0 1 295 173 L 245 173 A 3 3 0 0 1 242 170 Z" fill="#93C5FD"/>
+                            <circle cx="255" cy="125" r="3" fill="#3B82F6"/> <!-- Gota caindo -->
+                            
+                            <!-- Legendas -->
+                            <text x="40" y="105" font-size="10" font-weight="bold" fill="#0F172A">Água</text>
+                            <text x="40" y="115" font-size="10" font-weight="bold" fill="#0F172A">+ Sal</text>
+                            <text x="350" y="165" font-size="10" font-weight="bold" fill="#1D4ED8">Água Pura</text>
+                            <text x="350" y="175" font-size="10" font-weight="bold" fill="#1D4ED8">(Destilada)</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Evaporação:</strong> Usada para separar Sólido-Líquido homogéneo quando só queremos salvar o sólido. Deixa-se a água evaporar sozinha (ao sol). Ex: Obtenção do sal nas Salinas. (A água perde-se para a atmosfera).</li>
+                        <li><strong>Destilação Simples:</strong> Usada para separar Sólido-Líquido homogéneo quando queremos salvar AMBOS (ex: água e sal). A mistura ferve, a água vira vapor (gás), viaja pelo tubo frio (Condensador) e volta a pingar como água líquida do outro lado. O sal fica torrado no primeiro balão.</li>
+                        <li><strong>Destilação Fracionada:</strong> Usada para separar LÍQUIDO-LÍQUIDO homogéneos (ex: Água + Álcool ou os derivados do Petróleo). Exige uma "Coluna de Fracionamento". Funciona porque os líquidos têm <strong>Pontos de Ebulição Diferentes</strong> (o álcool ferve primeiro aos 78ºC e foge pelo tubo, a água fica retida até chegar aos 100ºC).</li>
+                    </ul>
+
+                    <div class="highlight-box alert">
+                        <strong>⚠️ O Combo Mortal: Dissolução Fracionada</strong><br>
+                        Como separar Areia e Sal grosso misturados a seco? São três passos cruciais:
+                        1º: Deitar água! (Apenas o sal se dissolve - Dissolução Fracionada).
+                        2º: Filtrar (A areia fica no papel, a água salgada passa).
+                        3º: Evaporar ou Destilar a água salgada (Sobrará apenas o Sal).
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Progresso 🔄
+            </button>
+        </main>
+
+        <!-- VISTA: PRÁTICA (QUIZ) -->
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - IFCE</h2>
+                <p style="color: var(--theme-contrast); font-size: 0.95rem; font-weight:600;">
+                    30 questões de laboratório prático. Acerta <strong>80% (24/30)</strong> para dominares a química analítica de base. O progresso fica salvo!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <!-- VISTA: RESULTADOS -->
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Acertaste 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <!-- RODAPÉ DE NAVEGAÇÃO -->
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - IFCE Foco: Separação) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Ao preparares café logo de manhã, a água a ferver é atirada sobre o pó e, de seguida, a mistura passa por um coador de papel. Como se chama o método químico físico que ocorre no papel de filtro?", options: ["Decantação.", "Filtração.", "Destilação.", "Centrifugação."], correctIndex: 1, explanation: { correctText: "A filtração atua como uma barreira física. O líquido (solução de café) atravessa os poros microscópicos do papel, mas as partículas sólidas do pó insolúvel (a borra) são demasiado grandes e ficam retidas.", otherOptions: ["Decantação precisa que a poeira vá ao fundo por gravidade.", "Destilação requer ferver a mistura num balão."] } },
+        { level: "Médio", text: "O aspirador de pó elétrico, usado nas limpezas domésticas, recolhe o ar sujo cheio de partículas de poeira. Dentro dele, o ar limpo é expulso de volta para a sala, mas a poeira fica presa num saco de tecido poroso. Qual o método de separação aqui aplicado?", options: ["Filtração (Gás-Sólido).", "Decantação (Gás-Sólido).", "Ventilação.", "Peneiração."], correctIndex: 0, explanation: { correctText: "Sim, a filtração não acontece apenas com líquidos! O saco do aspirador é um filtro que deixa o gás (ar) passar e retém o sólido (poeira).", otherOptions: ["O pó não assenta por gravidade como na decantação, é forçado contra uma barreira (filtro).", "A ventilação arrasta coisas com o vento, o aspirador suga contra um filtro."] } },
+        { level: "Fácil", text: "Um aluno deixou cair acidentalmente uma colher de areia dentro do seu copo com água. Como a areia não se dissolve, como ele pode separar facilmente essa mistura em casa sem usar filtros?", options: ["Evaporação imediata no fogão.", "Centrifugação térmica.", "Decantação (deixar em repouso e depois verter o líquido).", "Sublimação da areia."], correctIndex: 2, explanation: { correctText: "Como a areia é muito mais densa que a água, se ele deixar o copo quieto por uns minutos (repouso), a areia assenta toda no fundo. Depois, ele inclina o copo com cuidado e retira apenas a água de cima. Isso é a Decantação clássica Sólido-Líquido.", otherOptions: ["Evaporação faria a água sumir, mas ele quer salvar a água sem stress."] } },
+        { level: "Médio", text: "Como se chama o aparelho de vidro de laboratório, com formato de pera invertida e uma torneirinha na base, utilizado EXCLUSIVAMENTE para decantar líquidos imiscíveis (como Água e Óleo)?", options: ["Balão de Fundo Chato.", "Condensador Refringente.", "Ampola de Decantação (Funil de Separação ou de Bromo).", "Béquer Graduado."], correctIndex: 2, explanation: { correctText: "A Ampola de Decantação permite ver a divisão entre o óleo (no topo) e a água (no fundo). Quando abres a torneira em baixo, a água cai. Quando a água acaba e vai começar a cair o óleo, fechas a torneira bruscamente. Separação perfeita.", otherOptions: ["O Condensador é da destilação."] } },
+        { level: "Médio", text: "Qual a propriedade física exata que garante o funcionamento absoluto do método da DECANTAÇÃO (seja de água com barro, ou de água com óleo)?", options: ["A diferença de Cor entre os materiais.", "A diferença de Pontos de Ebulição.", "A diferença de Solubilidade.", "A diferença de Densidade entre os componentes."], correctIndex: 3, explanation: { correctText: "A decantação é guiada pela gravidade. A substância mais densa (mais 'pesada' em relação ao seu volume) desce e fica no fundo. A menos densa sobe e flutua.", otherOptions: ["Diferença de pontos de ebulição (PE) é a alma da Destilação, não da decantação."] } },
+        { level: "Difícil", text: "A Centrifugação não é, na verdade, um método de separação independente. Ela é apenas a aplicação de uma força centrípeta/rotacional acelerada para forçar um método natural a acontecer mais depressa. Que método natural é esse?", options: ["Destilação acelerada.", "Filtração acelerada.", "Catação acelerada.", "Decantação acelerada."], correctIndex: 3, explanation: { correctText: "A Centrifugação é uma 'Decantação Turbo'. Em vez de esperar 2 dias para os glóbulos do sangue assentarem no fundo do tubo por gravidade (decantação normal), a máquina gira a milhares de RPMs, colando o pesado (as células) no fundo do tubo em apenas 5 minutos.", otherOptions: ["A máquina de lavar roupa centrifuga (expulsa a água da roupa), mas em laboratório a base é sedimentar sólidos no líquido."] } },
+        { level: "Fácil", text: "Para separar areia fina de pedras maiores (brita) na construção civil, o pedreiro atira a mistura contra uma tela de arame quadriculada. A areia cai no chão e a brita fica retida na tela. Como se chama este método simples?", options: ["Catação.", "Levigação.", "Peneiração (ou Tamisação).", "Separação Magnética."], correctIndex: 2, explanation: { correctText: "A Peneiração separa misturas heterogéneas Sólido-Sólido com base na brutal diferença do tamanho das partículas (granulometria).", otherOptions: ["Catação é escolher com as mãos/pinça um por um."] } },
+        { level: "Médio", text: "Nas cooperativas de reciclagem, existe uma passadeira rolante onde se encontra lixo de plástico, papel e latas de alumínio/ferro. Qual o método mais rápido e industrial para remover todo o lixo FERROMAGNÉTICO (latas de ferro) da passadeira?", options: ["Catação manual pelos operários.", "Ventilação das latas de ferro.", "Separação Magnética (uso de um íman gigante/eletroíman por cima da passadeira).", "Flotação em água ácida."], correctIndex: 2, explanation: { correctText: "A Separação Magnética é perfeita quando um dos sólidos metálicos é atraído por campos magnéticos (Ferro, Níquel, Cobalto). O íman 'pesca' as latas de ferro e o plástico segue na passadeira.", otherOptions: ["As latas de alumínio dos refrigerantes NÃO são magnéticas, essas precisam ser retiradas por catação manual ou corrente de Foucault avançada."] } },
+        { level: "Difícil", text: "A Levigação é um método muito utilizado no garimpo artesanal de ouro (nos leitos dos rios). Como funciona este processo?", options: ["O garimpeiro usa um íman na areia do rio para puxar o ouro, pois o ouro atrai o ferro.", "O garimpeiro passa a bateia (bacia) na corrente de água. A água em movimento arrasta a areia do rio (menos densa), enquanto o ouro (muito mais denso) fica parado no fundo da bateia.", "Aquece-se o ouro até ele ferver e condensar de novo.", "Coador de papel com mercúrio."], correctIndex: 1, explanation: { correctText: "Levigação: Separação Sólido-Sólido com o auxílio de um líquido em movimento. Baseia-se na Densidade! A água corrente empurra e lava o lixo leve, e a 'pedra de ouro' pesada fixa-se no fundo do prato.", otherOptions: ["O Ouro não tem propriedade magnética, logo não gruda em ímanes."] } },
+        { level: "Fácil", text: "A avó no campo tem amendoins torrados ainda com a 'pele' (casca vermelha fina) solta à volta deles. Para separar a pele do amendoim gordo e comê-los, ela deita tudo ao ar a partir de um prato e sopra com a boca. A pele fina voa e o amendoim cai de novo no prato. Como se chama a este sopro metódico?", options: ["Levigação.", "Ventilação.", "Destilação a seco.", "Centrifugação oral."], correctIndex: 1, explanation: { correctText: "Ventilação: Separação Sólido-Sólido com a ajuda do vento/corrente de ar. O sólido extremamente leve e pouco denso (a casca) é soprado para longe, enquanto a semente pesada cai a direito.", otherOptions: ["Se usasses água em vez de ar, seria Levigação."] } },
+        { level: "Médio", text: "Um agricultor precisa separar sal grosso que caiu acidentalmente num monte de areia de praia limpa. Ambos são sólidos pequenos e de cor parecida. A primeira ação do agricultor para resolver o problema DEVE SER:", options: ["Pegar num íman.", "Meter a areia com sal na peneira.", "Adicionar ÁGUA à mistura, para que ocorra a Dissolução Fracionada do sal.", "Sublimar a areia ao sol."], correctIndex: 2, explanation: { correctText: "Truque Clássico: Quando tens Sal e Areia (ou Açúcar e Areia), o passo genial é deitar o líquido universal: Água! O Sal derrete (solúvel na água), mas a Areia é insolúvel e fica intacta no fundo. Acabaste de separar quimicamente o sistema Sólido-Sólido num Sólido-Líquido fácil de resolver.", otherOptions: ["Peneira não resulta pois os grãos de sal e areia podem ter o mesmo tamanho minúsculo."] } },
+        { level: "Difícil", text: "Continuando o caso da Areia com Sal grosso da questão anterior. Depois do agricultor deitar a Água, o sal derreteu por completo e ficou Areia molhada no fundo da bacia. Para limpar a situação de vez, e ter o Sal SECO numa mão e a Areia SECA na outra mão, ele DEVE aplicar DEPOIS pela seguinte ordem:", options: ["Peneiração e depois Ventilação forte.", "Filtração (para prender a Areia e deixar passar a água salgada) e depois Evaporação/Destilação (para ferver a água da panela e sobrar apenas o Sal sólido e cristalino no fundo).", "Decantação magnética térmica crua.", "Nenhuma hipótese, o sal fundiu-se molecularmente e tornou-se areia plástica."], correctIndex: 1, explanation: { correctText: "Passo 2: Filtração (A barreira do papel de filtro segura a areia molhada. A água límpida, que tem o sal dissolvido invisível, escorre para o frasco). Passo 3: Destilação Simples (Ferves o frasco límpido, a água escapa em vapor, e o sal fica queimado e torrado no fundo do copo a seco).", otherOptions: ["Física forense básica de laboratório: Dissolução Fracionada -> Filtração -> Destilação Simples."] } },
+        { level: "Fácil", text: "Para Misturas HOMOGÉNEAS (onde só vês 1 fase cristalina perfeita, como a água salgada), os métodos mecânicos como os filtros NÃO funcionam (o sal atravessa os poros). Portanto, para as soluções homogéneas líquidas, os métodos de separação química baseiam-se em que mudança brutal de estado físico?", options: ["Solidificação violenta.", "Vaporização (Ferver a mistura, tirando partido da diferença dos Pontos de Ebulição).", "Sublimação instantânea magnética.", "Condensação de nevoeiro."], correctIndex: 1, explanation: { correctText: "As Soluções Homogéneas dominam-se com o Fogo! Aqueces a mistura. Como a água e o sal (ou a água e o álcool) têm Pontos de Ebulição completamente diferentes, um deles vai evaporar e voar muito antes do outro, separando-os definitivamente.", otherOptions: ["O filtro é humilhado pelas misturas homogéneas invisíveis."] } },
+        { level: "Médio", text: "O Sal de Cozinha (Cloreto de Sódio) que consomes é recolhido nas 'Salinas' à beira-mar (poças quadradas e rasas de água do oceano). A separação Homogénea que ocorre nas salinas de forma lenta e natural chama-se:", options: ["Filtração Oceânica.", "Evaporação. A água evapora lentamente para o céu, deixando para trás o sal sólido amontoado, mas a água do mar perde-se para sempre e não é recuperada humana e logicamente.", "Destilação Simples Térmica.", "Decantação de ondas e salitre puro."], correctIndex: 1, explanation: { correctText: "Evaporação pura! É um método muito rústico e barato que usa a luz do sol. O objetivo da salina comercial não é 'obter água pura' para beber. O objetivo é 'obter o sal' que estava lá dentro, abandonando e desperdiçando o líquido nos céus do planeta.", otherOptions: ["A Destilação custaria rios de dinheiro em gás de laboratório."] } },
+        { level: "Médio", text: "Imagina que estás num barco salva-vidas rodeado de mar. Se usares a Evaporação das Salinas não terás água para beber e morres à sede. Logo, para transformar água do mar em ÁGUA POTÁVEL reciclável doce (Dessalinização laboratorial), tens de usar o aparelho oficial de:", options: ["Destilação Simples. A água salgada ferve no balão quente, o vapor de água sobe limpo, viaja pelo tubo frio condensador e volta a pingar LÍQUIDA e doce no teu copo de resgate salva-vidas.", "Filtração de vácuo forçada manual.", "Catação de sal grosso com pinça grossa mansa.", "Centrifugadora médica do barco salva mar."], correctIndex: 0, explanation: { correctText: "Sempre que precisares de SALVAR o líquido numa mistura Homogénea Sólido-Líquido, não podes usar a Evaporação. A Destilação Simples 'salva' o vapor aprisionando-o num cano gelado de vidro e forçando-o a ser água líquida purificada noutro balão fechado.", otherOptions: ["Um filtro de papel nunca, nunca dessaliniza água do mar! Ele bloqueia as algas heterogéneas mortas, mas o sal passa direto a rir-se."] } },
+        { level: "Difícil", text: "O laboratório preparou uma mistura Homogénea LÍQUIDO-LÍQUIDO mortal: Água (Ponto de Ebulição 100ºC) e Álcool Etílico (Ponto de Ebulição 78ºC). A Destilação Simples falha um bocado aqui. Tens de usar um aparelho maior que tem uma 'Coluna de Bolinhas de Vidro' chamada 'Coluna de Fracionamento'. Este método cirúrgico é a:", options: ["Decantação Alcoólica Fracionada Rústica Lisa.", "Destilação Fracionada.", "Centrifugação Homogénea.", "Cristalização Mágica Fria Bruta."], correctIndex: 1, explanation: { correctText: "Para Líquido + Líquido homogéneos a regra rainha imutável mestre é: Destilação Fracionada. Como ambos fervem perto um do outro, a coluna de fracionamento atua como um 'polícia de trânsito térmico'. Ela só deixa passar o vapor do álcool (mais volátil, 78ºC), enquanto a água condensa nas bolinhas de vidro e escorrega para trás para o balão quente.", otherOptions: ["Destilação simples (sem a coluna vertical alta) deixaria escapar muito vapor de água infiltrado no meio do álcool a 85 graus."] } },
+        { level: "Difícil", text: "A indústria mundial colapsaria sem este método específico! Como se separam os milhares de componentes LÍQUIDOS que formam o Ouro Negro bruto sujo e denso chamado PETRÓLEO bruto (Gás, Gasolina, Querosene, Diesel, Alcatrão Asfáltico)?", options: ["Filtração Gigante em coador de grafeno cego duro sólido.", "Centrifugação de Refinaria pesada fina rasa murcha fofa.", "Decantação em ampolas quilométricas altas lisas de vidro branco e mudo do campo.", "Destilação Fracionada Industrial (Torre de Fracionamento de Refinaria Quente)."], correctIndex: 3, explanation: { correctText: "O Petróleo cru é atirado para uma Fornalha gigante (Torre Fracionadora). Como é uma mistura homogénea de dezenas de líquidos hidrocarbonetos, a Destilação Fracionada faz o milagre: Aos 50ºC sai a Gasolina evaporada. Mais acima (e mais quente), condensa o Diesel. Lá no fundo caldeirão morre o Asfalto duro asfáltico negro. Eles separam-se de acordo rigoroso com os seus Pontos de Ebulição crescentes e decrescentes precisos e absolutos.", otherOptions: ["Qualquer outra opção destrói os exames Nacionais e os concursos do IFCE."] } },
+        { level: "Médio", text: "Sangue Num Tubo! O médico tira-te sangue limpo da veia. Após meia hora na bancada fria sem rodar na máquina de eixo mecânico fofo cego raso limpo frouxo forte nulo e baço denso murcho calado, o sangue exibe o líquido amarelo (plasma) em cima e a massa vermelha de hemácias no fundo duro nulo nua cego. Este fenómeno mecânico natural, ditado pela gravidade densa pura e densidade limpa calma exata branda fofa morna macia, chamou-se:", options: ["Flotação Pura Hemática Falsa Rústica Baça.", "Solidificação Crua Densa Oca.", "Decantação Normal Gravitacional Espontânea Clínica.", "Filtração de Coágulo Oco Sujo Fino Lento."], correctIndex: 2, explanation: { correctText: "O sangue assenta na bancada do médico? Isso é pura Decantação lenta mansa livre espontânea! As células vermelhas são densas grossas pesadas e tombam por gravidade passiva para o leito do tubo. O plasma (essencialmente água aquosa com proteínas soltas de sistema leve e calmo livre branco oco e frouxo fino ralo) flutua na zona superior apical nula vaga rasa lisa.", otherOptions: ["Não usou motor, não é centrifugação. Não usou peneira, não é filtração. É gravidade pacífica calma fofa pura!"] } },
+        { level: "Fácil", text: "Uma Mistura de Água Limpa Pura Aquosa Doce Morna e Serradura Grossa Murcha Lenta Cega Baça e Fina (Pó de serra da madeira oca livre). O pó de madeira (cerragem/serradura) teima em FLUTUAR orgulhoso leve fofo falso ralo fino no topo da superfície do copo de água lisa mansa rasa calada doce doce bruta dura forte longa limpa suja limpa mole morna fina fofa lisa raso de nível calmo e mudo morto. Qual processo fácil separa este sólido lenhoso insolúvel que flutua alto?", options: ["Cristalização do Pó.", "Apenas o Pescador Magnético Falso e Morto Nulo Mudo Frio Lento Liso Cego Murcho e Grosso Lúgubre.", "Catação por concha ou Decantação inversa escorrendo a espuma do topo líquido de transbordo (Filtração também funcionaria bem retendo o que flutua do copo em caso de queda).", "Destilação Magnética Rústica Fria Pura Baça Oca Limpa Oca Velha Suada Limpa Falsa Branda Vaga Ténue Morta."], correctIndex: 2, explanation: { correctText: "Quando o sólido não afunda para a Decantação perfeita clichê, podes usar um coador de rede (Filtração) ou fazer transbordar a camada superior decantando ao contrário para fora da bancada, num processo de separação rudimentar físico denso mecânico. O importante é perceber que são duas Fases separadas imiscíveis (Heterogénea sólida leve vs Líquido tenro grosso fundo raso morto denso de fundo fixo certo livre).", otherOptions: ["Cristalizar é obter pedras químicas de sal. Íman em madeira? Magia louca."] } },
+        { level: "Difícil", text: "Tratamento da Água da Cidade (ETA): Nas estações onde a água suja e barrenta barrenta barrenta barrenta do rio entra para as nossas torneiras da cozinha fria e morta clara fofa e oca rasa pura limpa clara de noite livre fria mansa limpa morna e rústica do banho limpo duro cego raso fixo. É adicionado Sulfato de Alumínio no tanque inicial da estação bruta e fofa. Para que serve esse produto químico perigoso rústico bruto no meio ambiente falso cego e opaco das águas lamacentas limpas ralas densas doces mortas da represa urbana clara forte fofa limpa limpa e fria baça?", options: ["Para matar todos os vírus de Ébola da água do rio no tanque estéril letal fofo ralo mole limpo morno e morno oco baço falso cego doce doce raso cego falso mudo murcho vazio.", "Para evaporar a água suja na Floculação Térmica Lenta Fina e Pálida Cega Morna.", "Para a 'Floculação'. O químico junta toda a sujeira leve e o barro fininho, formando flocos e rolos grandes e pesados que a seguir decantam com a gravidade mortal da piscina cega e mole morta no fundo sujo falso grosso murcho denso e limpo.", "Para dar sabor mentolado letal doce limpo e puro e suave calmo liso cego mudo opaco fino raso e liso no dente nulo."], correctIndex: 2, explanation: { correctText: "Passo vital de Química Ambiental Pro IFCE Ceará: O Sulfato Alumínio promove a FLOCULAÇÃO (ou Coagulação). Ele é como um íman de lixo. Agarra a areia leve, a terra solta fina, junta tudo em bolas grossas (os 'Flocos') maciças de gosma. Sendo pesados, estes flocos afundam no tanque seguinte (Tanque de Decantação lúgubre denso mudo calmo lento liso e suado quente denso frio grosso raso). Limpeza eficiente base!", otherOptions: ["Cloro mata vírus e micróbios na desinfeção (fase final do processo cego oco puro, não nesta fase química bruta estrutural molecular inicial pura falsa murcha fraca nula morta falsa livre fina leve pura falsa dura dura fina rasa branda nula oca vaga vazia doce e limpa lenta)."] } },
+        { level: "Médio", text: "No Laboratório, o aluno preparou ÁGUA (H₂O) LÍQUIDA + GELO (H₂O) SÓLIDO e pôs GÁS OXIGÊNIO (O₂) POUCO DISSOLVIDO SOLTO FALSO BOLHAS NA ÁGUA FINA DOCE e CEGA FRIA. O aluno tenta separar a mistura mágica fofa baça rasa e mole murcha crua de fases puras limpas mortas fracas lisas da prova dura morta nula livre oca branda e nula gasta suja calada vaga rústica letal do professor cego nulo vago limpo. Como classificar a sua insanidade letal e falsa pura branda mansa solta?", options: ["A água com gelo não se filtra viva lúgubre cega e clara cega. É sistema Heterogêneo Liso Doce.", "Apenas o funil mágico fraco letal murcho denso duro lúgubre cego murcho mole vago lento filtra a fase gasosa clara nua pura franca branda do ar denso e frio morto puro franco macio raso falso. O Gás não condensa frio cego e nulo e puro sujo doce. O gelo não evapora fraco liso mole fofo oca suada do vácuo lúgubre baço raso de mestre limpo morno. O filtro vácuo denso sujo liso nulo e morto mole frio raso calmo falso falso limpo limpo limpo. "], correctIndex: 0, explanation: { correctText: "Cuidado clínico, já aprendemos que água com gelo não é mistura de componentes vivos longos puros densos ocos soltos vagos brutos lisos frios brandos murchos quentes e falsos ciegos calmos doces rústicos de química fina morta doce clara e baça lenta limpa vaga nula falsa oca cega. Separar gelo da água é apenas meter a colher plástica e Catação/Filtração comum grosseira de pedras e blocos físicos de mesma base nua sólida frágil livre falsa e lúgubre cega.", otherOptions: [] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_separacao_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = parsed.lastIndexOf(parsed.findLast(a => a !== null));
+                    if (lastAnswered === -1) lastAnswered = 0;
+                    if (lastAnswered < questionsDatabase.length - 1) lastAnswered++; 
+                    
+                    quizState.currentIndex = lastAnswered;
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${lastAnswered + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tens a certeza que queres APAGAR todo o teu histórico de respostas e começar de novo?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            renderCurrentQuestion();
+            renderNavigationMap();
+            document.getElementById('btnResumeQuiz').style.display = 'none';
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = normalizeText(event.target.value);
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = normalizeText(group.textContent);
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    function normalizeText(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Analítico Aprovado!' : '❌ Diagnóstico de Separação Falho!';
+        
+        const wrongIndices = [];
+        for (let i = 0; i < question.options.length; i++) {
+            if (i !== question.correctIndex) {
+                wrongIndices.push(i);
+            }
+        }
+        
+        let distortionsHTML = '';
+        if (question.explanation && question.explanation.otherOptions && question.explanation.otherOptions.length > 0) {
+            distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+                const letter = alphabet[wrongIndices[idx]] || '?';
+                return `<div class="feedback-item wrong-opt"><strong>${letter})</strong> ${explanationText}</div>`;
+            }).join('');
+        }
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>O Método Correto:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML ? `<div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Desvios:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <span class="difficulty-badge ${badgeClass}">${question.level}</span>
+                <div style="margin-bottom:25px;">
+                    <div class="quiz-question-counter">
+                        <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                    </div>
+                    <h2 class="quiz-question-text">${question.text}</h2>
+                </div>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress(); 
+        
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#0F766E', '#14B8A6', '#F59E0B', '#E11D48'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        
+        if (btnPrev) btnPrev.disabled = (quizState.currentIndex === 0);
+        
+        if (btnNext) {
+            const isLastQuestion = quizState.currentIndex === questionsDatabase.length - 1;
+            if (isLastQuestion) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões por responder. Quer terminar a prova mesmo assim (as em branco serão dadas como erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Acertaste ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 MESTRE DO LABORATÓRIO!</strong> O teu laboratório mental está estéril e preciso. Não caíste na ilusão dos aparelhos destilatórios nem das redes da centrifugação gravitacional.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONTAMINAÇÃO LÓGICA NO COPO!</strong> Foste avaliado abaixo da meta (80%). Revisa urgente a análise das fases de decantação dos líquidos e a torre fracionadora do petróleo bruto.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Deixaste em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">O teu desvio: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">O Fato Científico: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>

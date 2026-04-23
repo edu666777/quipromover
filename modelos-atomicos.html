@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Química: Modelos Atómicos - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: QUÍMICA (Azul Petróleo / Teal) --- */
+        :root {
+            --bg-color: #F0FDFA; 
+            --text-color: #134E4A; 
+            --border-color: #042F2E; 
+            --white: #FFFFFF;
+            
+            --theme-light: #CCFBF1; 
+            --theme-medium: #14B8A6; 
+            --theme-dark: #0F766E; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #E11D48; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-medium) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .theory-box h4 { font-size: 1.1rem; font-weight: 800; color: var(--text-color); margin-top: 10px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: var(--theme-dark); font-weight: 700; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.teal { background-color: #F0FDFA; border-left-color: #0D9488; color: #115E59; }
+        .highlight-box.alert { background-color: #FFE4E6; border-left-color: #E11D48; color: #881337; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">⚛️</span> PROMOVER</div>
+            <h1>Química / 9º Ano</h1>
+            <p class="subtitle">Evolução dos Modelos Atómicos</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Rutherford, Eletrão, Núcleo)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🎱 1. Modelo de Dalton (1808)</div>
+                <article class="theory-box search-target">
+                    <h3>A Bola de Bilhar</h3>
+                    <p>John Dalton retomou a ideia grega de Demócrito e Leucipo. Para ele, a matéria era formada por partículas maciças, extremamente pequenas, que não podiam ser divididas ou destruídas.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="50" fill="#9CA3AF" stroke="#042F2E" stroke-width="4"/>
+                            <path d="M 10 60 A 50 50 0 0 0 110 60 A 50 20 0 0 1 10 60" fill="#4B5563" opacity="0.4"/>
+                            <circle cx="40" cy="40" r="10" fill="#FFFFFF" opacity="0.6"/> </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark);">Esfera Maciça e Indivisível</p>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Indivisível e Indestrutível:</strong> O átomo é a menor parte da matéria. Não tem partes menores dentro dele.</li>
+                        <li><strong>Maciço:</strong> Não tem espaços vazios. É como uma esfera de aço maciça.</li>
+                        <li><strong>Ausência de Carga:</strong> Dalton <strong>NÃO</strong> fala em cargas elétricas (nada de protões ou eletrões).</li>
+                        <li><strong>Elementos:</strong> Átomos do mesmo elemento químico são cópias exatas e pesam o mesmo (têm a mesma massa).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🍮 2. Modelo de Thomson (1897)</div>
+                <article class="theory-box search-target">
+                    <h3>O Pudim de Passas (Descoberta do Eletrão)</h3>
+                    <p>Usando um Tubo de Raios Catódicos, J.J. Thomson percebeu que havia partículas negativas a saltar <em>de dentro</em> do átomo. <strong>Boom! O átomo já não era indivisível.</strong></p>
+                    
+                    <div class="visual-area">
+                        <svg width="140" height="140" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="#FCA5A5" stroke="#042F2E" stroke-width="4"/>
+                            <text x="70" y="45" font-size="26" font-weight="900" fill="#BE123C" text-anchor="middle">+</text>
+                            
+                            <circle cx="40" cy="60" r="10" fill="#1D4ED8" stroke="#042F2E" stroke-width="2"/>
+                            <text x="40" y="64" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">-</text>
+
+                            <circle cx="100" cy="55" r="10" fill="#1D4ED8" stroke="#042F2E" stroke-width="2"/>
+                            <text x="100" y="59" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">-</text>
+
+                            <circle cx="70" cy="95" r="10" fill="#1D4ED8" stroke="#042F2E" stroke-width="2"/>
+                            <text x="70" y="99" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">-</text>
+
+                            <circle cx="105" cy="85" r="10" fill="#1D4ED8" stroke="#042F2E" stroke-width="2"/>
+                            <text x="105" y="89" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">-</text>
+
+                            <circle cx="35" cy="90" r="10" fill="#1D4ED8" stroke="#042F2E" stroke-width="2"/>
+                            <text x="35" y="94" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">-</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark);">Massa fluida (+) com eletrões (-)</p>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>O Fim da Indivisibilidade:</strong> O átomo pode afinal ser dividido em partes menores (partículas subatómicas).</li>
+                        <li><strong>A Estrutura:</strong> É uma esfera de carga <strong>Positiva</strong> (não maciça dura, mas sim fluida/gelatinosa) com eletrões (carga <strong>Negativa</strong>) incrustados na superfície, como passas num pudim.</li>
+                        <li><strong>Neutralidade:</strong> O átomo é eletricamente neutro (o total da "massa" positiva anula o das "passas" negativas).</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">☀️ 3. Modelo de Rutherford (1911)</div>
+                <article class="theory-box search-target">
+                    <h3>O Sistema Planetário (Descoberta do Núcleo)</h3>
+                    <p>Ao bombardear uma finíssima folha de ouro com partículas Alfa (positivas), Ernest Rutherford notou que a grande maioria passava direto e umas poucas batiam e recuavam violentamente. O átomo era, afinal, um imenso vazio.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Eletrosfera (Órbitas Elípticas ajustadas para não cortarem na borda) -->
+                            <ellipse cx="125" cy="90" rx="80" ry="25" fill="none" stroke="#94A3B8" stroke-width="2" transform="rotate(30 125 90)"/>
+                            <ellipse cx="125" cy="90" rx="80" ry="25" fill="none" stroke="#94A3B8" stroke-width="2" transform="rotate(150 125 90)"/>
+                            <ellipse cx="125" cy="90" rx="80" ry="25" fill="none" stroke="#94A3B8" stroke-width="2" transform="rotate(90 125 90)"/>
+                            
+                            <!-- Núcleo Positivo -->
+                            <circle cx="125" cy="90" r="12" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            <text x="125" y="95" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">+</text>
+
+                            <!-- Eletrões alinhados matematicamente nas órbitas -->
+                            <circle cx="125" cy="10" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1"/>
+                            <circle cx="125" cy="170" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1"/>
+                            <circle cx="194" cy="130" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1"/>
+                            <circle cx="56" cy="130" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1"/>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark);">Núcleo minúsculo (+) e Eletrosfera enorme (-)</p>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>O Grande Vazio:</strong> A maior parte do átomo é espaço vazio, chamado <strong>Eletrosfera</strong>, onde os eletrões giram caoticamente.</li>
+                        <li><strong>O Núcleo:</strong> Existe uma região central minúscula, muito pesada (densa) e que contém toda a carga <strong>Positiva</strong> (os protões). É por isso que as partículas Alfa batiam lá e voltavam (repulsão +,+).</li>
+                    </ul>
+
+                    <div class="highlight-box alert">
+                        <strong>⚠️ O Defeito Clássico de Rutherford:</strong><br>
+                        Pela física clássica, um eletrão (carga negativa) a girar infinitamente ao redor do núcleo (carga positiva) deveria perder energia e acabar por cair no núcleo em espiral, colapsando o átomo. Rutherford não sabia explicar o porquê de isso não acontecer.
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🎯 4. Modelo de Bohr (1913)</div>
+                <article class="theory-box search-target">
+                    <h3>Os Níveis de Energia (A Teoria Quântica)</h3>
+                    <p>Niels Bohr aplicou a matemática quântica (de Max Planck) para salvar o modelo de Rutherford. Ele organizou o caos da eletrosfera em "camadas de energia".</p>
+                    
+                    <div class="visual-area">
+                        <svg width="300" height="200" viewBox="0 0 300 200">
+                            <!-- Definição das pontas das setas -->
+                            <defs>
+                                <marker id="arrow-absorb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F59E0B"/></marker>
+                                <marker id="arrow-emit" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981"/></marker>
+                                <marker id="arrow-light" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E11D48"/></marker>
+                            </defs>
+
+                            <!-- Núcleo Positivo -->
+                            <circle cx="40" cy="100" r="14" fill="#E11D48" stroke="#042F2E" stroke-width="2"/>
+                            <text x="40" y="105" font-size="16" font-weight="900" fill="#FFFFFF" text-anchor="middle">+</text>
+
+                            <!-- Camada K (n=1) -->
+                            <path d="M 40 40 A 60 60 0 0 1 40 160" fill="none" stroke="#0F766E" stroke-width="3"/>
+                            <text x="45" y="30" font-size="13" font-weight="900" fill="#0F766E">K (n=1)</text>
+
+                            <!-- Camada L (n=2) -->
+                            <path d="M 40 10 A 90 90 0 0 1 40 190" fill="none" stroke="#0F766E" stroke-width="3"/>
+                            <text x="100" y="20" font-size="13" font-weight="900" fill="#0F766E">L (n=2)</text>
+
+                            <!-- Eletrão a Absorver (Salto para fora) -->
+                            <circle cx="82" cy="58" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1"/>
+                            <circle cx="118" cy="55" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                            <path d="M 88 56 Q 105 45 113 54" fill="none" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrow-absorb)"/>
+                            <text x="130" y="58" font-size="12" font-weight="800" fill="#F59E0B">Absorve Energia</text>
+
+                            <!-- Eletrão a Emitir (Salto para dentro) -->
+                            <circle cx="118" cy="145" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                            <circle cx="82" cy="142" r="6" fill="#1D4ED8" stroke="#042F2E" stroke-width="1"/>
+                            <path d="M 112 144 Q 95 155 87 144" fill="none" stroke="#10B981" stroke-width="2" marker-end="url(#arrow-emit)"/>
+                            
+                            <!-- Fóton de Luz -->
+                            <path d="M 125 150 Q 145 140 160 160" fill="none" stroke="#E11D48" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arrow-light)"/>
+                            <text x="170" y="165" font-size="13" font-weight="900" fill="#E11D48">Emite LUZ</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Órbitas Estacionárias (Camadas):</strong> Os eletrões só podem girar em níveis de energia exatos e permitidos (K, L, M, N...). Enquanto giram nestas órbitas, não perdem nem ganham energia (daí o átomo não colapsar).</li>
+                        <li><strong>O Salto Quântico:</strong> Se um eletrão recebe energia do exterior (calor, fogo, eletricidade), ele dá um <strong>Salto</strong> para uma camada mais externa (estado excitado).</li>
+                        <li><strong>A Emissão de Luz:</strong> O estado excitado é muito instável. Quando o eletrão "cai" de volta para a sua camada original, ele tem de devolver a energia extra. Ele fá-lo emitindo uma onda eletromagnética (<strong>LUZ</strong> / Fóton). É isto que explica o fogo de artifício!</li>
+                    </ul>
+
+                    <div class="highlight-box teal">
+                        <strong>Nota Importante: O Neutrão!</strong><br>
+                        Nem Rutherford nem Bohr descobriram o Neutrão (a partícula sem carga que fica no núcleo a atuar como "cimento" para impedir que os protões se repilam uns aos outros e explodam o átomo). O Neutrão só foi descoberto mais tarde, em 1932, por <strong>James Chadwick</strong>.
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Progresso 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - IFCE</h2>
+                <p style="color: var(--theme-contrast); font-size: 0.95rem; font-weight:600;">
+                    30 questões mortais sobre Modelos Atómicos. Acerta <strong>80% (24/30)</strong> para garantires que não tropeças nas rasteiras de quem descobriu o quê. O teu progresso é salvo!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Acertaste 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - IFCE Foco: Modelos Atómicos) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Qual cientista foi o primeiro a propor, no início do século XIX (1808), um modelo atómico baseado em evidências experimentais, afirmando que o átomo era uma esfera maciça e indivisível?", options: ["Rutherford.", "Thomson.", "Bohr.", "Dalton."], correctIndex: 3, explanation: { correctText: "Dalton ressuscitou a ideia grega do átomo, usando as leis da química (Lavoisier). Para ele, o átomo era como uma 'Bola de Bilhar' (maciço, indestrutível, indivisível).", otherOptions: ["Rutherford e Thomson vieram quase 100 anos depois de Dalton.", "Bohr é do século XX.", ""] } },
+        { level: "Médio", text: "As leis de conservação das massas (Lavoisier) que dizem 'Na natureza nada se cria, nada se perde, tudo se transforma' serviram de base principal para a formulação de qual modelo atómico?", options: ["Modelo de Bohr.", "Modelo de Thomson.", "Modelo de Dalton.", "Modelo de Rutherford."], correctIndex: 2, explanation: { correctText: "O modelo de Dalton, ao afirmar que os átomos eram 'indestrutíveis' e apenas se rearranjavam (misturavam) durante uma reação química, justificava perfeitamente a lei de Lavoisier de que o peso não se perde no fim.", otherOptions: ["Thomson e Rutherford basearam-se em eletricidade e radioatividade.", "", ""] } },
+        { level: "Fácil", text: "Quem foi o responsável por quebrar o dogma de milhares de anos de que o átomo era a menor partícula existente no universo, ao provar a existência do Eletrão?", options: ["James Chadwick.", "J.J. Thomson.", "John Dalton.", "Ernest Rutherford."], correctIndex: 1, explanation: { correctText: "Thomson, através da experiência com os raios catódicos, descobriu que os átomos podiam soltar partículas negativas (os eletrões), provando finalmente que o átomo podia ser dividido.", otherOptions: ["Dalton achava o átomo inquebrável.", "Chadwick descobriu o neutrão.", ""] } },
+        { level: "Médio", text: "O famoso apelido 'Pudim de Passas' (ou bolo com passas) refere-se ao modelo atómico de Thomson. O que representava a 'massa' do pudim e o que representavam as 'passas'?", options: ["A massa era o núcleo (protões e neutrões) e as passas eram os eletrões na eletrosfera.", "A massa era uma grande esfera fluida de carga positiva, e as passas eram os eletrões de carga negativa cravados nela.", "A massa era nula e as passas eram a carga positiva pura.", "A massa era uma esfera maciça neutra e as passas eram os átomos de Dalton menores."], correctIndex: 1, explanation: { correctText: "Atenção: No modelo de Thomson NÃO existe núcleo! Existe uma grande 'massa gelatinosa' Positiva, recheada de eletrões Negativos (as passas) que garantem a neutralidade elétrica de todo o átomo.", otherOptions: ["A eletrosfera e o núcleo só foram descobertos por Rutherford depois.", "", ""] } },
+        { level: "Fácil", text: "Que analogia clássica (apelido) é atribuída de imediato ao modelo atómico formulado por Ernest Rutherford em 1911?", options: ["Bola de Bilhar.", "Pudim de Ameixas.", "Sistema Planetário.", "Salto Quântico Dimensional."], correctIndex: 2, explanation: { correctText: "Rutherford propôs um núcleo central (como o Sol) onde estava concentrada a massa, rodeado por uma enorme eletrosfera onde os eletrões giravam em órbitas desordenadas (como os planetas num sistema solar caótico).", otherOptions: ["Bola de Bilhar = Dalton.", "Pudim = Thomson.", ""] } },
+        { level: "Difícil", text: "Na famosa experiência em que Rutherford bombardeou uma finíssima folha de ouro com partículas Alfa (α), a esmagadora maioria dessas partículas atravessou a folha em linha reta, sem sofrer desvios. Que conclusão monumental ele retirou disto?", options: ["Que o átomo de ouro era uma esfera maciça como Dalton previra, mas invisível.", "Que a maior parte do átomo é, na verdade, constituída por espaços completamente VAZIOS (a Eletrosfera).", "Que a folha de ouro tinha buracos macroscópicos causados por ferrugem.", "Que a carga positiva do átomo estava espalhada em formato de nuvem gasosa."], correctIndex: 1, explanation: { correctText: "Foi um choque para a ciência. O átomo deixou de ser sólido e maciço. Como 99% das partículas alfa passavam retas sem bater em nada, provava-se que o átomo é praticamente só um imenso Vazio de eletrosfera.", otherOptions: ["Se o átomo fosse maciço (como o pudim de Thomson), as partículas alfa bateriam na massa espessa e nenhuma passaria limpa para o outro lado.", "", ""] } },
+        { level: "Médio", text: "Ainda na experiência da Folha de Ouro, as raríssimas partículas Alfa (que têm carga elétrica Positiva) que batiam no centro do átomo sofriam um ricochete violento para trás. O que existia no átomo de ouro capaz de repelir com tanta fúria a carga positiva das partículas Alfa?", options: ["Uma densa e negra camada de eletrões negativos letais.", "O Núcleo atómico minúsculo, extremamente pesado (denso) e com carga elétrica POSITIVA.", "Um escudo de neutrões pesados de carga elétrica zero ativada.", "Uma força gravitacional de buraco negro da própria lâmina de ouro."], correctIndex: 1, explanation: { correctText: "A Física base: Cargas com sinais iguais repelem-se (+ com +). Como a partícula Alfa é fortemente Positiva, ela só recuava com violência quando batia em cheio noutra coisa Positiva: o núcleo de Ouro.", otherOptions: ["Se fossem eletrões (-), eles iriam atrair a partícula alfa (+), e não a iam repelir para trás.", "", ""] } },
+        { level: "Fácil", text: "Qual cientista resolveu o grande defeito mortal do modelo de Rutherford (que previa o colapso trágico do eletrão a cair no núcleo), introduzindo a ideia brilhante de 'Níveis de Energia' (Órbitas Estacionárias)?", options: ["J.J. Thomson.", "Niels Bohr.", "James Chadwick.", "John Dalton."], correctIndex: 1, explanation: { correctText: "Niels Bohr aplicou a física quântica inovadora ao modelo falho de Rutherford. Ele afirmou que os eletrões rodam em 'carris de comboio' (camadas K,L,M...) com níveis de energia estritos. Enquanto o eletrão ali estiver, ele não perde energia.", otherOptions: ["O modelo da escola chama-se Rutherford-Bohr exatamente por ser uma melhoria direta.", "", ""] } },
+        { level: "Médio", text: "O que é, tecnicamente, o 'Salto Quântico' defendido no modelo atómico de Bohr?", options: ["É a queda fatal do eletrão no núcleo do átomo.", "É a fusão de um protão com um eletrão para criar um neutrão livre.", "É o salto imediato de um eletrão para um nível de energia mais afastado (camada externa), quando ele ABSORVE energia do exterior.", "É o choque físico frontal entre dois eletrões."], correctIndex: 2, explanation: { correctText: "O salto quântico excitado ocorre quando o eletrão 'chupa' uma dose de energia (calor, luz) e é atirado (salta) para uma camada mais distante do núcleo.", otherOptions: ["A devolução dessa energia na viagem de retorno chama-se 'Emissão Quântica'.", "", ""] } },
+        { level: "Difícil", text: "Quando atiras pó de Cobre numa lareira, o fogo fica com uma cor verde. Se atirares pó de Estrôncio, a chama fica vermelha. Que momento temporal do modelo de Bohr explica o nascimento dessa luz colorida?", options: ["Ocorre quando o eletrão ABSORVE a energia do fogo e sobe para a camada externa.", "Ocorre porque o núcleo derrete no calor.", "Ocorre quando o eletrão VOLTA para a sua camada original interior, DEVOLVENDO a energia absorvida na forma de Fóton (Luz).", "Ocorre devido ao atrito dos protões."], correctIndex: 2, explanation: { correctText: "A emissão de luz colorida ocorre APENAS na 'viagem de regresso' do eletrão para casa. Ele devolve a energia extra emitindo Luz (Fóton) da cor exata que corresponde à energia do salto.", otherOptions: ["Na subida (absorção) o átomo não emite luz visível.", "", ""] } },
+        { level: "Médio", text: "Rutherford descobriu que o núcleo era formado por Protões (+). Mas colocar dezenas de protões juntos deveria causar uma repulsão imediata que rebentava com o átomo todo. Quem descobriu a partícula essencial sem carga (o Neutrão) que apazigua os protões no núcleo?", options: ["Niels Bohr.", "Ernest Rutherford.", "J.J. Thomson.", "James Chadwick."], correctIndex: 3, explanation: { correctText: "Chadwick descobriu o Neutrão (carga zero) em 1932. Ele atua como um 'cimento' no núcleo, permitindo que a força nuclear vença a repulsão elétrica dos protões.", otherOptions: ["Rutherford previu a existência, mas não conseguiu isolá-lo.", "", ""] } },
+        { level: "Fácil", text: "Historicamente, qual é a ordem cronológica de formulação dos 4 principais modelos atómicos?", options: ["Thomson -> Dalton -> Bohr -> Rutherford.", "Dalton -> Thomson -> Rutherford -> Bohr.", "Bohr -> Rutherford -> Thomson -> Dalton.", "Dalton -> Rutherford -> Thomson -> Bohr."], correctIndex: 1, explanation: { correctText: "A História exata: 1º Dalton (A bola maciça). 2º Thomson (O pudim). 3º Rutherford (O núcleo). 4º Bohr (As órbitas quânticas).", otherOptions: ["", "", ""] } },
+        { level: "Médio", text: "Lendo as notas de um diário científico: 'O núcleo tem carga positiva no centro, e os eletrões orbitam esse núcleo no meio de um imenso vazio esférico de forma desordenada'. Este texto traduz o modelo atómico de qual cientista?", options: ["Thomson.", "Bohr.", "Rutherford.", "Dalton."], correctIndex: 2, explanation: { correctText: "O 'imenso vazio', o 'núcleo positivo' e o 'giro desordenado' (caótico) são as bases de Rutherford.", otherOptions: ["Bohr já não deixava o eletrão voar 'caoticamente', impôs órbitas estacionárias rígidas.", "", ""] } },
+        { level: "Fácil", text: "Sobre a estrutura do átomo (Modelo Rutherford-Bohr), onde se concentra praticamente toda a MASSA do átomo (o seu peso)?", options: ["Na Eletrosfera, devido aos eletrões.", "Rigorosamente no Núcleo minúsculo, constituído pelos Protões e Neutrões pesados.", "Nas órbitas.", "No espaço vazio."], correctIndex: 1, explanation: { correctText: "O núcleo é microscópico comparado com a eletrosfera, mas detém 99,9% da massa do átomo. Os eletrões são extremamente leves.", otherOptions: ["O eletrão pesa cerca de 2000 vezes menos que um protão.", "", ""] } },
+        { level: "Difícil", text: "Segundo Bohr, o átomo tem várias camadas (K, L, M...). Sobre a energia destas órbitas, a física quântica postula que:", options: ["A camada K (mais próxima do núcleo) tem a maior energia de todas.", "Todas as camadas possuem a mesma energia.", "A energia da camada AUMENTA à medida que se afasta do núcleo.", "Os eletrões perdem energia continuamente ao orbitar."], correctIndex: 2, explanation: { correctText: "Quanto mais longe o eletrão está do núcleo atrativo, maior a energia potencial que ele possui. Afastamento = Maior Nível de Energia.", otherOptions: ["A camada K é a de menor energia (mais estável).", "", ""] } },
+        { level: "Médio", text: "O 'Tubo de Raios Catódicos' foi essencial para Thomson. Que achado espetacular derrubou o modelo de Dalton?", options: ["A descoberta dos neutrões.", "A descoberta do núcleo.", "A descoberta dos eletrões, provando que o átomo é divisível.", "A descoberta das órbitas."], correctIndex: 2, explanation: { correctText: "Thomson reparou que os raios se desviavam em direção a placas positivas, provando que eram partículas negativas (eletrões) arrancadas dos átomos.", otherOptions: ["Dalton dizia que o átomo era uma bola indivisível.", "", ""] } },
+        { level: "Fácil", text: "Diz-se que o átomo isolado é eletricamente NEUTRO. O que isso quer dizer na prática?", options: ["Que não possui nem eletrões nem protões.", "Que o número de Protões (carga +) é IGUAL ao número de Eletrões (carga -).", "Que só possui neutrões.", "Que a eletrosfera não tem carga."], correctIndex: 1, explanation: { correctText: "Equilíbrio elétrico: Se o átomo tem 10 Protões (+10), tem de ter 10 Eletrões (-10). A soma das cargas é zero.", otherOptions: ["Se houver desequilíbrio, chama-se íon.", "", ""] } },
+        { level: "Difícil", text: "As partículas Alfa (α) atiradas contra a folha de Ouro são Fortemente POSITIVAS. Por que isso provou que o núcleo do ouro também era Positivo?", options: ["Porque cargas opostas se repelem.", "Porque a partícula Alfa ricocheteava violentamente. Como sofreu forte repulsão, o núcleo só podia ter a mesma carga (Positiva).", "Porque a partícula Alfa era absorvida pelo ouro.", "Porque o ouro ficou negativo."], correctIndex: 1, explanation: { correctText: "Física básica: cargas com sinais iguais repelem-se (+ com +). O recuo provou a carga positiva do núcleo.", otherOptions: ["Se o núcleo fosse negativo, a partícula seria atraída e presa.", "", ""] } },
+        { level: "Médio", text: "O Modelo do 'Pudim de Passas' de Thomson conseguia explicar um fenómeno comum que a Bola de Bilhar de Dalton não explicava. Qual?", options: ["A queima da madeira.", "A fusão do gelo.", "A Eletrização por atrito (ex: esfregar um pente no cabelo).", "A lei de Lavoisier."], correctIndex: 2, explanation: { correctText: "Thomson provou que os eletrões podiam saltar de um corpo para o outro. Isso explica perfeitamente a eletrostática (ganhar ou perder cargas por atrito).", otherOptions: ["Dalton não tinha partículas com carga para explicar eletricidade.", "", ""] } },
+        { level: "Fácil", text: "A palavra grega 'Átomo' cunhada por Demócrito traduzia-se literalmente por:", options: ["Partícula de Luz.", "Indivisível (A = Não + Tomos = Divisão).", "Esfera de Fogo.", "O que gira livremente."], correctIndex: 1, explanation: { correctText: "A ideia era que se cortasses a matéria infinitamente, chegarias a uma última partícula que não poderia mais ser cortada (indivisível).", otherOptions: ["Hoje sabemos que pode ser dividido, mas o nome manteve-se.", "", ""] } },
+        { level: "Difícil", text: "Se o núcleo de um átomo fosse do tamanho de uma Bola de Ténis, onde estariam os eletrões na Eletrosfera?", options: ["Colados à bola de ténis.", "A alguns centímetros de distância.", "MUITO LONGE, a quilómetros de distância, provando que o átomo é essencialmente vazio.", "Dentro da bola de ténis."], correctIndex: 2, explanation: { correctText: "A eletrosfera é de 10.000 a 100.000 vezes maior que o núcleo. O átomo é 99,99% de puro espaço vazio.", otherOptions: ["O núcleo é incrivelmente denso e minúsculo.", "", ""] } },
+        { level: "Médio", text: "Dentre as partículas fundamentais (Protão, Neutrão, Eletrão), qual delas tem a MASSA tão pequena que é considerada praticamente ZERO nos cálculos de laboratório?", options: ["Protão.", "Neutrão.", "Eletrão.", "O Núcleo."], correctIndex: 2, explanation: { correctText: "O eletrão pesa quase 2000 vezes menos que um protão ou neutrão. Por isso, a massa do átomo é calculada apenas somando protões e neutrões (no núcleo).", otherOptions: ["Protão e neutrão pesam 1 unidade de massa atómica cada.", "", ""] } },
+        { level: "Fácil", text: "Um átomo neutro de Magnésio (Mg) PERDE 2 eletrões. Qual será o seu novo balanço de carga e como o chamamos?", options: ["Catião Positivo (+2).", "Anião Negativo (-2).", "Continua neutro.", "Isótopo de Magnésio."], correctIndex: 0, explanation: { correctText: "Eletrões são NEGATIVOS. Ao perder 2 cargas negativas, o átomo fica com excesso de protões (positivos). Vira um Catião (+2).", otherOptions: ["Se ganhasse eletrões, ficava Anião (-).", "", ""] } },
+        { level: "Médio", text: "O modelo de Dalton afirmava que todos os átomos do mesmo elemento eram idênticos e tinham a mesma massa. Qual descoberta atómica provou que Dalton estava errado neste aspeto?", options: ["Descoberta da Eletrosfera.", "Descoberta dos Isótopos (átomos do mesmo elemento com pesos diferentes devido aos neutrões).", "Descoberta dos Catiões.", "O salto quântico."], correctIndex: 1, explanation: { correctText: "Os Isótopos (como o Carbono-12 e Carbono-14) são o mesmo elemento (mesmo número de protões), mas têm massas diferentes porque têm números diferentes de neutrões.", otherOptions: ["", "", ""] } },
+        { level: "Fácil", text: "No modelo atual, quantas partículas subatómicas fundamentais compõem o Átomo e onde se encontram fisicamente?", options: ["Duas: Protões e Eletrões no núcleo.", "Três: Protões e Neutrões no núcleo, e Eletrões na eletrosfera.", "Quatro: Quarks, Protões, Neutrões e Fótons.", "Uma: A massa indivisível."], correctIndex: 1, explanation: { correctText: "O pesado núcleo guarda os Protões (+) e Neutrões (0). Bem longe, na eletrosfera, giram os Eletrões (-).", otherOptions: ["", "", ""] } },
+        { level: "Médio", text: "Ernest Rutherford usou uma finíssima folha de Ouro. Do ponto de vista da resistência dos materiais, por que razão exata o Ouro foi o metal eleito?", options: ["Porque emitia luz própria no escuro.", "Porque o ouro é altamente radiativo.", "Porque o ouro é o metal mais maleável conhecido, permitindo criar uma chapa da espessura de pouquíssimos átomos.", "Porque era inerte quimicamente ao chumbo."], correctIndex: 2, explanation: { correctText: "A Maleabilidade do Ouro! Rutherford precisava de um 'muro' finíssimo para atirar as partículas alfa e observar se passavam retas ou se batiam em algo denso (o núcleo).", otherOptions: ["", "", ""] } },
+        { level: "Difícil", text: "A identidade de um elemento: O que é que tens de mudar num átomo de Ouro para ele deixar de ser Ouro e transmutar-se noutro elemento (ex: Platina)?", options: ["Adicionar eletrões à eletrosfera.", "Aumentar os neutrões do núcleo.", "Alterar o seu Número Atómico, ou seja, alterar a quantidade de Protões no núcleo.", "Provocar um salto quântico longo."], correctIndex: 2, explanation: { correctText: "O Bilhete de Identidade do elemento é o seu NÚMERO ATÓMICO (Z), que é a quantidade de PROTÕES! Se mexes nos eletrões, crias íons. Se mexes nos neutrões, crias isótopos. Só alterando os protões mudas o elemento.", otherOptions: ["", "", ""] } },
+        { level: "Difícil", text: "O modelo das órbitas estacionárias de Bohr é brilhante, mas tinha um limite prático esmagador. As suas equações matemáticas funcionavam incrivelmente bem APENAS para qual elemento químico?", options: ["Apenas para metais de transição (Ouro).", "Para os gases nobres.", "Apenas e exclusivamente para o Átomo de Hidrogénio (que possui 1 único eletrão solitário).", "Para o Cobre dos fogos de artifício."], correctIndex: 2, explanation: { correctText: "As equações de física quantizada encaixavam na perfeição no Átomo de Hidrogénio. Mas ao tentar aplicar a átomos com muitos eletrões, a matemática de órbitas circulares simples começava a falhar, dando lugar mais tarde aos modelos orbitais modernos.", otherOptions: ["", "", ""] } },
+        { level: "Fácil", text: "Resumo Visual das Analogias: Bola de Bilhar, Pudim de Passas, Sistema Planetário e Órbitas/Degraus Estacionários. A que cientistas correspondem, respetivamente?", options: ["Bohr, Thomson, Rutherford, Dalton.", "Dalton, Thomson, Rutherford, Bohr.", "Dalton, Rutherford, Thomson, Bohr.", "Rutherford, Bohr, Thomson, Lavoisier."], correctIndex: 1, explanation: { correctText: "Dalton = Bola Maciça. Thomson = Pudim de Passas (+ e -). Rutherford = Sistema Planetário (Eletrosfera e Núcleo). Bohr = Órbitas Estacionárias (Níveis de Energia).", otherOptions: ["Decorar esta ordem visual é a chave para o sucesso na química atómica escolar.", "", ""] } },
+        { level: "Médio", text: "Se um átomo de Cloro ganhar 1 eletrão, a sua carga total e o seu nome técnico passarão a ser:", options: ["+1, Catião.", "-1, Anião.", "Neutra, Átomo isolado.", "+2, Isótopo."], correctIndex: 1, explanation: { correctText: "Ao ganhar eletrões (que são NEGATIVOS), o átomo fica com mais cargas negativas do que positivas. Passa a ter carga -1 e recebe o nome de Anião.", otherOptions: ["Atenção: ganhar partículas neste caso significa ganhar negatividade.", "", ""] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) COM LOCALSTORAGE --- */
+    const STORAGE_KEY = 'promover_quimica_modelos_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                    
+                    const answeredCount = parsed.filter(a => a !== null).length;
+                    if (answeredCount > 0) {
+                        const btnResume = document.getElementById('btnResumeQuiz');
+                        if(btnResume) {
+                            btnResume.style.display = 'block';
+                            btnResume.innerHTML = `Retomar Exame (Questão ${quizState.currentIndex + 1} de ${questionsDatabase.length}) 🔄`;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers));
+        } catch (e) {
+            console.error("Erro ao salvar progresso:", e);
+        }
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tens a certeza que queres limpar todo o teu progresso e reiniciar a avaliação do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    /* --- CONTROLO DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO INTERFACE DO QUIZ --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = { 'Fácil': 'dif-facil', 'Médio': 'dif-medio', 'Difícil': 'dif-dificil' };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Químico Correto!' : '❌ Desvio de Trajetória!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex || !explanationText) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>O Fato Exato:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+                ${distortionsHTML.trim() ? `
+                <div style="margin-top:15px;border-top:2px dashed var(--border-color);padding-top:15px;">
+                    <small style="color:var(--text-color);"><strong>Análise dos Erros:</strong></small>
+                    ${distortionsHTML}
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ E MOTOR --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress(); // Salva no LocalStorage assim que o utilizador responde
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation();
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#14B8A6', '#0F766E', '#F59E0B', '#E11D48'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const currentIndex = quizState.currentIndex;
+        const lastIndex = questionsDatabase.length - 1;
+        
+        if (btnPrev) {
+            btnPrev.disabled = (currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            if (currentIndex === lastIndex) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function calculateStars(percent) {
+        if (percent === 100) return "⭐⭐⭐⭐⭐";
+        if (percent >= 80) return "⭐⭐⭐⭐";
+        if (percent >= 60) return "⭐⭐⭐";
+        if (percent >= 40) return "⭐⭐";
+        if (percent > 0) return "⭐";
+        return "🌑"; 
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões por responder. Quer terminar a prova mesmo assim (as em branco serão dadas como erradas)?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Acertaste ${correctAnswersCount} de ${totalQuestions}`;
+        document.getElementById('finalStars').textContent = calculateStars(percentageScore);
+        
+        const reviewContainer = document.getElementById('review-container');
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 DOMÍNIO QUÂNTICO ABSOLUTO!</strong> O teu laboratório mental está impecável. Não te deixaste enganar pelas armadilhas da Eletrosfera e sabes diferenciar a genialidade cronológica da história da química.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR DADOS E REPETIR PARA 100%</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ CONTAMINAÇÃO LÓGICA NO NÚCLEO!</strong> Foste avaliado abaixo da meta (80%). Revisa urgente a cronologia atómica (Dalton > Thomson > Rutherford > Bohr) e entende quem descobriu o núcleo.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += '<h4 style="margin-bottom:15px; color:var(--text-color); font-size:1.15rem;">Revisão de Diagnóstico de Falhas:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Deixaste em branco" : question.options[userAnswerIndex];
+                    const correctAnswerText = question.options[question.correctIndex];
+
+                    summaryHTML += `
+                        <div class="error-log-item">
+                            <strong style="color:var(--theme-dark); font-size:1.05rem; display:block; margin-bottom:8px;">Q${index + 1}: ${question.text}</strong>
+                            <span style="color:var(--wrong-border); font-weight: 600; display:block; margin-bottom:5px;">O teu desvio: ${userAnswerText}</span>
+                            <span style="color:var(--correct-border); font-weight: 700; display:block;">O Fato Científico: ${correctAnswerText}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+    
+    // START APPLICATION
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>
